@@ -11,10 +11,8 @@ from bs4 import BeautifulSoup, NavigableString
 from datetime import datetime, timedelta
 import argparse
 import logging
-import os
 import re
 import requests
-import shutil
 import sys
 
 
@@ -60,14 +58,16 @@ def download_wikipedia_news(date, logger):
             return None
 
         # Extract markdown text
-        markdown_text = f"# {date.strftime('%Y_%B_%#d')}\n\n" + convert_to_markdown(
-            content, logger
-        )
+        front_matter = "layout: post\n"
+        front_matter += "title: " + date.strftime("%Y %B %d") + "\n"
+        front_matter += f"date: {date.strftime('%Y-%m-%d %H:%M:%S')} -0000\n\n"
+        front_matter += f"# {date.strftime('%Y %B %d')}\n\n"
+        markdown_text = convert_to_markdown(content, logger)
         logger.debug(
             f"Markdown text generated. Length: {len(markdown_text)} characters"
         )
 
-        return markdown_text
+        return (front_matter + markdown_text) if markdown_text else None
 
     except requests.RequestException as e:
         logger.error(f"Could not download news for {date}: {e}")
@@ -108,8 +108,9 @@ def process_li(li, depth, markdown_lines, logger):
         process_ul(sub_ul, depth + 1, markdown_lines, logger)
     else:
         content = get_content_li(li, markdown_lines, logger)
-        logger.debug(f"Found content: {content}")
-        markdown_lines.append("- " + content + "\n\n")
+        if content:
+            logger.debug(f"Found content: {content}")
+            markdown_lines.append("- " + content + "\n\n")
 
 
 def get_content_li(li, markdown_lines, logger):
@@ -179,11 +180,9 @@ def main():
     logger = setup_logging(args.verbose)
 
     # Dates to download
-    dates = [
-        # datetime.now().date(),
-        datetime.now().date() - timedelta(days=1),
-        # datetime.now().date() - timedelta(days=2),
-    ]
+    dates = [datetime.now()]
+    for i in range(1, 7):
+        dates.append(datetime.now() - timedelta(days=i))
 
     logger.info("Starting Wikipedia News Download")
 
