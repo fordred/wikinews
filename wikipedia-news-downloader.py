@@ -115,20 +115,39 @@ def process_li(li, depth, markdown_lines, logger):
 def get_content_li(li, markdown_lines, logger):
     # Handle bullet point
     text_parts = []
+    citations = []
+
     for content in li.contents:
         logger.debug(f"Processing content: {content}")
         if isinstance(content, NavigableString):
-            logger.debug(f"Found navigable string: {content}")
-            text_parts.append(content)
+            stripped = content.strip()
+            if stripped:
+                logger.debug(f"Found text: {stripped}")
+                text_parts.append(stripped)
         elif content.name == "a":
-            logger.debug(f"Found link: {content}")
-            text_parts.append(content.get_text())
-        # Ignore any other elements like nested ul which should be processed separately
-    text = " ".join(text_parts).strip()
-    # Clean up multiple spaces
-    text = " ".join(text.split())
-    # Clean up space before punctuation
-    text = re.sub(r"\s+([,.])", r"\1", text)
+            if "external" in content.get("class", []):
+                # Process citation link
+                logger.debug(f"Found external link: {content}")
+                citation_text = content.get_text().strip(" ()")
+                url = content["href"]
+                citations.append(f"[{citation_text}]({url})")
+            else:
+                # Regular inline link
+                logger.debug(f"Found internal link: {content}")
+                text_parts.append(content.get_text().strip())
+        else:
+            logger.debug(f"Skipping unknown content: {content}")
+
+    # Clean up main text
+    text = " ".join(text_parts)
+    text = re.sub(r"\s+([,.])", r"\1", text)  # Fix punctuation spacing
+    text = re.sub(r"\s{2,}", " ", text)  # Remove extra spaces
+
+    # Add citations if any
+    if citations:
+        logger.debug(f"Adding citations: {citations}")
+        text += " " + " ".join(citations)
+
     return text
 
 

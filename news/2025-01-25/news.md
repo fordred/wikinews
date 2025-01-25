@@ -6,21 +6,23 @@
 
 #### Israel–Hamas war hostage crisis
 
-- Hamas frees four Israeli hostages including Naama Levy in exchange for 200 Palestinian prisoners including 121 people serving life sentences after being convicted of deadly attacks against Israelis. The exchange is part of the ceasefire deal. (AP)
+- Hamas frees four Israeli hostages including Naama Levy in exchange for 200 Palestinian prisoners including 121 people serving life sentences after being convicted of deadly attacks against Israelis. The exchange is part of the ceasefire deal. [AP](https://apnews.com/article/israel-palestinians-hamas-war-news-ceasefire-hostages-01-25-2025-150674e17bd8b22f2c2c3aa4991cf061)
 
 ### Kivu conflict
 
-- Six peacekeepers, three from South Africa and three from Malawi, are killed as fighting intensifies in the Democratic Republic of the Congo between government forces and M23 rebels. (24news)
+- Six peacekeepers, three from South Africa and three from Malawi, are killed as fighting intensifies in the Democratic Republic of the Congo between government forces and M23 rebels. [24news](https://24newshd.tv/25-Jan-2025/six-peacekeepers-killed-as-fighting-rages-in-drc)
 
 ### Sudanese civil war
 
-- 30 people are killed in a drone attack on the Saudi Hospital one of the last functioning hospitals in El-Fasher,Sudan. (Al Arabiya)
+- 30 people are killed in a drone attack on the Saudi Hospital one of the last functioning hospitals in El-Fasher,Sudan. [Al Arabiya](https://english.alarabiya.net/News/middle-east/2025/01/25/drone-attack-on-saudi-hospital-in-sudan-s-darfur-kills-30-injures-dozens-report)
 
 ## Law and crime
 
-- A heist at the Drents Museum in Assen, Netherlands, results in the loss of valuable Dacian gold and silver artifacts, including the Helmet of Coțofenești. (Dutch News) (Romania Insider)
+- A heist at the Drents Museum in Assen, Netherlands, results in the loss of valuable Dacian gold and silver artifacts, including the Helmet of Coțofenești. [Dutch News](https://www.dutchnews.nl/2025/01/interpol-drafted-in-to-help-in-dacia-gold-heist-investigation/) [Romania Insider](https://www.romania-insider.com/romanian-dacian-treasure-robbery-dutch-museum-january-2025)
 
-- A Pakistani court sentences four people to death for blasphemy, allegedly because they posted sacrilegious material on social media about Islamic religious figures and the Quran. (Al Arabiya)
+### Islam and blasphemy
+
+- A Pakistani court sentences four people to death for blasphemy, allegedly because they posted sacrilegious material on social media about Islamic religious figures and the Quran. [Al Arabiya](https://english.alarabiya.net/News/world/2025/01/25/pakistan-court-sentences-4-people-to-death-for-blasphemy)
 
 ## Sports
 
@@ -28,4 +30,4 @@
 
 #### 2025 Australian Open
 
-- In tennis, Madison Keys wins her first major title after defeating the two-time defending champion Aryna Sabalenka, 6–3, 2–6, 7–5, to win the women's singles title at the Australian Open. (CNN)
+- In tennis, Madison Keys wins her first major title after defeating the two-time defending champion Aryna Sabalenka, 6–3, 2–6, 7–5, to win the women's singles title at the Australian Open. [CNN](https://edition.cnn.com/2025/01/25/sport/australian-open-womens-final-sabalenka-keys-spt-intl/index.html)
