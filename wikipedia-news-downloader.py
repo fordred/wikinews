@@ -155,22 +155,13 @@ def save_news(date, markdown_text, logger):
     """
     Save markdown to specified directory.
     """
-    # Create date-specific folder
-    folder_path = f"./news/{date.strftime('%Y-%m-%d')}"
-
     logger.info(f"Preparing to save news for {date}")
 
-    # Remove existing folder if it exists
-    if os.path.exists(folder_path):
-        logger.debug(f"Removing existing folder: {folder_path}")
-        shutil.rmtree(folder_path)
-
-    # Create new folder
-    os.makedirs(folder_path, exist_ok=True)
-    logger.debug(f"Created folder: {folder_path}")
+    # Create date-specific folder
+    folder_path = f"./_posts/"
 
     # Save markdown
-    markdown_path = f"{folder_path}/news.md"
+    markdown_path = f"{folder_path}/{date.strftime('%Y-%m-%d')}.md"
     with open(markdown_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(markdown_text)
     logger.info(f"Saved markdown to: {markdown_path}")
