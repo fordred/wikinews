@@ -2,6 +2,7 @@
 # requires-python = "==3.13"
 # dependencies = [
 #     "beautifulsoup4==4.12.3",
+#     "pytz",
 #     "requests==2.32.3",
 #     "ruff==0.8.1",
 # ]
@@ -11,6 +12,7 @@ from bs4 import BeautifulSoup, NavigableString
 from datetime import datetime, timedelta
 import argparse
 import logging
+import pytz
 import re
 import requests
 import sys
@@ -60,7 +62,7 @@ def download_wikipedia_news(date, logger):
         # Extract markdown text
         front_matter = "layout: post\n"
         front_matter += "title: " + date.strftime("%Y %B %d") + "\n"
-        front_matter += f"date: {date.strftime('%Y-%m-%d %H:%M:%S')} -0000\n\n"
+        front_matter += f"date: {date.strftime('%Y-%m-%d %H:%M:%S %z')}\n\n"
         front_matter += f"# {date.strftime('%Y %B %d')}\n\n"
         markdown_text = convert_to_markdown(content, logger)
         logger.debug(
@@ -180,9 +182,11 @@ def main():
     logger = setup_logging(args.verbose)
 
     # Dates to download
-    dates = [datetime.now()]
+    nz_timezone = pytz.timezone("Pacific/Auckland")
+    nz_time_now = datetime.now(nz_timezone)
+    dates = [nz_time_now]
     for i in range(1, 7):
-        dates.append(datetime.now() - timedelta(days=i))
+        dates.append(nz_time_now - timedelta(days=i))
 
     logger.info("Starting Wikipedia News Download")
 
