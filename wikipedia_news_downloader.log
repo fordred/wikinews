@@ -1,0 +1,22 @@
+2025-01-25 23:08:04,431 - INFO: Starting Wikipedia News Download
+2025-01-25 23:08:04,432 - INFO: Attempting to download news for 2025-01-26 12:08:04.431899+13:00
+2025-01-25 23:08:05,106 - WARNING: No content available for 2025-01-26 12:08:04.431899+13:00
+2025-01-25 23:08:05,106 - INFO: Attempting to download news for 2025-01-25 12:08:04.431899+13:00
+2025-01-25 23:08:05,296 - INFO: Preparing to save news for 2025-01-25 12:08:04.431899+13:00
+2025-01-25 23:08:05,297 - INFO: Saved markdown to: ./docs//2025-01-25.md
+2025-01-25 23:08:05,297 - INFO: Attempting to download news for 2025-01-24 12:08:04.431899+13:00
+2025-01-25 23:08:05,384 - INFO: Preparing to save news for 2025-01-24 12:08:04.431899+13:00
+2025-01-25 23:08:05,385 - INFO: Saved markdown to: ./docs//2025-01-24.md
+2025-01-25 23:08:05,385 - INFO: Attempting to download news for 2025-01-23 12:08:04.431899+13:00
+2025-01-25 23:08:05,464 - INFO: Preparing to save news for 2025-01-23 12:08:04.431899+13:00
+2025-01-25 23:08:05,464 - INFO: Saved markdown to: ./docs//2025-01-23.md
+2025-01-25 23:08:05,464 - INFO: Attempting to download news for 2025-01-22 12:08:04.431899+13:00
+2025-01-25 23:08:05,547 - INFO: Preparing to save news for 2025-01-22 12:08:04.431899+13:00
+2025-01-25 23:08:05,547 - INFO: Saved markdown to: ./docs//2025-01-22.md
+2025-01-25 23:08:05,547 - INFO: Attempting to download news for 2025-01-21 12:08:04.431899+13:00
+2025-01-25 23:08:05,676 - INFO: Preparing to save news for 2025-01-21 12:08:04.431899+13:00
+2025-01-25 23:08:05,676 - INFO: Saved markdown to: ./docs//2025-01-21.md
+2025-01-25 23:08:05,676 - INFO: Attempting to download news for 2025-01-20 12:08:04.431899+13:00
+2025-01-25 23:08:05,806 - INFO: Preparing to save news for 2025-01-20 12:08:04.431899+13:00
+2025-01-25 23:08:05,807 - INFO: Saved markdown to: ./docs//2025-01-20.md
+2025-01-25 23:08:05,807 - INFO: Wikipedia News Download Complete
