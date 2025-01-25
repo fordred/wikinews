@@ -6,13 +6,15 @@
 #     "ruff==0.8.1",
 # ]
 # ///
-import os
-import requests
+
 from bs4 import BeautifulSoup, NavigableString
 from datetime import datetime, timedelta
-import shutil
-import logging
 import argparse
+import logging
+import os
+import re
+import requests
+import shutil
 import sys
 
 
@@ -105,21 +107,26 @@ def process_li(li, depth, markdown_lines, logger):
     else:
         content = get_content_li(li, markdown_lines, logger)
         logger.debug(f"Found content: {content}")
-        markdown_lines.append(content + "\n\n")
+        markdown_lines.append("- " + content + "\n\n")
 
 
 def get_content_li(li, markdown_lines, logger):
     # Handle bullet point
     text_parts = []
     for content in li.contents:
+        logger.debug(f"Processing content: {content}")
         if isinstance(content, NavigableString):
-            text_parts.append(content.strip())
+            logger.debug(f"Found navigable string: {content}")
+            text_parts.append(content)
         elif content.name == "a":
-            text_parts.append(content.get_text().strip())
+            logger.debug(f"Found link: {content}")
+            text_parts.append(content.get_text())
         # Ignore any other elements like nested ul which should be processed separately
     text = " ".join(text_parts).strip()
     # Clean up multiple spaces
     text = " ".join(text.split())
+    # Clean up space before punctuation
+    text = re.sub(r"\s+([,.])", r"\1", text)
     return text
 
 
