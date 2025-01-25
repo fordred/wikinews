@@ -8,7 +8,7 @@
 # ///
 import os
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
 from datetime import datetime, timedelta
 import shutil
 import logging
@@ -51,7 +51,7 @@ def download_wikipedia_news(date, logger):
         soup = BeautifulSoup(response.text, "html.parser")
 
         # Extract main content
-        content = soup.find("div", {"id": "mw-content-text"})
+        content = soup.find("div", class_="current-events-content")
 
         if not content:
             logger.warning(f"No content found for {date}")
@@ -71,49 +71,56 @@ def download_wikipedia_news(date, logger):
 
 
 def convert_to_markdown(content, logger):
-    """
-    Convert HTML content to markdown, focusing on the description content.
-    """
-    # Find the div with the specific class
-    logger.info("Converting HTML to markdown")
-    description_div = content.find("div", class_="current-events-content description")
+    markdown_lines = []
 
-    if not description_div:
-        logger.error(f"Could not find any text")
-        return ""
-
-    # Remove edit section links and other unwanted elements
-    for tag in description_div.find_all(
-        ["sup", "span", "div"], class_=["mw-editsection"]
-    ):
-        logger.debug(f"Removing tag: {tag}")
-        tag.decompose()
-
-    markdown = []
-
-    # Process bold headers
-    for bold_header in description_div.find_all("b"):
-        logger.debug(f"Processing bold header: {bold_header.get_text().strip()}")
-        markdown.append(f"## {bold_header.get_text().strip()}")
-
-    # Process lists and paragraphs
-    for element in description_div.find_all(["p", "ul"]):
-        logger.debug(f"Processing element: {element.name}")
-        if element.name == "p":
-            markdown.append(element.get_text().strip())
+    for element in content.children:
+        if element.name == "p" and element.b:
+            section_title = element.b.get_text().strip()
+            logger.debug(f"Found section: {section_title}")
+            markdown_lines.append(f"## {section_title}\n\n")
         elif element.name == "ul":
-            for li in element.find_all("li", recursive=False):
-                # Handle nested lists
-                if li.find("ul"):
-                    # First, add the main list item
-                    markdown.append(f"- {li.contents[0].strip()}")
-                    # Then add nested list items
-                    for nested_li in li.find("ul").find_all("li"):
-                        markdown.append(f"  - {nested_li.get_text().strip()}")
-                else:
-                    markdown.append(f"- {li.get_text().strip()}")
+            process_ul(
+                element, 3, markdown_lines, logger
+            )  # Start with ### for the first ul after ##
 
-    return "\n\n".join(markdown)
+    return "".join(markdown_lines).strip()
+
+
+def process_ul(ul, depth, markdown_lines, logger):
+    logger.debug(f"Processing ul at depth {depth}")
+    for li in ul.find_all("li", recursive=False):
+        process_li(li, depth, markdown_lines, logger)
+
+
+def process_li(li, depth, markdown_lines, logger):
+    logger.debug(f"Processing li at depth {depth}")
+    # Handle section header
+    sub_ul = li.find("ul", recursive=False)
+    if sub_ul:
+        logger.debug(f"Found sub ul at depth {depth}")
+        section_title = get_content_li(li, markdown_lines, logger)
+        logger.debug(f"Found section link: {section_title}")
+        markdown_lines.append("#" * depth + " " + section_title + "\n\n")
+        process_ul(sub_ul, depth + 1, markdown_lines, logger)
+    else:
+        content = get_content_li(li, markdown_lines, logger)
+        logger.debug(f"Found content: {content}")
+        markdown_lines.append(content + "\n\n")
+
+
+def get_content_li(li, markdown_lines, logger):
+    # Handle bullet point
+    text_parts = []
+    for content in li.contents:
+        if isinstance(content, NavigableString):
+            text_parts.append(content.strip())
+        elif content.name == "a":
+            text_parts.append(content.get_text().strip())
+        # Ignore any other elements like nested ul which should be processed separately
+    text = " ".join(text_parts).strip()
+    # Clean up multiple spaces
+    text = " ".join(text.split())
+    return text
 
 
 def save_news(date, markdown_text, logger):
