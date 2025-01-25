@@ -60,7 +60,9 @@ def download_wikipedia_news(date, logger):
             return None
 
         # Extract markdown text
-        markdown_text = convert_to_markdown(content, logger)
+        markdown_text = f"# {date.strftime('%Y_%B_%#d')}\n\n" + convert_to_markdown(
+            content, logger
+        )
         logger.debug(
             f"Markdown text generated. Length: {len(markdown_text)} characters"
         )
@@ -150,7 +152,7 @@ def save_news(date, markdown_text, logger):
 
     # Save markdown
     markdown_path = f"{folder_path}/news.md"
-    with open(markdown_path, "w", encoding="utf-8") as f:
+    with open(markdown_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(markdown_text)
     logger.info(f"Saved markdown to: {markdown_path}")
 
