@@ -1,0 +1,30 @@
+name: Download Wikipedia News
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Run every hour
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  download-news:
+    runs-on: ubuntu-latest
+
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the added or changed files to the repository.
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        version: "0.5.24"
+        uv-file: "uv.toml"
+        enable-cache: true
+
+
+    - name: Download Wikipedia News
+      run: uv run wikipedia_news_downloader.py
+
+    - uses: stefanzweifel/git-auto-commit-action@v5
