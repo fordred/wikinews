@@ -161,7 +161,7 @@ def save_news(date, markdown_text, logger):
     logger.info(f"Preparing to save news for {date}")
 
     # Create date-specific folder
-    folder_path = f"./_posts/"
+    folder_path = f"./docs/"
 
     # Save markdown
     markdown_path = f"{folder_path}/{date.strftime('%Y-%m-%d')}.md"
