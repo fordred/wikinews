@@ -164,7 +164,7 @@ def save_news(date, markdown_text, logger):
     logger.info(f"Preparing to save news for {date}")
 
     # Create date-specific folder
-    folder_path = f"./docs/_posts/{date.strftime('%Y/%m/%d/')}"
+    folder_path = "./docs/_posts/"
 
     # Create new folder
     os.makedirs(folder_path, exist_ok=True)
@@ -172,7 +172,7 @@ def save_news(date, markdown_text, logger):
 
 
     # Save markdown
-    markdown_path = f"{folder_path}/index.md"
+    markdown_path = folder_path + date.strftime('%Y-%m-%d') + "-index.md"
     with open(markdown_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(markdown_text)
     logger.info(f"Saved markdown to: {markdown_path}")
@@ -193,7 +193,7 @@ def main():
     nz_timezone = pytz.timezone("Pacific/Auckland")
     nz_time_now = datetime.now(nz_timezone)
     dates = [nz_time_now]
-    for i in range(1, 31):
+    for i in range(1, 7):
         dates.append(nz_time_now - timedelta(days=i))
 
     logger.info("Starting Wikipedia News Download")
