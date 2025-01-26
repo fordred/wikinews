@@ -1,0 +1,49 @@
+---
+layout: post
+title: 2025 January 23
+date: 2025-01-23 07:01:51 +1300
+---
+
+# 2025 January 23
+
+## Disasters and accidents
+
+- Four people are killed and five more injured in a stampede at Cambodian businessman Sok Kong 's home in Phnom Penh. Kong was giving away food and money amid Lunar New Year celebrations. [AP](https://apnews.com/article/cambodia-crowd-crush-killed-sok-kong-facdf0652f008fa1695283aae9f49078)
+
+## Law and crime
+
+### 2024 Southport stabbing
+
+- A court in Liverpool, England, sentences the man who was found guilty of killing three children and injuring 10 others in a mass stabbing in Southport, Merseyside, to life imprisonment with a minimum of 52 years in prison. [DW](https://www.dw.com/en/uk-court-jails-southport-girls-murderer-to-52-years/a-71382959)
+
+### LGBTQ rights in Thailand
+
+- Thailand becomes the 38th country and the first in Southeast Asia to legalize same-sex marriage. [Reuters](https://www.reuters.com/world/asia-pacific/thailands-same-sex-marriage-law-2025-01-23/)
+
+- The International Criminal Court prosecutor requests arrest warrants against Afghanistan's Taliban supreme leader Hibatullah Akhundzada and Taliban chief justice Abdul Hakim Haqqani, accusing them of crimes against humanity. [Reuters](https://www.reuters.com/world/icc-prosecutor-seeks-arrest-warrants-against-taliban-leaders-2025-01-23/)
+
+- United States federal law enforcement and ICE agents arrest nearly 500 undocumented migrants with arrest warrants in sanctuary cities, including in New Jersey and New York. [CTV News](https://www.ctvnews.ca/world/article/ice-agents-arrest-hundreds-of-migrants-in-sanctuary-cities-including-new-york-city/)
+
+## Politics and elections
+
+### Second presidency of Donald Trump
+
+#### Executive actions by Donald Trump
+
+##### Declassification of Records Concerning the Assassinations of President John F. Kennedy, Senator Robert F. Kennedy, and the Reverend Dr. Martin Luther King, Jr.
+
+- U.S. President Donald Trump signs an executive order to declassify files related to the assassinations of John F. Kennedy, Robert F. Kennedy and Martin Luther King Jr. [Axios](https://www.axios.com/2025/01/23/trump-classified-files-jfk-mlk-assassinations-executive-order)
+
+- U.S. District Judge for Washington John C. Coughenour temporarily blocks President Trump's executive order attempting to end birthright citizenship, calling it "blatantly unconstitutional ". [Reuters](https://www.reuters.com/world/us/us-judge-hear-states-bid-block-trump-birthright-citizenship-order-2025-01-23/) [The New York Times](https://www.nytimes.com/2025/01/23/us/politics/judge-blocks-birthright-citizenship.html)
+
+- The U.S. Department of State bans consular posts from flying any flags other than the U.S. flag as part of the Trump administration targeting several instances during the Biden administration when LGBTQ pride and Black Lives Matter flags were flown at embassies abroad. [The Guardian](https://www.theguardian.com/us-news/2025/jan/23/trump-administration-bans-non-us-flags-from-being-flown-at-embassies)
+
+### 2024 Irish general election, Government of the 34th Dáil
+
+- Fianna Fáil and Fine Gael form a coalition government with the backing of several independent TDs. Fianna Fáil leader Micheál Martin is elected as Taoiseach, with Fine Gael leader Simon Harris as Tánaiste. [Politico](https://www.politico.eu/article/dublin-detente-micheal-martin-elected-prime-minister-after-opposition-showdown/)
+
+## Sports
+
+### 2025 Australian Open
+
+- In tennis, John Peers and Olivia Gadecki, both from Australia, defeats Kimberly Birrell and John-Patrick Smith 3-6, 6-4, 10-6, in the mixed doubles final to win their first Australian Open title. [The Guardian](https://www.theguardian.com/sport/2025/jan/24/local-heroes-olivia-gadecki-and-john-peers-clinch-australian-open-mixed-doubles-title)

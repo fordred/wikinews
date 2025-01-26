@@ -1,0 +1,97 @@
+---
+layout: post
+title: 2025 January 11
+date: 2025-01-11 07:01:51 +1300
+---
+
+# 2025 January 11
+
+## Armed conflicts and attacks
+
+### Israel–Hamas war
+
+#### Israel–United States relations, Calls for a ceasefire during the Israel–Hamas war
+
+- Incoming U.S. Middle East Envoy Steve Witkoff meets with Israeli Prime Minister Benjamin Netanyahu in an effort to secure a ceasefire deal in Gaza before President-elect Donald Trump 's inauguration on January 20. [Sky News](https://news.sky.com/story/donald-trumps-middle-east-envoy-pushes-for-gaza-ceasefire-deal-ahead-of-us-inauguration-13287325)
+
+- Netanyahu sends Mossad director David Barnea to ceasefire talks in Doha. [ABC News](https://abcnews.go.com/International/wireStory/israels-netanyahu-sends-mossad-director-gaza-ceasefire-talks-117581245)
+
+#### Israeli bombing of the Gaza Strip
+
+- An Israeli airstrike on a school sheltering displaced civilians in Jabalia, northern Gaza, kills at least eight Palestinians and leaves 30 others injured. [Middle East Monitor](https://www.middleeastmonitor.com/20250111-israeli-strike-on-school-in-northern-gaza-kills-8-displaced-palestinians/)
+
+### Russian invasion of Ukraine
+
+#### Eastern Ukraine campaign
+
+- The Russian Army says that it has gained control of the settlement of Shevchenko in Donetsk Oblast, Ukraine. [Anadolu Agency](https://www.aa.com.tr/en/russia-ukraine-war/russia-claims-to-have-taken-control-of-another-village-in-ukraine/3447499)
+
+#### Kursk offensive, North Korean involvement in the Russian invasion of Ukraine
+
+- Ukrainian President Volodymyr Zelenskyy announces that Ukraine has captured two North Korean soldiers in healthy condition in Kursk Oblast, Russia, for the first time since North Korea entered the war, as the two previous North Korean prisoners of war died of their injuries shortly following their capture. [Reuters](https://www.reuters.com/world/europe/ukraine-captures-two-north-korean-soldiers-kursk-zelenskiy-says-2025-01-11/)
+
+### Somali Civil War, War against the Islamic State
+
+#### Islamic State insurgency in Puntland
+
+- The Counterterrorism Forces of Puntland's disclosed a cave that was being used to store food by ISIL was captured by Puntland forces in Al-Miskad mountains, killed ISIL fighters and captured including foreigners and destroyed improvised explosive devices and hideouts, and downed three explosives-laden drones as the troops continued their offensive against ISIL militants hiding in the remote areas of the Bari region, Puntland. [Garowe Online](https://www.garoweonline.com/en/news/puntland/somalia-puntland-troops-make-gains-in-large-scale-offensive-against-isis) [The Somali Digest](https://thesomalidigest.com/puntland-advances-against-is-somalia-claims-fgs-is-compromised/) [VOA](https://www.voasomali.com/a/7933272.html)
+
+### Sudanese civil war
+
+#### Battle of Wad Madani
+
+- The Sudanese Armed Forces say that they liberated Wad Madani, the capital of Gezira State, Sudan, from the Rapid Support Forces. [Al Arabiya](https://english.alarabiya.net/News/middle-east/2025/01/11/sudan-government-spokesman-says-army-liberated-key-city-from-rsf-)
+
+### Myanmar civil war
+
+- At least fifteen civilians are killed and 10 others are wounded in a Tatmadaw airstrike on a market, targeting Kachin Independence Army fighters, in Tanai Township, Kachin State, Myanmar. [The Defense Post](https://thedefensepost.com/2025/01/12/myanmar-junta-air-strike-2/) [Daily Post](https://dailypost.ng/2025/01/12/myanmar-junta-air-strike-kills-15-civilians/)
+
+### Nigerian bandit conflict
+
+- Twenty-one government-backed fighters are killed during an ambush against a convoy in Baure, Katsina State, Nigeria. [Al Jazeera](https://www.aljazeera.com/news/2025/1/11/bandits-in-nigeria-ambush-and-kill-21-government-backed-fighters)
+
+## Disasters and accidents
+
+### 2025 California wildfires
+
+#### January 2025 Southern California wildfires
+
+- At least 939 CDCR inmates are deployed to fight the ongoing wildfires in Los Angeles County, California, United States. [BBC News](https://www.bbc.com/news/articles/c3rwdjwglx2o)
+
+- The number of deaths in the California wildfires rises to 16. [NBC](https://www.nbcnews.com/news/us-news/california-wildfires-victims-rcna186989)
+
+### 2024–25 South-West Indian Ocean cyclone season
+
+- France places the Indian Ocean island of Mayotte on red alert due to approaching Tropical Cyclone Dikeledi, roughly one month after the French overseas department was devastated by Cyclone Chido. [Reuters](https://www.reuters.com/world/europe/cyclone-battered-mayotte-be-put-red-alert-2025-01-11/)
+
+### Al-Bayda gas station explosion
+
+- At least 15 people are killed and 67 others are injured, including 40 critically, in an explosion at a gas station in Al Bayda Governorate, Yemen. [CTV News](https://www.ctvnews.ca/world/15-killed-in-an-explosion-and-fire-at-a-gas-station-in-central-yemen-1.7172825)
+
+- Six people are killed and eleven injured when a propane-butane cylinder explodes in a restaurant in Most, Czech Republic. [Reuters](https://www.reuters.com/world/europe/six-killed-explosion-czech-restaurant-2025-01-12/) [DW](https://www.dw.com/en/czech-restaurant-explosion-leaves-several-dead/a-71276478)
+
+- Two people are killed and eleven others are injured when a bus flips on its side on a highway near Prenzlau, northeast of Berlin, Germany. [CTV News](https://www.ctvnews.ca/world/a-bus-accident-on-a-highway-in-northeastern-germany-leaves-two-dead-1.7172611)
+
+- At least 50 people are injured when two trams collide in a tunnel in Strasbourg, France. [DW](https://www.dw.com/en/france-two-trams-collide-in-strasbourg/a-71274743)
+
+## International relations
+
+### Ethiopia–Somalia relations
+
+- Prime Minister of Ethiopia Abiy Ahmed and President of Somalia Hassan Sheikh Mohamud meet in Addis Ababa, Ethiopia, as part of a Turkey -brokered rapprochement to restore bilateral relations after a yearlong dispute due to the 2024 Ethiopia–Somaliland memorandum of understanding. [Bloomberg](https://www.bloomberg.com/news/articles/2025-01-11/ethiopia-somalia-leaders-meet-agree-to-restore-relations)
+
+### Lebanon–Syria relations
+
+- Prime Minister of Lebanon Najib Mikati and Syrian de facto leader Ahmed al-Sharaa hold a meeting in Damascus, Syria, the first time that the two countries have met since the Syrian civil war began in 2011. [24 Digital](https://24newshd.tv/11-Jan-2025/lebanon-pm-visits-damascus-on-first-such-trip-since-before-syria-war) [MTV](https://www.mtv.com.lb/en/News/Local/1538189/photos--the-meeting-between-mikati-and-sharaa-in-damascus-has-just-kicked-off)
+
+## Law and crime
+
+- A person throws a Molotov cocktail at the consulate of Venezuela in Lisbon, Portugal. No injuries are reported. [Euronews](https://www.euronews.com/2025/01/12/venezuelas-consulate-in-lisbon-targeted-with-explosive-device)
+
+## Politics and elections
+
+### 2024 South Korean martial law crisis
+
+- Thousands of people demonstrate in Seoul, South Korea, to protest against President Yoon Suk Yeol as he defies an arrest warrant from his attempt to institute martial law in December 2024. [Al Jazeera](https://www.aljazeera.com/news/2025/1/11/thousands-protest-in-south-korea-as-yoon-continues-to-resist-arrest) [TRT World](https://www.trtworld.com/asia/rival-protests-erupt-in-south-korea-as-arrest-looms-for-suspended-president-18252604)
+
+- At least 12,000 people gather in Riesa, Saxony, Germany, to protest an Alternative for Germany convention as well as the party's far-right views. [Al Jazeera](https://www.aljazeera.com/news/2025/1/11/german-protesters-attempt-to-block-far-right-afd-congress)

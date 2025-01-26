@@ -1,0 +1,87 @@
+---
+layout: post
+title: 2025 January 15
+date: 2025-01-15 07:01:51 +1300
+---
+
+# 2025 January 15
+
+## Armed conflicts and attacks
+
+### Allied Democratic Forces insurgency
+
+#### Kivu conflict
+
+- Allied Democratic Forces militants kill ten people in an attack on a village in North Kivu, Democratic Republic of the Congo. [AP](https://apnews.com/article/congo-islamic-rebel-attack-adf-kivu-makoko-faae44fe327d54ca619acd7c3fb30104)
+
+### Israel–Hamas war
+
+#### 2025 Israel–Hamas war ceasefire
+
+- Israel and Hamas reach a diplomatic agreement mediated by Egypt, Qatar, and the U.S. to initiate a ceasefire and an end to military operations in the Gaza Strip, as well as to facilitate the exchange of hostages and prisoners, marking the first major cessation of hostilities since November 2023. [CNN](https://www.cnn.com/world/live-news/israel-hamas-gaza-ceasefire-hostages-01-15-24/index.html)
+
+### Syrian civil war
+
+#### Israeli invasion of Syria
+
+- The Israeli Air Force strikes a Hay'at Tahrir al-Sham (HTS) vehicle convoy in Quneitra Governorate, Syria, killing two HTS personnel and the mayor of a local village. It is the first time that Israel has targeted HTS forces since the fall of the Assad regime. [Al Arabiya](https://english.alarabiya.net/News/middle-east/2025/01/15/first-israel-strike-on-new-syria-security-forces-kills-3-medical-source-monitor)
+
+### Russian invasion of Ukraine
+
+#### Russian strikes against Ukrainian infrastructure
+
+- Russia launches a major ballistic and cruise missile attack on regions across Ukraine, targeting energy production and compelling authorities to shut down the power grid. [AP](https://apnews.com/article/russia-ukraine-war-massive-attack-power-cuts-2dc7a30e36c9eca3e874476374c21eba)
+
+### Red Sea crisis
+
+- Yemen 's Houthi movement claims that it launched a missile attack targeting the USS Harry S. Truman aircraft carrier and accompanying warships of the United States Navy in the Red Sea. [Anadolu Agency](https://www.aa.com.tr/en/middle-east/yemen-s-houthis-claim-missile-drone-attack-on-us-aircraft-carrier-in-red-sea/3451441)
+
+## Disasters and accidents
+
+### 2025 Istanbul alcohol poisonings
+
+- Bootleg alcohol kills 37 people and leaves 80 others hospitalized over the last 48 hours in Istanbul, Turkey. Turkish health officials say many of those in hospital are in intensive care. [ABC News](https://abcnews.go.com/International/wireStory/bootleg-alcohol-claims-lives-30-people-istanbul-dozens-117746365)
+
+### Stilfontein mine deaths
+
+- Seventy-eight bodies of workers are retrieved from a closed illegal gold mine in Stilfontein, North West Province, South Africa following a months-long siege by police. Over 200 survivors are arrested as they exit the mine. [Reuters](https://www.reuters.com/world/africa/body-count-south-african-mine-rescue-operation-rises-60-2025-01-15/)
+
+## Health and environment
+
+- The U.S. Food and Drug Administration bans the usage of Red No. 3 artificial food coloring, due to research showing that the food coloring is carcinogenic. [NBC News](https://www.nbcnews.com/health/health-news/fda-bans-red-no-3-artificial-coloring-beverages-candy-rcna185479)
+
+## International relations
+
+### Poland–Russia relations
+
+- Polish Prime Minister Donald Tusk accuses Russian President Vladimir Putin and his country of plotting terror attacks on airliners around the world. [The Independent](https://www.independent.co.uk/news/world/europe/ukraine-russia-war-live-putin-storm-shadow-missiles-b2679782.html)
+
+## Law and crime
+
+### 2024 South Korean martial law crisis
+
+#### Arrest of Yoon Suk Yeol
+
+- Anti-corruption officials and police attempt to breach the residence of impeached South Korean president Yoon Suk Yeol for a second time in order to execute an arrest warrant, while facing resistance from the Presidential Security Service, People Power Party lawmakers, and pro-Yoon protesters. Following a five-hour standoff, Yoon is arrested, becoming South Korea 's first sitting president to be arrested. [Yonhap](https://www.yna.co.kr/view/AKR20250115005200004?rec_id=1736900123005&site=recommendation_view) [Yonhap 2](https://www.yna.co.kr/view/AKR20250115069851001) [AP](https://apnews.com/article/south-korea-yoon-martial-law-detain-8dd7f03661be39729741de9a3b5d1714)
+
+### 2024 drone sightings
+
+- The German government authorises the Bundeswehr to shoot down suspicious drones seen near military sites or other critical infrastructure with Interior Minister Nancy Faeser stating that Russia is suspected of being behind the drone activity. [BBC News](https://www.bbc.com/news/articles/ce3l2v01y4wo)
+
+## Politics and elections
+
+### 2024–2025 Georgian protests
+
+- A general strike takes place in Georgia with hundreds of Georgian firms urging the government to release all political prisoners and hold new elections amid nationwide protests. Former Prime Minister and opposition leader Giorgi Gakharia is hospitalized after being assaulted, allegedly by members of the ruling Georgian Dream party. [Civil Georgia](https://civil.ge/archives/652251) [BBC News](https://www.bbc.com/news/articles/cpql9v1r57vo)
+
+### 2024–2025 Mozambican protests
+
+- Daniel Chapo is sworn in as President of Mozambique, succeeding Filipe Nyusi. The inauguration takes place amid ongoing political unrest in Mozambique, with opposition leader Venâncio Mondlane continuing to insist that the October 2024 election was rigged. Since then, over 300 people have died in clashes with Police. [France 24](https://www.france24.com/en/africa/20250115-mozambique-inaugurates-president-elect-daniel-chapo-amid-deadly-unrest) [Reuters](https://www.reuters.com/world/africa/mozambique-president-sworn-post-election-protest-deaths-rise-2025-01-15/)
+
+- Rosen Zhelyazkov of the GERB–SDS coalition is tasked by Bulgarian President Rumen Radev with forming the new goverment, following the parliamentary election in October 2024. [Fakti.bg](https://fakti.bg/en/bulgaria/941822-prezidentat-vrachi-parvia-mandat-na-gerb-sds)
+
+## Science and technology
+
+### Exploration of the Moon, Commercial Lunar Payload Services
+
+- A SpaceX Falcon 9 rocket lifts off from the Kennedy Space Center in Florida, United States, carrying the American Blue Ghost M1 moon lander from Firefly Aerospace and the Japanese Hakuto-R Mission 2 moon lander from ispace. [BBC News](https://www.bbc.com/news/articles/cn8x5gm4k1xo)

@@ -1,0 +1,73 @@
+---
+layout: post
+title: 2025 January 14
+date: 2025-01-14 07:01:51 +1300
+---
+
+# 2025 January 14
+
+## Armed conflicts and attacks
+
+### Israel–Hamas war
+
+#### Israel–Hamas war hostage crisis, Calls for a ceasefire during the Israel–Hamas war
+
+- Hamas officials say that they have accepted a draft agreement for a potential ceasefire as well as the release of hostages. Mediators in the United States and Qatar also state that this is the closest that both sides have been to a ceasefire agreement so far. [AP](https://apnews.com/article/israel-palestinians-hamas-war-news-01-14-2025-a1495c0f4f13102903ce31a862c49baa)
+
+#### Israeli incursions in the West Bank
+
+- Four Al-Qassam Brigades militants and two civilians are killed during an Israeli airstrike in Jenin, in the occupied West Bank. [Al Jazeera](https://www.aljazeera.com/news/liveblog/2025/1/15/live-israel-launches-fierce-strikes-on-gaza-as-ceasefire-deal-moves-closer?update=3442835)
+
+### Russian invasion of Ukraine
+
+#### Attacks in Russia during the Russian invasion of Ukraine
+
+- Ukraine strikes targets in the Republic of Tatarstan and Bryansk, Saratov, and Tula oblasts, Russia, with more than 200 drones and five ATACMS ballistic missiles, hitting ammunition depots, industrial plants and a refinery, in what Ukraine says is its "most massive" and "deepest" attack inside Russia so far. [CNN](https://edition.cnn.com/2025/01/14/europe/ukraine-russia-drone-missile-attack-intl-hnk/index.html) [BBC News](https://www.bbc.com/news/articles/cwypg2z780go)
+
+### North Korean missile tests
+
+- North Korea launches multiple short-range ballistic missiles into the Sea of Japan. [Reuters](https://www.reuters.com/world/asia-pacific/north-korea-fires-missile-off-east-coast-says-south-korea-military-2025-01-14/)
+
+### Red Sea crisis
+
+- Yemen 's Houthi forces fire a missile at Israel, triggering sirens in several areas, including Tel Aviv and some Israeli settlements in the occupied West Bank. According to the Israeli military, the missile was "likely intercepted" with no injuries reported. [Xinhua](https://english.news.cn/20250114/7d596dc7d5e6418683867e53dbecb391/c.html)
+
+## Health and environment
+
+- The World Health Organization reports a suspected Marburg virus outbreak in Kagera, Tanzania, with nine cases and eight deaths. [Reuters](https://www.reuters.com/world/africa/suspected-outbreak-marburg-virus-kills-eight-tanzania-who-says-2025-01-15/)
+
+## International relations
+
+### 2024 Baltic Sea submarine cable disruptions, NATO operations
+
+- At the Summit of Baltic Sea Allies in Helsinki, Finland, NATO Secretary General Mark Rutte announces the establishment of the military mission, which will strengthen the protection of critical infrastructure in the region, such as energy and communication cables, from "destabilizing acts". [NATO News](https://www.nato.int/cps/cz/natohq/news_232122.htm?selectedLocale=en)
+
+### Armenia–United States relations
+
+- The Armenian Foreign Minister, Ararat Mirzoyan, and the U.S. Secretary of State, Antony Blinken, sign in Washington, DC a Strategic Partnership Charter between Armenia and the United States. [The Defense Post](https://thedefensepost.com/2025/01/14/armenia-signs-us-pact/)
+
+### Cuba–United States relations
+
+- U.S. President Joe Biden announces that the United States will remove Cuba from its state sponsors of terrorism list as part of a prisoner release deal. [BBC News](https://www.bbc.com/news/articles/c17e0k92g41o)
+
+## Law and crime
+
+### 2024 South Korean martial law crisis
+
+#### Arrest of Yoon Suk Yeol
+
+- A military unit assigned to guard the presidential residence of impeached South Korean President Yoon Suk Yeol approves the entry of anti-corruption officials and police, which is contested by the Presidential Security Service. [Yonhap](https://en.yna.co.kr/view/AEN20250114011453320?section=national/politics)
+
+- The Constitutional Court of South Korea adjourns the opening session of Yoon Suk Yeol's impeachment trial after Yoon failed to attend the session due to alleged safety concerns. [NBC News](https://www.nbcnews.com/news/world/impeachment-trial-south-koreas-yoon-adjourned-not-attend-rcna187549) [Xinhua](https://english.news.cn/20250112/45dfd6352df4438ea412380d3f2df56e/c.html)
+
+- Moldova detains former Kyrgyzstan presidential advisor Aidar Khalikov, who has accused Kyrgyz President Sadyr Japarov of corruption and election rigging. [OCCRP](https://www.occrp.org/en/news/moldova-detains-ex-kyrgyz-advisor-who-accused-president-japarov-of-graft)
+
+## Politics and elections
+
+- British Treasury Economic Secretary Tulip Siddiq resigns amid an anti-corruption investigation in Bangladesh involving her family. [BBC News](https://www.bbc.com/news/live/crmnjjm9j12t)
+
+- The new Government of Prime Minister Américo Ramos is sworn in São Tomé and Príncipe. [Xinhua](https://english.news.cn/20250115/62c12ba528404f3b923b3a6f6853de7f/c.html)
+
+## Science and technology
+
+- The government of Venezuela lifts its ban on the social media and instant messaging app Telegram. [TechRadar](https://www.techradar.com/vpn/vpn-privacy-security/venezuela-lifts-telegram-ban-but-the-internet-remains-restricted)

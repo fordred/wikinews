@@ -1,0 +1,65 @@
+---
+layout: post
+title: 2025 January 18
+date: 2025-01-18 07:01:51 +1300
+---
+
+# 2025 January 18
+
+## Armed conflicts and attacks
+
+### Russian invasion of Ukraine
+
+#### Kryvyi Rih strikes
+
+- Four people are killed and 14 others are injured in a Russian ballistic missile strike on Kryvyi Rih, Ukraine, according to the Governor of Dnipropetrovsk Oblast Serhiy Lysak. [Euronews](https://www.euronews.com/my-europe/2025/01/18/four-killed-in-russian-air-strike-on-kryvyi-rih-as-zelenskyy-bemoans-lack-of-air-defences)
+
+#### Russian strikes against Ukrainian infrastructure
+
+- At least four people are killed in Russian missile and drone attacks on Kyiv, Ukraine. [Al Jazeera](https://www.aljazeera.com/news/2025/1/18/russian-attacks-on-centre-of-kyiv-leave-four-dead)
+
+### Israeli–Palestinian conflict
+
+#### Israel–Hamas war
+
+- The Government of Israel approves the proposed Gaza ceasefire agreement, which had previously been approved by the Security Cabinet of Israel. [CNN](https://edition.cnn.com/2025/01/18/middleeast/israel-approves-ceasefire-hostage-deal-intl-hnk/index.html?iid=cnn_buildContentRecirc_end_recirc)
+
+- A Palestinian man from Tulkarm in the West Bank stabs and seriously injures a man in central Tel Aviv after illegally entering Israel. An armed civilian subsequently shoots and kills the perpetrator. [The Times of Israel](https://www.timesofisrael.com/man-seriously-hurt-in-tel-aviv-stabbing-palestinian-terrorist-shot-dead/)
+
+### 2025 assassination of Iranian Supreme Court judges
+
+- Two judges are killed and a third judge and a bodyguard are injured in a mass shooting at the Supreme Court of Iran in Tehran, Iran. The perpetrator subsequently kills himself. [DW](https://www.dw.com/en/iran-two-judges-shot-dead-outside-supreme-court-in-tehran/a-71335185)
+
+- Ghanian soldiers open fire on illegal miners at a gold mine in Ashanti Region, killing seven people. Ghanian president John Mahama calls for an investigation into the incident. [AP](https://apnews.com/article/ghana-illegal-gold-mining-soldiers-anglogold-ashanti-abd602d2574d19281550244dc8a622cd)
+
+## Disasters and accidents
+
+### 2025 Suleja fuel tanker explosion
+
+- At least 86 people are killed and several others are injured when a fuel tanker overturns on a highway in Suleja, Niger State, Nigeria, and later explodes when people gather to collect the spilled fuel. [Vanguard](https://www.vanguardngr.com/2025/01/death-toll-in-niger-petrol-tanker-explosion-now-70/) [The Straits Times](https://www.straitstimes.com/world/fuel-tanker-truck-blast-kills-at-least-60-in-nigeria)
+
+- Ten people are injured, including two seriously, when a chairlift collapses at the Astún ski resort in Aragon, Spain. [BBC News](https://www.bbc.com/news/articles/ckgydwvkv1do)
+
+## Health and environment
+
+### 2023–2024 mpox epidemic
+
+- Azerbaijan 's Ministry of Healthcare reports the country's first case of mpox in a 22-year-old patient who had recently travelled abroad. [Reuters](https://www.reuters.com/business/healthcare-pharmaceuticals/first-mpox-case-detected-azerbaijan-interfax-reports-2025-01-18/)
+
+## Law and crime
+
+### Internet censorship in the United States
+
+- Apple and Google remove apps by the Chinese company ByteDance, including TikTok, Lemon8, and CapCut, from their app stores in the United States to comply with the Protecting Americans from Foreign Adversary Controlled Applications Act. [Reuters](https://www.reuters.com/technology/tiktok-faces-us-ban-deadline-users-brace-fallout-2025-01-18/) [CNBC](https://www.cnbc.com/2025/01/18/apple-google-remove-tiktok-from-stores-as-app-halts-service-in-us.html)
+
+## Politics and elections
+
+### Israel–Hamas war protests
+
+#### Israel–Hamas war protests in the United Kingdom
+
+- More than 70 people are arrested at a pro-Palestine protest in London, England, United Kingdom for violating protest regulations. [BBC News](https://www.bbc.com/news/articles/cz0l34kpv51o)
+
+### Protests against Donald Trump
+
+- In Washington, D.C., the Women's March holds a protest rebranded as the People's March against U.S. President-elect Donald Trump ahead of his inauguration on Monday. Women's March protests are also held in several cities in the United Kingdom. [Reuters](https://www.reuters.com/world/us/thousands-gather-washington-protest-trump-inauguration-2025-01-18/) [WRC-TV](https://www.nbcwashington.com/news/local/live-coverage-crowds-expected-for-the-peoples-march-in-dc-saturday/3817450/) [BBC News](https://www.bbc.com/news/articles/cq8kyv7yxlgo)

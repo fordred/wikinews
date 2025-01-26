@@ -1,0 +1,79 @@
+---
+layout: post
+title: 2025 January 12
+date: 2025-01-12 07:01:51 +1300
+---
+
+# 2025 January 12
+
+## Armed conflicts and attacks
+
+### Israel–Hamas war
+
+#### Israel–Hamas war hostage crisis
+
+- A top-level Israeli security delegation arrives in Qatar for talks on a Gaza hostages and ceasefire deal. [Reuters](https://www.reuters.com/world/middle-east/top-israeli-security-delegation-doha-gaza-talks-2025-01-12/)
+
+#### Israel–United States relations, Calls for a ceasefire during the Israel–Hamas war
+
+- Israeli Prime Minister Benjamin Netanyahu and U.S. President Joe Biden discuss efforts to reach a deal to solve the hostage crisis as well as a ceasefire to end the war. [USA Today](https://www.usatoday.com/story/news/world/israel-hamas/2025/01/12/biden-netanyahu-israel-hamas-hostage-cease-fire/77655633007/)
+
+#### Israeli bombing of the Gaza Strip
+
+- At least eight Palestinians are killed in Israeli airstrikes on areas of the Gaza Strip. [Xinhua](https://english.news.cn/20250113/007ceff485b8479eb2a6bcb634f2f354/c.html)
+
+### Kivu conflict
+
+#### M23 offensive
+
+- The Army of the Democratic Republic of the Congo says that over the days it has recaptured several towns that fell to M23 rebels and other armed groups in North Kivu and South Kivu provinces. [AP](https://apnews.com/article/congo-rebels-northkivu-goma-44d802cead4adde2b9aea5515bb83172)
+
+### Nigerian bandit conflict
+
+- At least 40 people are killed during an attack by Boko Haram gunmen in Dumba, Borno State, Nigeria. [AP](https://apnews.com/article/nigeria-massacre-boho-haram-3579523f5f1b978ea7d32b4374c8e036)
+
+- At least 16 civilians are killed in an airstrike conducted by the Nigerian Air Force in Zamfara State, apparently after being mistaken for criminal gangs. [BBC News](https://www.bbc.com/news/articles/cn0y30766kjo)
+
+## Disasters and accidents
+
+### 2025 California wildfires
+
+#### January 2025 Southern California wildfires
+
+- California Governor Gavin Newsom states that the ongoing wildfires impacting Los Angeles County could become the worst natural disaster in American history "in terms of the scale and scope", amid current estimated damages of more than US$ 135 billion. [The Independent](https://www.independent.co.uk/news/world/americas/fires-los-angeles-california-palisades-map-victim-latest-updates-b2677814.html) [NBC News](https://www.nbcnews.com/meet-the-press/video/gov-newsom-says-l-a-wildfires-could-be-worst-natural-disaster-in-u-s-history-full-interview-229078085843)
+
+- The death toll from the wildfires increases to 24. [BBC News](https://www.bbc.com/news/articles/ckgy0pyvglpo)
+
+- Officials say that the Kenneth Fire has been contained. [KCAL-TV](https://www.cbsnews.com/losangeles/news/kenneth-fire-evacuations-in-west-hills-area/)
+
+- Ten people are killed and several others are injured after large floods engulf the city of Ipatinga in Minas Gerais, Brazil. [BBC](https://www.bbc.com/news/articles/cvglwd34l81o.amp)
+
+- Three people are killed and two others are injured in an avalanche in Trasquera, Province of Verbano-Cusio-Ossola, Italy. [Rai News](https://www.rainews.it/articoli/2025/01/valanga-travolge-scialpinisti-in-piemonte-3-morti-e-2-feriti-trasquera-verbano-cusio-ossola-0186dba0-f920-4286-95de-4f72db97dbd4.html)
+
+- At least 17 miners are trapped in a gold mine in La Libertad Department, Peru, after a group of illegal miners attacked the mine. [Xinhua](https://english.news.cn/20250114/c17952037b594df4bdc2e8f0b23c8099/c.html)
+
+## Health and environment
+
+### HMPV seasonal outbreak in China
+
+- The Bangladeshi IEDCR reports the country's first case of HMPV in Bhairab, Dhaka Division, Bangladesh. [New Age](https://www.newagebd.net/post/country/255169/iedcr-confirms-hmvp-case-in-bangladesh)
+
+## International relations
+
+### Germany–Syria relations
+
+- German Foreign Minister Annalena Baerbock pledges € 50 million in food, emergency shelters, and medical care to Syria following talks with the Syrian transitional government in Riyadh, Saudi Arabia. [DW](https://www.dw.com/en/germanys-baerbock-pledges-50m-for-syria-at-riyadh-talks/a-71276877)
+
+- Foreign ministers and senior officers of Arab countries, the European Union, Turkey, the United Kingdom, and the United States hold a series of diplomatic meetings focused on Syria in Riyadh, Saudi Arabia. [Saudi Gazette](https://saudigazette.com.sa/article/648521/SAUDI-ARABIA/Riyadh-hosts-key-international-talks-on-Syrias-future)
+
+## Politics and elections
+
+### 2024–25 Croatian presidential election
+
+- Croatians vote in the second round to elect the president between incumbent Zoran Milanović and former science and education minister Dragan Primorac. [The Dubrovnik Times](https://www.thedubrovniktimes.com/news/croatia/item/17378-croatia-votes-presidential-election-enters-decisive-second-round) [Sarajevo Times](https://sarajevotimes.com/croatia-set-to-elect-president-in-pivotal-second-round-of-elections-2/)
+
+### 2025 Comorian parliamentary election
+
+- Voters in Comoros elect the 33 members of the Assembly of the Union. [Reuters](https://www.reuters.com/world/africa/voters-comoros-head-polls-elect-33-seat-parliament-2025-01-12/)
+
+- Ilza Amado Vaz unexpectedly resigns as Prime Minister of São Tomé and Príncipe three days after being appointed Prime Minister by President Carlos Vila Nova. The ruling Independent Democratic Action party then proposes Adelino Pereira to replace Vaz, but Vila Nova appoints Américo d'Oliveira dos Ramos., [Xinhua 1](https://english.news.cn/20250113/2fd3f6c7f9e148fbb544e1e0c52e0a10/c.html) [Xinhua 2](https://english.news.cn/africa/20250113/bb2a5df8aecd44b58c904f3a522c43d3/c.html)
