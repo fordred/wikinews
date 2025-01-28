@@ -66,7 +66,7 @@ def download_wikipedia_news(date, logger):
         front_matter += "title: " + date.strftime("%Y %B %d") + "\n"
         front_matter += "date: " + date.strftime("%Y-%m-%d 00:00:00 +0000") + "\n"
         front_matter += "---\n\n"
-        front_matter += f"# {date.strftime('%Y %B %d')}\n\n"
+
         markdown_text = convert_to_markdown(content, logger)
         logger.debug(
             f"Markdown text generated. Length: {len(markdown_text)} characters"
