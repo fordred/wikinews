@@ -64,7 +64,7 @@ def download_wikipedia_news(date, logger):
         front_matter = "---\n"
         front_matter += "layout: post\n"
         front_matter += "title: " + date.strftime("%Y %B %d") + "\n"
-        front_matter += "date: " + date.strftime("%Y-%m-%d 00:00:00 +0000") + "\n"
+        front_matter += "date: " + date.strftime("%Y-%m-%d") + "\n"
         front_matter += "---\n\n"
 
         markdown_text = convert_to_markdown(content, logger)
@@ -170,9 +170,8 @@ def save_news(date, markdown_text, logger):
     os.makedirs(folder_path, exist_ok=True)
     logger.debug(f"Created folder: {folder_path}")
 
-
     # Save markdown
-    markdown_path = folder_path + date.strftime('%Y-%m-%d') + "-index.md"
+    markdown_path = folder_path + date.strftime("%Y-%m-%d") + "-index.md"
     with open(markdown_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(markdown_text)
     logger.info(f"Saved markdown to: {markdown_path}")
