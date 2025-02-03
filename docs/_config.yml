@@ -3,5 +3,6 @@ paginate: 7
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
+  - jekyll-sitemap
 
 permalink: /:short_year:month:day
