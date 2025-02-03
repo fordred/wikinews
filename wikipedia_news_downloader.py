@@ -1,23 +1,19 @@
 # /// script
 # requires-python = "==3.13"
 # dependencies = [
-#     "beautifulsoup4",
 #     "markitdown",
 #     "pytz",
-#     "requests",
 #     "ruff",
 # ]
 # ///
 
 import argparse
-from bs4 import BeautifulSoup, NavigableString
 from datetime import datetime, timedelta
 import logging
 from markitdown import MarkItDown
 import os
 import pytz
 import re
-import requests
 import sys
 
 
@@ -48,122 +44,40 @@ def download_wikipedia_news(date, logger):
     url = f"https://en.m.wikipedia.org/wiki/Portal:Current_events/{date.year}_{date:%B}_{date.day}"
     logger.debug(f"Prepare to page: {url}")
 
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        logger.debug(f"Successfully retrieved page: {url}")
+    # Extract markdown text
+    front_matter = "---\n"
+    front_matter += "layout: post\n"
+    front_matter += "title: " + date.strftime("%Y %B %d") + "\n"
+    front_matter += "date: " + date.strftime("%Y-%m-%d") + "\n"
+    front_matter += "---\n\n"
 
-        soup = BeautifulSoup(response.text, "html.parser")
+    markdown_text = use_markitdown(url, logger)
+    logger.debug(f"Markdown text generated. Length: {len(markdown_text)} characters")
 
-        # Extract main content
-        content = soup.find("div", class_="current-events-content")
+    return (front_matter + markdown_text) if markdown_text else None
 
-        if not content:
-            logger.warning(f"No content found for {date}")
-            return None
 
-        # Extract markdown text
-        front_matter = "---\n"
-        front_matter += "layout: post\n"
-        front_matter += "title: " + date.strftime("%Y %B %d") + "\n"
-        front_matter += "date: " + date.strftime("%Y-%m-%d") + "\n"
-        front_matter += "---\n\n"
-
-        markdown_text = convert_to_markdown(content, logger)
-        logger.debug(
-            f"Markdown text generated. Length: {len(markdown_text)} characters"
-        )
-
-        return (front_matter + markdown_text) if markdown_text else None
-
-    except requests.RequestException as e:
-        logger.error(f"Could not download news for {date}: {e}")
+def use_markitdown(url, logger):
+    logger.debug("MarkItDown: Converting soup to markdown")
+    md = MarkItDown()
+    result = md.convert(url)
+    if "page does not exist" in result.text_content:
         return None
 
+    # Remove text up to and including the line that begins with "[watch]"
+    my_text_content = re.sub(
+        r"^.*action=watch\)\n", "", result.text_content, flags=re.DOTALL
+    )
+    # Remove text starting at "[Month" until the end
+    my_text_content = re.sub(r"\[Month.*", "", my_text_content, flags=re.DOTALL)
+    my_text_content = re.sub(
+        r"\(/wiki/", r"(https://en.wikipedia.org/wiki/", my_text_content
+    )
 
-def convert_to_markdown(content, logger):
-    markdown_lines = []
+    logger.debug(f"MarkItDown result head: {my_text_content[:100]}")
+    logger.debug(f"MarkItDown result tail: {my_text_content[-100:]}")
 
-    for element in content.children:
-        if element.name == "p" and element.b:
-            section_title = element.b.get_text().strip()
-            logger.debug(f"Found section: {section_title}")
-            markdown_lines.append(f"## {section_title}\n\n")
-        elif element.name == "ul":
-            process_ul(
-                element, 3, markdown_lines, logger
-            )  # Start with ### for the first ul after ##
-
-    return "".join(markdown_lines).strip()
-
-
-def use_markitdown(response, logger):
-    md = MarkItDown()
-    result = md.convert(response)
-    logger.debug(f"MarkItDown:{result.title}")
-    return result.text_content
-
-
-def process_ul(ul, depth, markdown_lines, logger):
-    logger.debug(f"Processing ul at depth {depth}")
-    for li in ul.find_all("li", recursive=False):
-        process_li(li, depth, markdown_lines, logger)
-
-
-def process_li(li, depth, markdown_lines, logger):
-    logger.debug(f"Processing li at depth {depth}")
-    # Handle section header
-    sub_ul = li.find("ul", recursive=False)
-    if sub_ul:
-        logger.debug(f"Found sub ul at depth {depth}")
-        section_title = get_content_li(li, markdown_lines, logger)
-        logger.debug(f"Found section link: {section_title}")
-        markdown_lines.append("#" * depth + " " + section_title + "\n\n")
-        process_ul(sub_ul, depth + 1, markdown_lines, logger)
-    else:
-        content = get_content_li(li, markdown_lines, logger)
-        if content:
-            logger.debug(f"Found content: {content}")
-            markdown_lines.append("- " + content + "\n\n")
-
-
-def get_content_li(li, markdown_lines, logger):
-    # Handle bullet point
-    text_parts = []
-    citations = []
-
-    for content in li.contents:
-        logger.debug(f"Processing content: {content}")
-        if isinstance(content, NavigableString):
-            stripped = content.strip()
-            if stripped:
-                logger.debug(f"Found text: {stripped}")
-                text_parts.append(stripped)
-        elif content.name == "a":
-            if "external" in content.get("class", []):
-                # Process citation link
-                logger.debug(f"Found external link: {content}")
-                citation_text = content.get_text().strip(" ()")
-                url = content["href"]
-                citations.append(f"[{citation_text}]({url})")
-            else:
-                # Regular inline link
-                logger.debug(f"Found internal link: {content}")
-                text_parts.append(content.get_text().strip())
-        else:
-            logger.debug(f"Skipping unknown content: {content}")
-
-    # Clean up main text
-    text = " ".join(text_parts)
-    text = re.sub(r"\s+([,.])", r"\1", text)  # Fix punctuation spacing
-    text = re.sub(r"\s{2,}", " ", text)  # Remove extra spaces
-
-    # Add citations if any
-    if citations:
-        logger.debug(f"Adding citations: {citations}")
-        text += " " + " ".join(citations)
-
-    return text
+    return my_text_content
 
 
 def save_news(date, markdown_text, logger):
