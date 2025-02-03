@@ -1,17 +1,19 @@
 # /// script
 # requires-python = "==3.13"
 # dependencies = [
-#     "beautifulsoup4==4.12.3",
+#     "beautifulsoup4",
+#     "markitdown",
 #     "pytz",
-#     "requests==2.32.3",
-#     "ruff==0.8.1",
+#     "requests",
+#     "ruff",
 # ]
 # ///
 
+import argparse
 from bs4 import BeautifulSoup, NavigableString
 from datetime import datetime, timedelta
-import argparse
 import logging
+from markitdown import MarkItDown
 import os
 import pytz
 import re
@@ -93,6 +95,13 @@ def convert_to_markdown(content, logger):
             )  # Start with ### for the first ul after ##
 
     return "".join(markdown_lines).strip()
+
+
+def use_markitdown(response, logger):
+    md = MarkItDown()
+    result = md.convert(response)
+    logger.debug(f"MarkItDown:{result.title}")
+    return result.text_content
 
 
 def process_ul(ul, depth, markdown_lines, logger):
