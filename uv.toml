@@ -1,2 +1,2 @@
 python-preference = "only-managed"
-required-version = "latest"
+#required-version = "==0.5.24"
