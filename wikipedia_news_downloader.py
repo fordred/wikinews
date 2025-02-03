@@ -45,7 +45,7 @@ def download_wikipedia_news(date, logger):
     logger.info(f"Attempting to download news for {date}")
 
     # Wikipedia current events portal URL
-    url = f"https://en.m.wikipedia.org/wiki/Portal:Current_events/{date.strftime('%Y_%B_%#d')}"
+    url = f"https://en.m.wikipedia.org/wiki/Portal:Current_events/{date.year}_{date:%B}_{date.day}"
     logger.debug(f"Prepare to page: {url}")
 
     try:
