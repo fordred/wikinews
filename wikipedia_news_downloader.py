@@ -52,7 +52,6 @@ def download_wikipedia_news(date, logger):
     front_matter += "---\n\n"
 
     markdown_text = use_markitdown(url, logger)
-    logger.debug(f"Markdown text generated. Length: {len(markdown_text)} characters")
     if markdown_text is None:
         logger.warning(f"Markdown_text is None")
         return None
@@ -60,8 +59,9 @@ def download_wikipedia_news(date, logger):
         logger.warning(f"Markdown text length is less than 10. {len(markdown_text)=}")
         return None
     else:
+        logger.debug(f"Markdown text generated. Length: {len(markdown_text)} characters")
         logger.info(f"Downloaded news for {date}")
-        return (front_matter + markdown_text)
+        return str(front_matter + markdown_text)
 
 
 def use_markitdown(url, logger):
@@ -136,7 +136,7 @@ def main():
             else:
                 logger.warning(f"No content available for {date}")
         except Exception as e:
-            logger.error(f"Unexpected error processing {date}: {e}")
+            logger.error(f"Unexpected error processing {date=}: {e=}")
 
     logger.info("Wikipedia News Download Complete")
 
