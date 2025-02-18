@@ -53,8 +53,15 @@ def download_wikipedia_news(date, logger):
 
     markdown_text = use_markitdown(url, logger)
     logger.debug(f"Markdown text generated. Length: {len(markdown_text)} characters")
-
-    return (front_matter + markdown_text) if markdown_text else None
+    if markdown_text is None:
+        logger.warning(f"Markdown_text is None")
+        return None
+    elif len(markdown_text) < 10:
+        logger.warning(f"Markdown text length is less than 10. {len(markdown_text)=}")
+        return None
+    else:
+        logger.info(f"Downloaded news for {date}")
+        return (front_matter + markdown_text)
 
 
 def use_markitdown(url, logger):
@@ -70,6 +77,7 @@ def use_markitdown(url, logger):
     )
     # Remove text starting at "[Month" until the end
     my_text_content = re.sub(r"\[Month.*", "", my_text_content, flags=re.DOTALL)
+    # Replace relative links with absolute links
     my_text_content = re.sub(
         r"\(/wiki/", r"(https://en.wikipedia.org/wiki/", my_text_content
     )
