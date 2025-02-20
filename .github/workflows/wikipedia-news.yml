@@ -23,6 +23,10 @@ jobs:
         version: "latest"
         uv-file: "uv.toml"
         enable-cache: true
+        cache-dependency-glob: |
+          **/requirements*.txt
+          **/pyproject.toml
+          **/*.lock
 
     - name: Save date
       id: save-date
