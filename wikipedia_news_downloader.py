@@ -3,7 +3,6 @@
 # dependencies = [
 #     "markitdown",
 #     "pytz",
-#     "ruff",
 # ]
 # ///
 
