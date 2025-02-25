@@ -2,7 +2,7 @@
 # requires-python = "==3.13.*"
 # dependencies = [
 #     "markitdown",
-#     "markdownify<1.*",
+#     "markdownify<1.0",
 #     "pytz",
 # ]
 # ///
