@@ -4,6 +4,7 @@ requires-python = "==3.13.*"
 
 [manifest]
 requirements = [
+    { name = "markdownify", specifier = "<1.0" },
     { name = "markitdown" },
     { name = "pytz" },
 ]
@@ -377,15 +378,15 @@ wheels = [
 
 [[package]]
 name = "markdownify"
-version = "1.0.0"
+version = "0.14.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "six" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a6/ae/9d0b6df033867a9b0226354c32a0345c3c348629920a1ffb5c20cf5b71b6/markdownify-1.0.0.tar.gz", hash = "sha256:8e58d7bd7336cffe4168e5ceac22d78656b1121994bd65d1021cc1ac61a628d6", size = 16976 }
+sdist = { url = "https://files.pythonhosted.org/packages/1b/75/483a4bcca436fe88d02dc7686c372631d833848951b368700bdc0c770bb7/markdownify-0.14.1.tar.gz", hash = "sha256:a62a7a216947ed0b8dafb95b99b2ef4a0edd1e18d5653c656f68f03db2bfb2f1", size = 14332 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/59/28/0fab5123d809b33b7f2f39915060311e627c338a6930c2f0b997e064bcce/markdownify-1.0.0-py3-none-any.whl", hash = "sha256:4c665b19a421121a88fadd6b09285488822c3a948cc33cdc4d78b1307198ddc6", size = 13733 },
+    { url = "https://files.pythonhosted.org/packages/65/0b/74cec93a7b05edf4fc3ea1c899fe8a37f041d7b9d303c75abf7a162924e0/markdownify-0.14.1-py3-none-any.whl", hash = "sha256:4c46a6c0c12c6005ddcd49b45a5a890398b002ef51380cd319db62df5e09bc2a", size = 11530 },
 ]
 
 [[package]]
