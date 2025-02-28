@@ -58,17 +58,17 @@ def download_wikipedia_news(date, logger):
         logger.warning(f"Markdown text length is less than 10. {len(markdown_text)=}")
         return str(front_matter)
     else:
-        logger.debug(f"Markdown text generated. Length: {len(markdown_text)} characters")
+        logger.debug(
+            f"Markdown text generated. Length: {len(markdown_text)} characters"
+        )
         logger.info(f"Downloaded news for {date}")
         return str(front_matter + markdown_text)
 
 
 def use_markitdown(url, logger):
-    logger.debug("MarkItDown: Converting soup to markdown")
     md = MarkItDown()
     result = md.convert(url)
-    if "page does not exist" in result.text_content:
-        return None
+    logger.debug(f"MarkItDown result: {result.text_content}")
 
     # Remove text up to and including the line that begins with "[watch]"
     my_text_content = re.sub(
@@ -80,6 +80,9 @@ def use_markitdown(url, logger):
     my_text_content = re.sub(
         r"\(/wiki/", r"(https://en.wikipedia.org/wiki/", my_text_content
     )
+    # Remove trailing whitespace and newlines
+    my_text_content = my_text_content.rstrip()
+    my_text_content += "\n"
 
     logger.debug(f"MarkItDown result head: {my_text_content[:100]}")
     logger.debug(f"MarkItDown result tail: {my_text_content[-100:]}")
