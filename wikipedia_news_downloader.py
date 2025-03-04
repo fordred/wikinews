@@ -116,6 +116,12 @@ def main():
     parser.add_argument(
         "-v", "--verbose", action="store_true", help="Enable verbose logging"
     )
+    parser.add_argument(
+        "-a",
+        "--all",
+        action="store_true",
+        help="Download news from Jan 1, 2025, to today",
+    )
     args = parser.parse_args()
 
     # Setup logging
@@ -125,8 +131,17 @@ def main():
     nz_timezone = pytz.timezone("Pacific/Auckland")
     nz_time_now = datetime.now(nz_timezone)
     dates = [nz_time_now]
-    for i in range(1, 7):
-        dates.append(nz_time_now - timedelta(days=i))
+
+    if args.all:
+        logger.info("Downloading all news from Jan 1, 2025, to today")
+        start_date = datetime(2025, 1, 1, tzinfo=nz_timezone)
+        delta = nz_time_now - start_date
+        for i in range(delta.days + 1):
+            dates.append(start_date + timedelta(days=i))
+    else:
+        logger.info("Downloading news for the last 7 days")
+        for i in range(1, 7):
+            dates.append(nz_time_now - timedelta(days=i))
 
     logger.info("Starting Wikipedia News Download")
 
