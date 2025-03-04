@@ -1,8 +1,8 @@
-name: Download Wikipedia News Weekly
+name: Download Wikipedia News Daily
 
 on:
   schedule:
-    - cron: '0 0 * * 0'  # Run every Sunday at midnight
+    - cron: '5 7 * * *'  # Run every day at midnight
   workflow_dispatch:  # Allow manual triggering
 
 concurrency:
@@ -36,4 +36,4 @@ jobs:
 
     - uses: stefanzweifel/git-auto-commit-action@v5
       with:
-        commit_message: "Update Wikipedia News Weekly on ${{ steps.save-date.outputs.date }}"
+        commit_message: "Update Wikipedia News Daily on ${{ steps.save-date.outputs.date }}"
