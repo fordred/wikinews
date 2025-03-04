@@ -52,7 +52,7 @@ def download_wikipedia_news(date, logger):
 
     markdown_text = use_markitdown(url, logger)
     if markdown_text is None:
-        logger.warning(f"Markdown_text is None")
+        logger.warning("Markdown_text is None")
         return str(front_matter)
     elif len(markdown_text) < 10:
         logger.warning(f"Markdown text length is less than 10. {len(markdown_text)=}")
