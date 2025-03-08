@@ -390,7 +390,7 @@ wheels = [
 
 [[package]]
 name = "markitdown"
-version = "0.0.1"
+version = "0.0.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "azure-ai-documentintelligence" },
@@ -414,9 +414,9 @@ dependencies = [
     { name = "xlrd" },
     { name = "youtube-transcript-api" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/07/c6/21f17f3d8beffbf658fcab20331461733c88d254f49e714c384de1f21991/markitdown-0.0.1.tar.gz", hash = "sha256:54795c3ed3d28fa1d5b7103275b0fa784d992291b9f51963dd912b1eba75be40", size = 21597 }
+sdist = { url = "https://files.pythonhosted.org/packages/69/bf/8d5ee5ceef8dc175b4c8714e6f5170e3bc38862eeb6a45f29433c64611c1/markitdown-0.0.2.tar.gz", hash = "sha256:678fc2c9bc4eded0941c01155251982cab1f86c8148c8ac7ca3869116d3d49d7", size = 21008 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/49/44/bf36f276284a7c9e61877bcbdc545d57654f9d2a21254e91769806ad2e02/markitdown-0.0.1-py3-none-any.whl", hash = "sha256:22a62d8429146adcc2d809c2f02c6d96ef51b301143d663fada5de04444affd0", size = 21956 },
+    { url = "https://files.pythonhosted.org/packages/4a/f9/d0d6c6a11a16e2e22faf79bb4a86764110a8b391a510d6bd5cbb4ec57f59/markitdown-0.0.2-py3-none-any.whl", hash = "sha256:6ee5a6b70fbc36ba1586a40d5ab1ea8ea7f89bf37ebbaaa11013e026dc55b16e", size = 21278 },
 ]
 
 [[package]]
