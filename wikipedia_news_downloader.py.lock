@@ -148,7 +148,7 @@ wheels = [
 
 [[package]]
 name = "markitdown"
-version = "0.1.0"
+version = "0.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -157,9 +157,9 @@ dependencies = [
     { name = "markdownify" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1c/60/e816a0222a187dfe3bd922df98abd40325b545a254d58e8787e409bdb722/markitdown-0.1.0.tar.gz", hash = "sha256:b43dfdc6629fe2c6b7cf01f890f0350894916e73f6985d507a5225c0a3a39c9d", size = 30533 }
+sdist = { url = "https://files.pythonhosted.org/packages/cb/e8/83669ba97718bbbccd4c432b763d22783df4c8218e770717151acf01e85b/markitdown-0.1.1.tar.gz", hash = "sha256:da97a55a45a3d775ea758e88a344d5cac94ee97115fb0293f99027d32c2fc3f6", size = 31475 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4d/53/aa817a03ca32aff81fae1db80e48edb8e450042d4ef9f901f25fa16b9226/markitdown-0.1.0-py3-none-any.whl", hash = "sha256:8d01e538cd78c6a87318edf6129c9c5f1784d10d7800e75d5fa00b34907a24ef", size = 46951 },
+    { url = "https://files.pythonhosted.org/packages/0b/8a/c1f85ee609de5d45f80d0213bebf6664f76ab406e9d57709e684a4a436ba/markitdown-0.1.1-py3-none-any.whl", hash = "sha256:98ea8c009fe174b37ef933e00f4364214e8fed35691178b8521b13604d0c4a58", size = 48230 },
 ]
 
 [[package]]
