@@ -189,7 +189,13 @@ def main():
     for date in dates:
         try:
             markdown_text = download_wikipedia_news(date, logger)
-            save_news(date, markdown_text, logger)
+            # Only save if published: true (i.e., markdown_text is valid and not too short)
+            if markdown_text is not None and "published: true" in markdown_text:
+                save_news(date, markdown_text, logger)
+            else:
+                logger.warning(
+                    f"Skipping save for {date}: fetch/conversion failed or content too short."
+                )
         except Exception as e:
             logger.error(f"Unexpected error processing {date=}: {e=}")
 
