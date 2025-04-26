@@ -35,7 +35,7 @@ def setup_logging(verbose=False):
 def download_wikipedia_news(date, logger):
     """
     Download Wikipedia news for a specific date.
-    Returns page content.
+    Returns page content with Jekyll front matter.
     """
     logger.info(f"Attempting to download news for {date}")
 
@@ -43,26 +43,39 @@ def download_wikipedia_news(date, logger):
     url = f"https://en.m.wikipedia.org/wiki/Portal:Current_events/{date.year}_{date:%B}_{date.day}"
     logger.debug(f"Prepare to page: {url}")
 
-    # Extract markdown text
-    front_matter = "---\n"
-    front_matter += "layout: post\n"
-    front_matter += "title: " + date.strftime("%Y %B %d") + "\n"
-    front_matter += "date: " + date.strftime("%Y-%m-%d") + "\n"
-    front_matter += "---\n\n"
-
+    # Extract markdown text first
     markdown_text = use_markitdown(url, logger)
-    if markdown_text is None:
-        logger.warning("Markdown_text is None")
-        return str(front_matter)
-    elif len(markdown_text) < 10:
-        logger.warning(f"Markdown text length is less than 10. {len(markdown_text)=}")
-        return str(front_matter)
+
+    # Build front matter
+    front_matter_lines = [
+        "---",
+        "layout: post",
+        f"title: {date.strftime('%Y %B %d')}",
+        f"date: {date.strftime('%Y-%m-%d')}",
+    ]
+
+    # Determine published status based on markdown content
+    if markdown_text is None or len(markdown_text) < 10:
+        logger.warning(
+            f"Markdown text is None or too short ({len(markdown_text) if markdown_text else 'None'}). Setting published: false."
+        )
+        front_matter_lines.append("published: false")
+        content_body = ""  # No content if not published
     else:
         logger.debug(
-            f"Markdown text generated. Length: {len(markdown_text)} characters"
+            f"Markdown text generated. Length: {len(markdown_text)} characters. Setting published: true."
         )
+        front_matter_lines.append("published: true")
+        content_body = markdown_text
         logger.info(f"Downloaded news for {date}")
-        return str(front_matter + markdown_text)
+
+    front_matter_lines.append("---")
+    front_matter_lines.append("")  # Add a blank line after front matter
+
+    # Combine front matter and content
+    full_content = "\n".join(front_matter_lines) + content_body
+
+    return full_content
 
 
 def use_markitdown(url, logger):
