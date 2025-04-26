@@ -84,6 +84,7 @@ def use_markitdown(url, logger, max_retries=5):
     Convert a Wikipedia page to markdown using MarkItDown, with exponential backoff on HTTP 429.
     """
     md = MarkItDown()
+    base_wait = 10  # Start with 10 seconds
     for attempt in range(max_retries):
         try:
             result = md.convert(url)
@@ -96,7 +97,7 @@ def use_markitdown(url, logger, max_retries=5):
                 and getattr(e.response, "status_code", None) == 429
                 or "429" in str(e)
             ):
-                wait = 2**attempt
+                wait = base_wait * (2**attempt)
                 logger.warning(
                     f"HTTP 429 Too Many Requests for {url}. Waiting {wait}s before retrying (attempt {attempt + 1}/{max_retries})..."
                 )
