@@ -79,10 +79,36 @@ def download_wikipedia_news(date, logger):
     return full_content
 
 
-def use_markitdown(url, logger):
+def use_markitdown(url, logger, max_retries=5):
+    """
+    Convert a Wikipedia page to markdown using MarkItDown, with exponential backoff on HTTP 429.
+    """
     md = MarkItDown()
-    result = md.convert(url)
-    logger.debug(f"MarkItDown result: {result.text_content}")
+    for attempt in range(max_retries):
+        try:
+            result = md.convert(url)
+            logger.debug(f"MarkItDown result: {result.text_content}")
+            break
+        except Exception as e:
+            # Check for HTTP 429 in the exception message
+            if (
+                hasattr(e, "response")
+                and getattr(e.response, "status_code", None) == 429
+                or "429" in str(e)
+            ):
+                wait = 2**attempt
+                logger.warning(
+                    f"HTTP 429 Too Many Requests for {url}. Waiting {wait}s before retrying (attempt {attempt + 1}/{max_retries})..."
+                )
+                import time
+
+                time.sleep(wait)
+            else:
+                logger.error(f"Error fetching {url}: {e}")
+                raise
+    else:
+        logger.error(f"Exceeded max retries for {url}")
+        return None
 
     # Remove text up to and including the line that begins with "[watch]"
     my_text_content = re.sub(
