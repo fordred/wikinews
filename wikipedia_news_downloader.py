@@ -84,7 +84,7 @@ def use_markitdown(url, logger, max_retries=5):
     Convert a Wikipedia page to markdown using MarkItDown, with exponential backoff on HTTP 429.
     """
     md = MarkItDown()
-    base_wait = 10  # Start with 10 seconds
+    base_wait = 20  # Start with 20 seconds
     for attempt in range(max_retries):
         try:
             result = md.convert(url)
