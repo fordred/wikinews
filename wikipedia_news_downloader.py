@@ -71,6 +71,7 @@ def download_wikipedia_news(date, logger):
 
     front_matter_lines.append("---")
     front_matter_lines.append("")  # Add a blank line after front matter
+    front_matter_lines.append("")  # Add another blank line after front matter
 
     # Combine front matter and content
     full_content = "\n".join(front_matter_lines) + content_body
