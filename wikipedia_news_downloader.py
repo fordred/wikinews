@@ -12,6 +12,7 @@ from markitdown import MarkItDown
 import os
 import re
 import sys
+import concurrent.futures
 
 
 def setup_logging(verbose=False):
@@ -149,6 +150,23 @@ def save_news(date, markdown_text, logger):
     logger.info(f"Saved markdown to: {markdown_path}")
 
 
+def process_date(date, logger):
+    """
+    Download and save news for a single date.
+    """
+    try:
+        markdown_text = download_wikipedia_news(date, logger)
+        # Only save if published: true (i.e., markdown_text is valid and not too short)
+        if markdown_text is not None and "published: true" in markdown_text:
+            save_news(date, markdown_text, logger)
+        else:
+            logger.warning(
+                f"Skipping save for {date}: fetch/conversion failed or content too short."
+            )
+    except Exception as e:
+        logger.error(f"Unexpected error processing {date=}: {e=}")
+
+
 def main():
     # Set up argument parsing
     parser = argparse.ArgumentParser(description="Download Wikipedia News")
@@ -188,18 +206,14 @@ def main():
 
     logger.info("Starting Wikipedia News Download")
 
-    for date in dates:
-        try:
-            markdown_text = download_wikipedia_news(date, logger)
-            # Only save if published: true (i.e., markdown_text is valid and not too short)
-            if markdown_text is not None and "published: true" in markdown_text:
-                save_news(date, markdown_text, logger)
-            else:
-                logger.warning(
-                    f"Skipping save for {date}: fetch/conversion failed or content too short."
-                )
-        except Exception as e:
-            logger.error(f"Unexpected error processing {date=}: {e=}")
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = [executor.submit(process_date, date, logger) for date in dates]
+        # Optionally, wait for all to complete and raise exceptions if any
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                future.result()
+            except Exception as exc:
+                logger.error(f"Error in parallel execution: {exc}")
 
     logger.info("Wikipedia News Download Complete")
 
