@@ -198,10 +198,11 @@ def main():
 
     end_date = tomorrow + timedelta(days=1)  # inclusive of tomorrow
 
-    dates = []
+    # Use a set to avoid duplicates
+    dates = set()
     current_date = start_date
     while current_date < end_date:
-        dates.append(current_date)
+        dates.add(current_date)
         current_date += timedelta(days=1)
 
     logger.info("Starting Wikipedia News Download")
