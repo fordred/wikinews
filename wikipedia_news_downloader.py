@@ -138,13 +138,11 @@ def save_news(date, markdown_text, logger):
 
     # Create date-specific folder
     folder_path = "./docs/_posts/"
-
-    # Create new folder
     os.makedirs(folder_path, exist_ok=True)
     logger.debug(f"Created folder: {folder_path}")
 
     # Save markdown
-    markdown_path = folder_path + date.strftime("%Y-%m-%d") + "-index.md"
+    markdown_path = os.path.join(folder_path, date.strftime("%Y-%m-%d") + "-index.md")
     with open(markdown_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(markdown_text)
     logger.info(f"Saved markdown to: {markdown_path}")
@@ -205,7 +203,9 @@ def main():
         dates.add(current_date)
         current_date += timedelta(days=1)
 
-    logger.info("Starting Wikipedia News Download")
+    logger.info(
+        f"Starting download for {len(dates)} dates from {start_date} to {end_date}"
+    )
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = [executor.submit(process_date, date, logger) for date in dates]
