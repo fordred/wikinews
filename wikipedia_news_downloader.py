@@ -2,7 +2,6 @@
 # requires-python = "==3.13.*"
 # dependencies = [
 #     "markitdown",
-#     "pytz",
 # ]
 # ///
 
@@ -11,7 +10,6 @@ from datetime import datetime, timedelta
 import logging
 from markitdown import MarkItDown
 import os
-import pytz
 import re
 import sys
 
@@ -168,21 +166,25 @@ def main():
     # Setup logging
     logger = setup_logging(args.verbose)
 
-    # Dates to download
-    nz_timezone = pytz.timezone("Pacific/Auckland")
-    nz_time_now = datetime.now(nz_timezone)
-    dates = [nz_time_now]
+    # Dates to download (local time, no NZ-specific code)
+    now = datetime.now()
+    today = datetime(now.year, now.month, now.day)
+    tomorrow = today + timedelta(days=1)
 
     if args.all:
-        logger.info("Downloading all news from Jan 1, 2025, to today")
-        start_date = datetime(2025, 1, 1, tzinfo=nz_timezone)
-        delta = nz_time_now - start_date
-        for i in range(delta.days + 1):
-            dates.append(start_date + timedelta(days=i))
+        logger.info("Downloading all news from Jan 1, 2025, to tomorrow (inclusive)")
+        start_date = datetime(2025, 1, 1)
     else:
-        logger.info("Downloading news for the last 7 days")
-        for i in range(1, 7):
-            dates.append(nz_time_now - timedelta(days=i))
+        logger.info("Downloading news for the last 7 days up to tomorrow (inclusive)")
+        start_date = today - timedelta(days=7)
+
+    end_date = tomorrow + timedelta(days=1)  # inclusive of tomorrow
+
+    dates = []
+    current_date = start_date
+    while current_date < end_date:
+        dates.append(current_date)
+        current_date += timedelta(days=1)
 
     logger.info("Starting Wikipedia News Download")
 
