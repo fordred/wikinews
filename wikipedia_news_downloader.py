@@ -5,14 +5,28 @@
 # ]
 # ///
 
+from typing import Optional, Set
 import argparse
 from datetime import datetime, timedelta
 import logging
 from markitdown import MarkItDown
+import requests  # Import requests to catch its exceptions
 import os
 import re
 import sys
 import concurrent.futures
+import time  # Import time at the top level
+
+# --- Constants ---
+BASE_WIKIPEDIA_URL = "https://en.m.wikipedia.org/wiki/Portal:Current_events/"
+DEFAULT_OUTPUT_DIR = "./docs/_posts/"
+LOG_FILE = "wikipedia_news_downloader.log"
+RETRY_MAX_ATTEMPTS = 5
+RETRY_BASE_WAIT_SECONDS = 20  # Start wait time for retries
+MIN_MARKDOWN_LENGTH_PUBLISH = (
+    10  # Minimum length to consider content valid for publishing
+)
+# --- End Constants ---
 
 
 def setup_logging(verbose=False):
@@ -25,112 +39,77 @@ def setup_logging(verbose=False):
         format="%(asctime)s - %(levelname)s: %(message)s",
         handlers=[
             logging.StreamHandler(sys.stdout),
-            logging.FileHandler("wikipedia_news_downloader.log", mode="w"),
+            logging.FileHandler(LOG_FILE, mode="w"),
         ],
     )
     return logging.getLogger(__name__)
 
 
-def download_wikipedia_news(date, logger):
-    """
-    Download Wikipedia news for a specific date.
-    Returns page content with Jekyll front matter.
-    """
-    logger.info(f"Attempting to download news for {date}")
+def clean_wikipedia_markdown(raw_markdown: str, logger: logging.Logger) -> str:
+    """Cleans the raw markdown extracted from Wikipedia Current Events."""
+    # Remove text up to and including the line that begins with "[watch]"
+    cleaned_text = re.sub(r"^.*action=watch\)\n", "", raw_markdown, flags=re.DOTALL)
+    # Remove text starting at "[Month" until the end
+    cleaned_text = re.sub(r"\[Month.*", "", cleaned_text, flags=re.DOTALL)
+    # Replace relative links with absolute links
+    cleaned_text = re.sub(r"\(/wiki/", r"(https://en.wikipedia.org/wiki/", cleaned_text)
+    # Remove trailing whitespace and newlines, ensure single trailing newline
+    cleaned_text = cleaned_text.rstrip() + "\n"
 
-    # Wikipedia current events portal URL
-    url = f"https://en.m.wikipedia.org/wiki/Portal:Current_events/{date.year}_{date:%B}_{date.day}"
-    logger.debug(f"Prepare to page: {url}")
-
-    # Extract markdown text first
-    markdown_text = use_markitdown(url, logger)
-
-    # Build front matter
-    front_matter_lines = [
-        "---",
-        "layout: post",
-        f"title: {date.strftime('%Y %B %d')}",
-        f"date: {date.strftime('%Y-%m-%d')}",
-    ]
-
-    # Determine published status based on markdown content
-    if markdown_text is None or len(markdown_text) < 10:
-        logger.warning(
-            f"Markdown text is None or too short ({len(markdown_text) if markdown_text else 'None'}). Setting published: false."
-        )
-        front_matter_lines.append("published: false")
-        content_body = ""  # No content if not published
-    else:
-        logger.debug(
-            f"Markdown text generated. Length: {len(markdown_text)} characters. Setting published: true."
-        )
-        front_matter_lines.append("published: true")
-        content_body = markdown_text
-        logger.info(f"Downloaded news for {date}")
-
-    front_matter_lines.append("---")
-    front_matter_lines.append("")  # Add a blank line after front matter
-    front_matter_lines.append("")  # Add another blank line after front matter
-
-    # Combine front matter and content
-    full_content = "\n".join(front_matter_lines) + content_body
-
-    return full_content
+    logger.debug(f"Cleaned MarkItDown result head: {cleaned_text[:100]}")
+    logger.debug(f"Cleaned MarkItDown result tail: {cleaned_text[-100:]}")
+    return cleaned_text
 
 
-def use_markitdown(url, logger, max_retries=5):
+def fetch_and_convert_wikipedia_page(url: str, logger: logging.Logger) -> Optional[str]:
     """
     Convert a Wikipedia page to markdown using MarkItDown, with exponential backoff on HTTP 429.
+    Returns cleaned markdown content or None if fetching/conversion fails after retries.
     """
     md = MarkItDown()
-    base_wait = 20  # Start with 20 seconds
-    for attempt in range(max_retries):
+    for attempt in range(RETRY_MAX_ATTEMPTS):
         try:
             result = md.convert(url)
-            logger.debug(f"MarkItDown result: {result.text_content}")
-            break
-        except Exception as e:
-            # Check for HTTP 429 in the exception message
-            if (
-                hasattr(e, "response")
-                and getattr(e.response, "status_code", None) == 429
-                or "429" in str(e)
-            ):
-                wait = base_wait * (2**attempt)
-                logger.warning(
-                    f"HTTP 429 Too Many Requests for {url}. Waiting {wait}s before retrying (attempt {attempt + 1}/{max_retries})..."
-                )
-                import time
+            logger.debug(f"Raw MarkItDown result length: {len(result.text_content)}")
+            return clean_wikipedia_markdown(result.text_content, logger)
 
+        except requests.exceptions.RequestException as e:
+            # Check specifically for HTTP errors, especially 429
+            status_code = getattr(e.response, "status_code", None)
+            if status_code == 429:
+                wait = RETRY_BASE_WAIT_SECONDS * (2**attempt)
+                logger.warning(
+                    f"HTTP 429 Too Many Requests for {url}. Waiting {wait}s before retrying (attempt {attempt + 1}/{RETRY_MAX_ATTEMPTS})..."
+                )
                 time.sleep(wait)
+            elif status_code == 404:
+                logger.warning(f"HTTP 404 Not Found for {url}. Skipping retries.")
+                return None  # No point retrying a 404
             else:
-                logger.error(f"Error fetching {url}: {e}")
-                raise
+                # Log other request exceptions and attempt retry
+                logger.warning(
+                    f"Request error fetching {url}: {e}. Retrying (attempt {attempt + 1}/{RETRY_MAX_ATTEMPTS})..."
+                )
+                time.sleep(
+                    RETRY_BASE_WAIT_SECONDS / 2 * (2**attempt)
+                )  # Shorter wait for non-429 errors
+        except Exception as e:
+            # Catch other potential errors during conversion
+            logger.exception(
+                f"Unexpected error converting {url} (attempt {attempt + 1}/{RETRY_MAX_ATTEMPTS}): {e}"
+            )
+            # Optionally retry for generic errors too, or break
+            time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**attempt))
+
     else:
-        logger.error(f"Exceeded max retries for {url}")
+        # This block executes if the loop completes without a break (i.e., all retries failed)
+        logger.error(f"Exceeded max retries ({RETRY_MAX_ATTEMPTS}) for {url}")
         return None
 
-    # Remove text up to and including the line that begins with "[watch]"
-    my_text_content = re.sub(
-        r"^.*action=watch\)\n", "", result.text_content, flags=re.DOTALL
-    )
-    # Remove text starting at "[Month" until the end
-    my_text_content = re.sub(r"\[Month.*", "", my_text_content, flags=re.DOTALL)
-    # Replace relative links with absolute links
-    my_text_content = re.sub(
-        r"\(/wiki/", r"(https://en.wikipedia.org/wiki/", my_text_content
-    )
-    # Remove trailing whitespace and newlines
-    my_text_content = my_text_content.rstrip()
-    my_text_content += "\n"
 
-    logger.debug(f"MarkItDown result head: {my_text_content[:100]}")
-    logger.debug(f"MarkItDown result tail: {my_text_content[-100:]}")
-
-    return my_text_content
-
-
-def save_news(date, markdown_text, logger):
+def save_news(
+    date: datetime, full_content: str, output_dir: str, logger: logging.Logger
+):
     """
     Save markdown to specified directory.
     """
@@ -138,31 +117,81 @@ def save_news(date, markdown_text, logger):
 
     # Create date-specific folder
     folder_path = "./docs/_posts/"
-    os.makedirs(folder_path, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
     logger.debug(f"Created folder: {folder_path}")
 
     # Save markdown
-    markdown_path = os.path.join(folder_path, date.strftime("%Y-%m-%d") + "-index.md")
+    markdown_path = os.path.join(output_dir, date.strftime("%Y-%m-%d") + "-index.md")
     with open(markdown_path, "w", encoding="utf-8", newline="\n") as f:
-        f.write(markdown_text)
+        f.write(full_content)
     logger.info(f"Saved markdown to: {markdown_path}")
 
 
-def process_date(date, logger):
+def generate_jekyll_content(
+    date: datetime, markdown_body: str, logger: logging.Logger
+) -> Optional[str]:
+    """
+    Generates the full page content with Jekyll front matter.
+    Returns the full content string, or None if markdown_body is invalid.
+    """
+    # Determine published status based on markdown content
+    is_published = len(markdown_body) >= MIN_MARKDOWN_LENGTH_PUBLISH
+
+    if not is_published:
+        logger.warning(
+            f"Markdown for {date.strftime('%Y-%m-%d')} is too short ({len(markdown_body)=}). Setting published: false."
+        )
+
+    # Build front matter
+    front_matter_lines = [
+        "---",
+        "layout: post",
+        f"title: {date.strftime('%Y %B %d')}",
+        f"date: {date.strftime('%Y-%m-%d')}",
+        f"published: {'true' if is_published else 'false'}",
+        "---",
+        "",  # Add blank lines after front matter
+        "",
+    ]
+
+    # Combine front matter and content (use empty body if not published)
+    content_body = markdown_body if is_published else ""
+    full_content = "\n".join(front_matter_lines) + content_body
+
+    return full_content
+
+
+def process_date(date: datetime, output_dir: str, logger: logging.Logger):
     """
     Download and save news for a single date.
     """
     try:
-        markdown_text = download_wikipedia_news(date, logger)
-        # Only save if published: true (i.e., markdown_text is valid and not too short)
-        if markdown_text is not None and "published: true" in markdown_text:
-            save_news(date, markdown_text, logger)
+        logger.info(f"Processing date: {date.strftime('%Y-%m-%d')}")
+        url = f"{BASE_WIKIPEDIA_URL}{date.year}_{date:%B}_{date.day}"
+        logger.debug(f"Prepare to fetch page: {url}")
+
+        markdown_body = fetch_and_convert_wikipedia_page(url, logger)
+
+        if markdown_body is not None:
+            logger.info(
+                f"Successfully fetched and converted content for {date.strftime('%Y-%m-%d')}"
+            )
+            full_content = generate_jekyll_content(date, markdown_body, logger)
+            if full_content and "published: true" in full_content:
+                save_news(date, full_content, output_dir, logger)
+            else:
+                logger.warning(
+                    f"Skipping save for {date.strftime('%Y-%m-%d')}: Content marked as unpublished or generation failed."
+                )
         else:
             logger.warning(
-                f"Skipping save for {date}: fetch/conversion failed or content too short."
+                f"Skipping save for {date.strftime('%Y-%m-%d')}: Fetch/conversion failed."
             )
+
     except Exception as e:
-        logger.error(f"Unexpected error processing {date=}: {e=}")
+        logger.exception(
+            f"Unexpected error processing date {date.strftime('%Y-%m-%d')}"
+        )
 
 
 def main():
@@ -176,6 +205,20 @@ def main():
         "--all",
         action="store_true",
         help="Download news from Jan 1, 2025, to today",
+    )
+    parser.add_argument(
+        "-o",
+        "--output-dir",
+        type=str,
+        default=DEFAULT_OUTPUT_DIR,
+        help=f"Directory to save markdown files (default: {DEFAULT_OUTPUT_DIR})",
+    )
+    parser.add_argument(
+        "-w",
+        "--workers",
+        type=int,
+        default=None,  # Default to ThreadPoolExecutor's choice
+        help="Maximum number of concurrent download workers",
     )
     args = parser.parse_args()
 
@@ -197,7 +240,7 @@ def main():
     end_date = tomorrow + timedelta(days=1)  # inclusive of tomorrow
 
     # Use a set to avoid duplicates
-    dates = set()
+    dates: Set[datetime] = set()
     current_date = start_date
     while current_date < end_date:
         dates.add(current_date)
@@ -205,16 +248,25 @@ def main():
 
     logger.info(
         f"Starting download for {len(dates)} dates from {start_date} to {end_date}"
+        f" using up to {args.workers or 'default'} workers."
+        f" Output directory: {args.output_dir}"
     )
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = [executor.submit(process_date, date, logger) for date in dates]
+    # Ensure output directory exists
+    os.makedirs(args.output_dir, exist_ok=True)
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as executor:
+        # Submit tasks with necessary arguments
+        futures = [
+            executor.submit(process_date, date, args.output_dir, logger)
+            for date in sorted(list(dates))
+        ]
         # Optionally, wait for all to complete and raise exceptions if any
         for future in concurrent.futures.as_completed(futures):
             try:
                 future.result()
-            except Exception as exc:
-                logger.error(f"Error in parallel execution: {exc}")
+            except Exception:  # Exception already logged in process_date
+                pass  # logger.exception("A thread generated an unexpected exception") # Optionally log here too
 
     logger.info("Wikipedia News Download Complete")
 
