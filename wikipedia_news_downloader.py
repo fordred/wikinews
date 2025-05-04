@@ -16,6 +16,8 @@ import re
 import sys
 import concurrent.futures
 import time  # Import time at the top level
+import queue
+import threading
 
 # --- Constants ---
 BASE_WIKIPEDIA_URL = "https://en.m.wikipedia.org/wiki/Portal:Current_events/"
@@ -59,52 +61,6 @@ def clean_wikipedia_markdown(raw_markdown: str, logger: logging.Logger) -> str:
     logger.debug(f"Cleaned MarkItDown result head: {cleaned_text[:100]}")
     logger.debug(f"Cleaned MarkItDown result tail: {cleaned_text[-100:]}")
     return cleaned_text
-
-
-def fetch_and_convert_wikipedia_page(url: str, logger: logging.Logger) -> Optional[str]:
-    """
-    Convert a Wikipedia page to markdown using MarkItDown, with exponential backoff on HTTP 429.
-    Returns cleaned markdown content or None if fetching/conversion fails after retries.
-    """
-    md = MarkItDown()
-    for attempt in range(RETRY_MAX_ATTEMPTS):
-        try:
-            result = md.convert(url)
-            logger.debug(f"Raw MarkItDown result length: {len(result.text_content)}")
-            return clean_wikipedia_markdown(result.text_content, logger)
-
-        except requests.exceptions.RequestException as e:
-            # Check specifically for HTTP errors, especially 429
-            status_code = getattr(e.response, "status_code", None)
-            if status_code == 429:
-                wait = RETRY_BASE_WAIT_SECONDS * (2**attempt)
-                logger.warning(
-                    f"HTTP 429 Too Many Requests for {url}. Waiting {wait}s before retrying (attempt {attempt + 1}/{RETRY_MAX_ATTEMPTS})..."
-                )
-                time.sleep(wait)
-            elif status_code == 404:
-                logger.warning(f"HTTP 404 Not Found for {url}. Skipping retries.")
-                return None  # No point retrying a 404
-            else:
-                # Log other request exceptions and attempt retry
-                logger.warning(
-                    f"Request error fetching {url}: {e}. Retrying (attempt {attempt + 1}/{RETRY_MAX_ATTEMPTS})..."
-                )
-                time.sleep(
-                    RETRY_BASE_WAIT_SECONDS / 2 * (2**attempt)
-                )  # Shorter wait for non-429 errors
-        except Exception as e:
-            # Catch other potential errors during conversion
-            logger.exception(
-                f"Unexpected error converting {url} (attempt {attempt + 1}/{RETRY_MAX_ATTEMPTS}): {e}"
-            )
-            # Optionally retry for generic errors too, or break
-            time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**attempt))
-
-    else:
-        # This block executes if the loop completes without a break (i.e., all retries failed)
-        logger.error(f"Exceeded max retries ({RETRY_MAX_ATTEMPTS}) for {url}")
-        return None
 
 
 def save_news(
@@ -161,18 +117,67 @@ def generate_jekyll_content(
     return full_content
 
 
-def process_date(date: datetime, output_dir: str, logger: logging.Logger):
-    """
-    Download and save news for a single date.
-    """
-    try:
-        logger.info(f"Processing date: {date.strftime('%Y-%m-%d')}")
+def worker(date_queue, output_dir, logger):
+    while True:
+        try:
+            item = date_queue.get(timeout=2)
+        except queue.Empty:
+            break  # No more items to process
+
+        date, retries = item
+        if retries > RETRY_MAX_ATTEMPTS:
+            logger.error(
+                f"Exceeded max retries ({RETRY_MAX_ATTEMPTS}) for {date.strftime('%Y-%m-%d')}"
+            )
+            date_queue.task_done()
+            continue
+
+        logger.info(
+            f"Processing date: {date.strftime('%Y-%m-%d')} (attempt {retries + 1})"
+        )
         url = f"{BASE_WIKIPEDIA_URL}{date.year}_{date:%B}_{date.day}"
         logger.debug(f"Prepare to fetch page: {url}")
 
-        markdown_body = fetch_and_convert_wikipedia_page(url, logger)
+        try:
+            md = MarkItDown()
+            try:
+                result = md.convert(url)
+                logger.debug(
+                    f"Raw MarkItDown result length: {len(result.text_content)}"
+                )
+                markdown_body = clean_wikipedia_markdown(result.text_content, logger)
+            except requests.exceptions.RequestException as e:
+                status_code = getattr(e.response, "status_code", None)
+                if status_code == 429:
+                    logger.warning(
+                        f"HTTP 429 Too Many Requests for {url}. Re-queuing for later retry (attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})..."
+                    )
+                    # Re-queue with incremented retry count
+                    date_queue.put((date, retries + 1))
+                    date_queue.task_done()
+                    continue
+                elif status_code == 404:
+                    logger.warning(f"HTTP 404 Not Found for {url}. Skipping retries.")
+                    date_queue.task_done()
+                    continue
+                else:
+                    logger.warning(
+                        f"Request error fetching {url}: {e}. Retrying (attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})..."
+                    )
+                    time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
+                    date_queue.put((date, retries + 1))
+                    date_queue.task_done()
+                    continue
+            except Exception as e:
+                logger.exception(
+                    f"Unexpected error converting {url} (attempt {retries + 1}/{RETRY_MAX_ATTEMPTS}): {e}"
+                )
+                time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
+                date_queue.put((date, retries + 1))
+                date_queue.task_done()
+                continue
 
-        if markdown_body is not None:
+            # If we get here, markdown_body is available
             logger.info(
                 f"Successfully fetched and converted content for {date.strftime('%Y-%m-%d')}"
             )
@@ -183,15 +188,12 @@ def process_date(date: datetime, output_dir: str, logger: logging.Logger):
                 logger.warning(
                     f"Skipping save for {date.strftime('%Y-%m-%d')}: Content marked as unpublished or generation failed."
                 )
-        else:
-            logger.warning(
-                f"Skipping save for {date.strftime('%Y-%m-%d')}: Fetch/conversion failed."
+        except Exception as e:
+            logger.exception(
+                f"Unexpected error processing date {date.strftime('%Y-%m-%d')}"
             )
-
-    except Exception as e:
-        logger.exception(
-            f"Unexpected error processing date {date.strftime('%Y-%m-%d')}"
-        )
+        finally:
+            date_queue.task_done()
 
 
 def main():
@@ -255,18 +257,21 @@ def main():
     # Ensure output directory exists
     os.makedirs(args.output_dir, exist_ok=True)
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as executor:
-        # Submit tasks with necessary arguments
-        futures = [
-            executor.submit(process_date, date, args.output_dir, logger)
-            for date in sorted(list(dates))
-        ]
-        # Optionally, wait for all to complete and raise exceptions if any
-        for future in concurrent.futures.as_completed(futures):
-            try:
-                future.result()
-            except Exception:  # Exception already logged in process_date
-                pass  # logger.exception("A thread generated an unexpected exception") # Optionally log here too
+    # Use a queue for cooperative retry handling
+    date_queue = queue.Queue()
+    for date in sorted(list(dates)):
+        date_queue.put((date, 0))  # (date, retry_count)
+
+    num_workers = args.workers or min(8, len(dates))
+    threads = []
+    for _ in range(num_workers):
+        t = threading.Thread(target=worker, args=(date_queue, args.output_dir, logger))
+        t.start()
+        threads.append(t)
+
+    date_queue.join()
+    for t in threads:
+        t.join()
 
     logger.info("Wikipedia News Download Complete")
 
