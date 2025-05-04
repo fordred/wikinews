@@ -55,6 +55,12 @@ def clean_wikipedia_markdown(raw_markdown: str, logger: logging.Logger) -> str:
     cleaned_text = re.sub(r"\[Month.*", "", cleaned_text, flags=re.DOTALL)
     # Replace relative links with absolute links
     cleaned_text = re.sub(r"\(/wiki/", r"(https://en.wikipedia.org/wiki/", cleaned_text)
+    # Remove markdown links to non-existent pages (redlinks), leaving only the text
+    cleaned_text = re.sub(
+        r'\[([^\]]+)\]\(/w/index\.php\?title=[^&\s]+&action=edit&redlink=1\s*"[^"]*"\)',
+        r"\1",
+        cleaned_text,
+    )
     # Remove trailing whitespace and newlines, ensure single trailing newline
     cleaned_text = cleaned_text.rstrip() + "\n"
 
