@@ -1,3 +1,4 @@
+#!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = "==3.13.*"
 # dependencies = [
@@ -25,9 +26,7 @@ DEFAULT_OUTPUT_DIR = "./docs/_posts/"
 LOG_FILE = "wikipedia_news_downloader.log"
 RETRY_MAX_ATTEMPTS = 5
 RETRY_BASE_WAIT_SECONDS = 20  # Start wait time for retries
-MIN_MARKDOWN_LENGTH_PUBLISH = (
-    10  # Minimum length to consider content valid for publishing
-)
+MIN_MARKDOWN_LENGTH_PUBLISH = 10  # Minimum length to consider content valid for publishing
 # --- End Constants ---
 
 
@@ -69,9 +68,7 @@ def clean_wikipedia_markdown(raw_markdown: str, logger: logging.Logger) -> str:
     return cleaned_text
 
 
-def save_news(
-    date: datetime, full_content: str, output_dir: str, logger: logging.Logger
-):
+def save_news(date: datetime, full_content: str, output_dir: str, logger: logging.Logger):
     """
     Save markdown to specified directory.
     """
@@ -89,9 +86,7 @@ def save_news(
     logger.info(f"Saved markdown to: {markdown_path}")
 
 
-def generate_jekyll_content(
-    date: datetime, markdown_body: str, logger: logging.Logger
-) -> Optional[str]:
+def generate_jekyll_content(date: datetime, markdown_body: str, logger: logging.Logger) -> Optional[str]:
     """
     Generates the full page content with Jekyll front matter.
     Returns the full content string, or None if markdown_body is invalid.
@@ -100,9 +95,7 @@ def generate_jekyll_content(
     is_published = len(markdown_body) >= MIN_MARKDOWN_LENGTH_PUBLISH
 
     if not is_published:
-        logger.warning(
-            f"Markdown for {date.strftime('%Y-%m-%d')} is too short ({len(markdown_body)=}). Setting published: false."
-        )
+        logger.warning(f"Markdown for {date.strftime('%Y-%m-%d')} is too short ({len(markdown_body)=}). Setting published: false.")
 
     # Build front matter
     front_matter_lines = [
@@ -132,15 +125,11 @@ def worker(date_queue, output_dir, logger):
 
         date, retries = item
         if retries > RETRY_MAX_ATTEMPTS:
-            logger.error(
-                f"Exceeded max retries ({RETRY_MAX_ATTEMPTS}) for {date.strftime('%Y-%m-%d')}"
-            )
+            logger.error(f"Exceeded max retries ({RETRY_MAX_ATTEMPTS}) for {date.strftime('%Y-%m-%d')}")
             date_queue.task_done()
             continue
 
-        logger.info(
-            f"Processing date: {date.strftime('%Y-%m-%d')} (attempt {retries + 1})"
-        )
+        logger.info(f"Processing date: {date.strftime('%Y-%m-%d')} (attempt {retries + 1})")
         url = f"{BASE_WIKIPEDIA_URL}{date.year}_{date:%B}_{date.day}"
         logger.debug(f"Prepare to fetch page: {url}")
 
@@ -148,9 +137,7 @@ def worker(date_queue, output_dir, logger):
             md = MarkItDown()
             try:
                 result = md.convert(url)
-                logger.debug(
-                    f"Raw MarkItDown result length: {len(result.text_content)}"
-                )
+                logger.debug(f"Raw MarkItDown result length: {len(result.text_content)}")
                 markdown_body = clean_wikipedia_markdown(result.text_content, logger)
             except requests.exceptions.RequestException as e:
                 status_code = getattr(e.response, "status_code", None)
@@ -167,37 +154,27 @@ def worker(date_queue, output_dir, logger):
                     date_queue.task_done()
                     continue
                 else:
-                    logger.warning(
-                        f"Request error fetching {url}: {e}. Retrying (attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})..."
-                    )
+                    logger.warning(f"Request error fetching {url}: {e}. Retrying (attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})...")
                     time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
                     date_queue.put((date, retries + 1))
                     date_queue.task_done()
                     continue
             except Exception as e:
-                logger.exception(
-                    f"Unexpected error converting {url} (attempt {retries + 1}/{RETRY_MAX_ATTEMPTS}): {e}"
-                )
+                logger.exception(f"Unexpected error converting {url} (attempt {retries + 1}/{RETRY_MAX_ATTEMPTS}): {e}")
                 time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
                 date_queue.put((date, retries + 1))
                 date_queue.task_done()
                 continue
 
             # If we get here, markdown_body is available
-            logger.info(
-                f"Successfully fetched and converted content for {date.strftime('%Y-%m-%d')}"
-            )
+            logger.info(f"Successfully fetched and converted content for {date.strftime('%Y-%m-%d')}")
             full_content = generate_jekyll_content(date, markdown_body, logger)
             if full_content and "published: true" in full_content:
                 save_news(date, full_content, output_dir, logger)
             else:
-                logger.warning(
-                    f"Skipping save for {date.strftime('%Y-%m-%d')}: Content marked as unpublished or generation failed."
-                )
+                logger.warning(f"Skipping save for {date.strftime('%Y-%m-%d')}: Content marked as unpublished or generation failed.")
         except Exception as e:
-            logger.exception(
-                f"Unexpected error processing date {date.strftime('%Y-%m-%d')}"
-            )
+            logger.exception(f"Unexpected error processing date {date.strftime('%Y-%m-%d')}")
         finally:
             date_queue.task_done()
 
@@ -205,9 +182,7 @@ def worker(date_queue, output_dir, logger):
 def main():
     # Set up argument parsing
     parser = argparse.ArgumentParser(description="Download Wikipedia News")
-    parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Enable verbose logging"
-    )
+    parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose logging")
     parser.add_argument(
         "-a",
         "--all",
