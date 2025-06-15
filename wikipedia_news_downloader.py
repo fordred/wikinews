@@ -105,6 +105,7 @@ def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: date
     logger.debug(f"Found {len(matches)} potential daily segments in markdown for {month_datetime.strftime('%Y-%B')}.")
 
     for i, match in enumerate(matches):
+        month_str = day_str = year_str = None  # Ensure variables are always defined
         try:
             month_str, day_str, year_str = match.groups()
             day = int(day_str)
