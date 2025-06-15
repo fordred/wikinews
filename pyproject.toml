@@ -12,4 +12,5 @@ dependencies = [
 dev = [
     "pytest>=8.4.0",
     "ruff>=0.11.13",
+    "types-requests>=2.32.4.20250611",
 ]

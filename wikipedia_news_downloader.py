@@ -2,14 +2,13 @@
 
 from typing import Optional, Set
 import argparse
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 from markitdown import MarkItDown
 import requests  # Import requests to catch its exceptions
 import os
 import re
 import sys
-import concurrent.futures
 import time  # Import time at the top level
 import queue
 import threading
@@ -281,7 +280,7 @@ def worker(date_queue, output_dir, logger):
         except Exception as e:
             # This is a general catch-all for errors not handled by the retry logic for fetching/conversion,
             # such as unexpected errors within split_and_clean_monthly_markdown or the daily processing loop.
-            logger.exception(f"Unexpected error processing month {month_date.strftime('%Y-%B')}")
+            logger.exception(f"Unexpected error processing month {month_date.strftime('%Y-%B')}: {e}")
         finally:
             date_queue.task_done()
 
