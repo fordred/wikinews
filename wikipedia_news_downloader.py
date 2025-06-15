@@ -1,10 +1,4 @@
-#!/usr/bin/env -S uv run --script
-# /// script
-# requires-python = "==3.13.*"
-# dependencies = [
-#     "markitdown",
-# ]
-# ///
+#!/usr/bin/env -S uv run
 
 from typing import Optional, Set
 import argparse

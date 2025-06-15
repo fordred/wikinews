@@ -1,9 +1,6 @@
 version = 1
 revision = 2
-requires-python = "==3.13.*"
-
-[manifest]
-requirements = [{ name = "markitdown" }]
+requires-python = ">=3.13"
 
 [[package]]
 name = "beautifulsoup4"
@@ -332,3 +329,14 @@ sdist = { url = "https://files.pythonhosted.org/packages/8a/78/16493d9c386d8e60e
 wheels = [
     { url = "https://files.pythonhosted.org/packages/6b/11/cc635220681e93a0183390e26485430ca2c7b5f9d33b15c74c2861cb8091/urllib3-2.4.0-py3-none-any.whl", hash = "sha256:4e16665048960a0900c702d4a66415956a584919c03361cac9f1df5c5dd7e813", size = 128680, upload-time = "2025-04-10T15:23:37.377Z" },
 ]
+
+[[package]]
+name = "wikinews"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "markitdown" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "markitdown" }]
