@@ -1,17 +1,17 @@
 #!/usr/bin/env -S uv run --upgrade
 
-from typing import Optional, Set
 import argparse
-from datetime import datetime
 import logging
-from markitdown import MarkItDown
-import requests  # Import requests to catch its exceptions
-import os
+import queue
 import re
 import sys
-import time  # Import time at the top level
-import queue
 import threading
+import time  # Import time at the top level
+from datetime import datetime
+from pathlib import Path
+
+import requests  # Import requests to catch its exceptions
+from markitdown import MarkItDown
 
 # --- Constants ---
 BASE_WIKIPEDIA_URL = "https://en.m.wikipedia.org/wiki/Portal:Current_events/"
@@ -23,10 +23,8 @@ MIN_MARKDOWN_LENGTH_PUBLISH = 10  # Minimum length to consider content valid for
 # --- End Constants ---
 
 
-def setup_logging(verbose=False):
-    """
-    Configure logging based on verbosity level.
-    """
+def setup_logging(verbose: bool = False) -> logging.Logger:
+    """Configure logging based on verbosity level."""
     log_level = logging.DEBUG if verbose else logging.INFO
     logging.basicConfig(
         level=log_level,
@@ -55,8 +53,8 @@ MONTH_NAME_TO_NUMBER = {
 }
 
 
-def _clean_daily_markdown_content(daily_md: str, logger: logging.Logger) -> str:
-    """Helper to apply common cleaning rules to daily markdown"""
+def _clean_daily_markdown_content(daily_md: str) -> str:
+    """Helper to apply common cleaning rules to daily markdown."""
     # Replace relative links with absolute links
     cleaned_text = re.sub(r"\(/wiki/", r"(https://en.wikipedia.org/wiki/", daily_md)
     # Remove markdown links to non-existent pages (redlinks), leaving only the text
@@ -75,16 +73,15 @@ def _clean_daily_markdown_content(daily_md: str, logger: logging.Logger) -> str:
     # Ensure the entire text block ends with a single newline and has no other trailing whitespace.
     # This also handles cases where the original text might not end with a newline,
     # or collapses multiple trailing newlines from the block into one.
-    cleaned_text = cleaned_text.rstrip() + "\n"
-    return cleaned_text
+    return cleaned_text.rstrip() + "\n"
 
 
 def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: datetime, logger: logging.Logger) -> list[tuple[datetime, str]]:
-    """
+    """Split markdown by day.
+
     Splits markdown from a monthly Wikipedia Current Events page into daily segments,
     extracts dates, and cleans each segment.
     """
-
     # Remove the trailing text that is not part of the daily events.
     monthly_markdown = re.sub(r"\[◀\].*", "", monthly_markdown, flags=re.DOTALL)
 
@@ -100,7 +97,7 @@ def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: date
         r"([A-Za-z]+)\xa0(\d{1,2}),\xa0(\d{4})(?:[^\n]*)\n\n"  # Month Day, Year line (captures M, D, Y), rest of line, then two newlines
         r"\* \[edit\]\(.*?\)\n"  # * [edit](...) line
         r"\* \[history\]\(.*?\)\n"  # * [history](...) line
-        r"\* \[watch\]\(.*?\)\n"  # * [watch](...) line
+        r"\* \[watch\]\(.*?\)\n",  # * [watch](...) line
     )
 
     # Find all starting positions of daily segments
@@ -134,44 +131,43 @@ def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: date
 
             # The header (e.g. "June 1, 2025 ... (action=watch)\n") has already been excluded by segment_start_pos.
             # Now apply further cleaning.
-            cleaned_daily_md = _clean_daily_markdown_content(daily_raw_content.strip(), logger)
+            cleaned_daily_md = _clean_daily_markdown_content(daily_raw_content.strip())
 
             if cleaned_daily_md.strip():  # Ensure there's some content
                 daily_events.append((day_dt, cleaned_daily_md))
             else:
                 logger.debug(f"Segment {i + 1} for {day_dt.strftime('%Y-%m-%d')} is empty after cleaning. Skipping.")
 
-        except ValueError as e:
-            logger.error(f"Error parsing date for segment {i + 1} ({month_str} {day_str}, {year_str}): {e}. Skipping.")
+        except ValueError:
+            logger.exception(f"Error parsing date for segment {i + 1} ({month_str} {day_str}, {year_str}). Skipping.")
             continue
-        except Exception as e:
-            logger.exception(f"Unexpected error processing segment {i + 1} for {month_datetime.strftime('%Y-%B')}: {e}")
+        except Exception:
+            logger.exception(f"Unexpected error processing segment {i + 1} for {month_datetime.strftime('%Y-%B')}")
             continue
 
     logger.info(f"Successfully processed {len(daily_events)} daily segments from {month_datetime.strftime('%Y-%B')}.")
     return daily_events
 
 
-def save_news(date: datetime, full_content: str, output_dir: str, logger: logging.Logger):
-    """
-    Save markdown to specified directory.
-    """
+def save_news(date: datetime, full_content: str, output_dir: str, logger: logging.Logger) -> None:
+    """Save markdown to specified directory."""
     logger.info(f"Preparing to save news for {date}")
 
     # Create date-specific folder
     folder_path = "./docs/_posts/"
-    os.makedirs(output_dir, exist_ok=True)
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
     logger.debug(f"Created folder: {folder_path}")
 
     # Save markdown
-    markdown_path = os.path.join(output_dir, date.strftime("%Y-%m-%d") + "-index.md")
-    with open(markdown_path, "w", encoding="utf-8", newline="\n") as f:
+    markdown_path = Path(output_dir) / (date.strftime("%Y-%m-%d") + "-index.md")
+    with markdown_path.open("w", encoding="utf-8", newline="\n") as f:
         f.write(full_content)
     logger.info(f"Saved markdown to: {markdown_path}")
 
 
-def generate_jekyll_content(date: datetime, markdown_body: str, logger: logging.Logger) -> Optional[str]:
-    """
+def generate_jekyll_content(date: datetime, markdown_body: str, logger: logging.Logger) -> str | None:
+    """Jekyll front matter generator.
+
     Generates the full page content with Jekyll front matter.
     Returns the full content string, or None if markdown_body is invalid.
     """
@@ -196,12 +192,10 @@ def generate_jekyll_content(date: datetime, markdown_body: str, logger: logging.
 
     # Combine front matter and content (use empty body if not published)
     content_body = markdown_body if is_published else ""
-    full_content = "\n".join(front_matter_lines) + content_body
-
-    return full_content
+    return "\n".join(front_matter_lines) + content_body
 
 
-def worker(date_queue, output_dir, logger):
+def worker(date_queue, output_dir, logger) -> None:
     while True:
         try:
             item = date_queue.get(timeout=2)
@@ -231,26 +225,31 @@ def worker(date_queue, output_dir, logger):
                 status_code = getattr(e.response, "status_code", None)
                 if status_code == 429:
                     logger.warning(
-                        f"HTTP 429 Too Many Requests for {url}. Re-queuing month {month_date.strftime('%Y-%B')} for later retry (attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})..."
+                        (
+                            f"HTTP 429 Too Many Requests for {url}. "
+                            f"Re-queuing month {month_date.strftime('%Y-%B')} for later retry "
+                            f"(attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})..."
+                        ),
                     )
                     date_queue.put((month_date, retries + 1))  # Re-queue with incremented retry count
                     date_queue.task_done()
                     continue
-                elif status_code == 404:
+                if status_code == 404:
                     logger.warning(f"HTTP 404 Not Found for {url} (month: {month_date.strftime('%Y-%B')}). Skipping retries.")
                     date_queue.task_done()
                     continue
-                else:
-                    logger.warning(
-                        f"Request error fetching {url} (month: {month_date.strftime('%Y-%B')}): {e}. Retrying (attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})..."
-                    )
-                    time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
-                    date_queue.put((month_date, retries + 1))
-                    date_queue.task_done()
-                    continue
-            except Exception as e:  # Includes MarkItDown conversion errors
+                logger.warning(
+                    f"Request error fetching {url} (month: {month_date.strftime('%Y-%B')}): {e}. "
+                    f"Retrying (attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})...",
+                )
+                time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
+                date_queue.put((month_date, retries + 1))
+                date_queue.task_done()
+                continue
+            except Exception:  # Includes MarkItDown conversion errors
                 logger.exception(
-                    f"Unexpected error converting {url} (month: {month_date.strftime('%Y-%B')}, attempt {retries + 1}/{RETRY_MAX_ATTEMPTS}): {e}"
+                    f"Unexpected error converting {url} (month: {month_date.strftime('%Y-%B')}, "
+                    f"attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})",
                 )
                 time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
                 date_queue.put((month_date, retries + 1))
@@ -264,7 +263,8 @@ def worker(date_queue, output_dir, logger):
 
             if not daily_events:
                 logger.warning(
-                    f"No daily events found or extracted for month: {month_date.strftime('%Y-%B')}. This might be normal for very recent archives or if the content structure changed."
+                    f"No daily events found or extracted for month: {month_date.strftime('%Y-%B')}. "
+                    f"This might be normal for very recent archives or if the content structure changed.",
                 )
 
             for event_date, daily_markdown in daily_events:
@@ -274,18 +274,18 @@ def worker(date_queue, output_dir, logger):
                     save_news(event_date, full_content, output_dir, logger)
                 else:
                     logger.warning(
-                        f"Skipping save for {event_date.strftime('%Y-%m-%d')}: Content marked as unpublished or generation failed."
+                        f"Skipping save for {event_date.strftime('%Y-%m-%d')}: Content marked as unpublished or generation failed.",
                     )
 
-        except Exception as e:
+        except Exception:
             # This is a general catch-all for errors not handled by the retry logic for fetching/conversion,
             # such as unexpected errors within split_and_clean_monthly_markdown or the daily processing loop.
-            logger.exception(f"Unexpected error processing month {month_date.strftime('%Y-%B')}: {e}")
+            logger.exception(f"Unexpected error processing month {month_date.strftime('%Y-%B')}")
         finally:
             date_queue.task_done()
 
 
-def main():
+def main() -> None:
     # Set up argument parsing
     parser = argparse.ArgumentParser(description="Download Wikipedia News")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose logging")
@@ -316,7 +316,7 @@ def main():
     end_date = datetime(now.year, now.month, 1)
 
     # Use a set to avoid duplicates, populate with the first day of each month
-    dates: Set[datetime] = set()
+    dates: set[datetime] = set()
     current_date = start_date
     while current_date <= end_date:
         dates.add(current_date)
@@ -329,15 +329,15 @@ def main():
     logger.info(
         f"Starting download for {len(dates)} dates from {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
         f" (first day of each month inclusive) using up to {args.workers or 'default'} workers."
-        f" Output directory: {args.output_dir}"
+        f" Output directory: {args.output_dir}",
     )
 
     # Ensure output directory exists
-    os.makedirs(args.output_dir, exist_ok=True)
+    Path(args.output_dir).mkdir(parents=True, exist_ok=True)
 
     # Use a queue for cooperative retry handling
-    date_queue = queue.Queue()
-    for date in sorted(list(dates)):
+    date_queue: queue.Queue[tuple[datetime, int]] = queue.Queue()
+    for date in sorted(dates):
         date_queue.put((date, 0))  # (date, retry_count)
 
     num_workers = args.workers or min(8, len(dates))
