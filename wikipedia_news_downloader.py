@@ -1,4 +1,4 @@
-#!/usr/bin/env -S uv run
+#!/usr/bin/env -S uv run --upgrade
 
 from typing import Optional, Set
 import argparse
@@ -41,9 +41,18 @@ def setup_logging(verbose=False):
 
 
 MONTH_NAME_TO_NUMBER = {
-    "January": 1, "February": 2, "March": 3, "April": 4,
-    "May": 5, "June": 6, "July": 7, "August": 8,
-    "September": 9, "October": 10, "November": 11, "December": 12
+    "January": 1,
+    "February": 2,
+    "March": 3,
+    "April": 4,
+    "May": 5,
+    "June": 6,
+    "July": 7,
+    "August": 8,
+    "September": 9,
+    "October": 10,
+    "November": 11,
+    "December": 12,
 }
 
 
@@ -57,7 +66,16 @@ def _clean_daily_markdown_content(daily_md: str, logger: logging.Logger) -> str:
         r"\1",
         cleaned_text,
     )
-    # Remove trailing whitespace and newlines, ensure single trailing newline
+    # Remove any text that looks like [[1]](#cite_note-1)
+    cleaned_text = re.sub(r"\[\[\d+\]\]\(#cite_note-\d+\)", "", cleaned_text)
+
+    # Remove trailing spaces or tabs from the end of each individual line.
+    # This doesn't remove empty lines but cleans lines that only contained spaces/tabs.
+    cleaned_text = re.sub(r"[ \t]+$", "", cleaned_text, flags=re.MULTILINE)
+
+    # Ensure the entire text block ends with a single newline and has no other trailing whitespace.
+    # This also handles cases where the original text might not end with a newline,
+    # or collapses multiple trailing newlines from the block into one.
     cleaned_text = cleaned_text.rstrip() + "\n"
     return cleaned_text
 
@@ -67,6 +85,10 @@ def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: date
     Splits markdown from a monthly Wikipedia Current Events page into daily segments,
     extracts dates, and cleans each segment.
     """
+
+    # Remove the trailing text that is not part of the daily events.
+    monthly_markdown = re.sub(r"\[◀\].*", "", monthly_markdown, flags=re.DOTALL)
+
     daily_events = []
     # Regex to find the start of each day's content block, capturing month name, day, and year.
     # Example: June 1, 2025 (2025-06-01) (Sunday) ... [watch]
@@ -94,17 +116,17 @@ def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: date
             month = MONTH_NAME_TO_NUMBER.get(month_str)
 
             if not month:
-                logger.warning(f"Could not parse month: {month_str} for segment {i+1}. Skipping.")
+                logger.warning(f"Could not parse month: {month_str} for segment {i + 1}. Skipping.")
                 continue
 
             day_dt = datetime(year, month, day)
-            logger.debug(f"Extracted date for segment {i+1}: {day_dt.strftime('%Y-%m-%d')}")
+            logger.debug(f"Extracted date for segment {i + 1}: {day_dt.strftime('%Y-%m-%d')}")
 
             # Determine the content of the current day's segment
-            segment_start_pos = match.end() # Content starts after the matched delimiter
+            segment_start_pos = match.end()  # Content starts after the matched delimiter
             if i + 1 < len(matches):
                 # Next day's header starts where this day's content ends
-                segment_end_pos = matches[i+1].start()
+                segment_end_pos = matches[i + 1].start()
             else:
                 # This is the last segment, so it goes to the end of the markdown
                 segment_end_pos = len(monthly_markdown)
@@ -115,16 +137,16 @@ def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: date
             # Now apply further cleaning.
             cleaned_daily_md = _clean_daily_markdown_content(daily_raw_content.strip(), logger)
 
-            if cleaned_daily_md.strip(): # Ensure there's some content
+            if cleaned_daily_md.strip():  # Ensure there's some content
                 daily_events.append((day_dt, cleaned_daily_md))
             else:
-                logger.debug(f"Segment {i+1} for {day_dt.strftime('%Y-%m-%d')} is empty after cleaning. Skipping.")
+                logger.debug(f"Segment {i + 1} for {day_dt.strftime('%Y-%m-%d')} is empty after cleaning. Skipping.")
 
         except ValueError as e:
-            logger.error(f"Error parsing date for segment {i+1} ({month_str} {day_str}, {year_str}): {e}. Skipping.")
+            logger.error(f"Error parsing date for segment {i + 1} ({month_str} {day_str}, {year_str}): {e}. Skipping.")
             continue
         except Exception as e:
-            logger.exception(f"Unexpected error processing segment {i+1} for {month_datetime.strftime('%Y-%B')}: {e}")
+            logger.exception(f"Unexpected error processing segment {i + 1} for {month_datetime.strftime('%Y-%B')}: {e}")
             continue
 
     logger.info(f"Successfully processed {len(daily_events)} daily segments from {month_datetime.strftime('%Y-%B')}.")
@@ -170,6 +192,7 @@ def generate_jekyll_content(date: datetime, markdown_body: str, logger: logging.
         "---",
         "",  # Add blank lines after front matter
         "",
+        "",
     ]
 
     # Combine front matter and content (use empty body if not published)
@@ -211,7 +234,7 @@ def worker(date_queue, output_dir, logger):
                     logger.warning(
                         f"HTTP 429 Too Many Requests for {url}. Re-queuing month {month_date.strftime('%Y-%B')} for later retry (attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})..."
                     )
-                    date_queue.put((month_date, retries + 1)) # Re-queue with incremented retry count
+                    date_queue.put((month_date, retries + 1))  # Re-queue with incremented retry count
                     date_queue.task_done()
                     continue
                 elif status_code == 404:
@@ -219,13 +242,17 @@ def worker(date_queue, output_dir, logger):
                     date_queue.task_done()
                     continue
                 else:
-                    logger.warning(f"Request error fetching {url} (month: {month_date.strftime('%Y-%B')}): {e}. Retrying (attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})...")
+                    logger.warning(
+                        f"Request error fetching {url} (month: {month_date.strftime('%Y-%B')}): {e}. Retrying (attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})..."
+                    )
                     time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
                     date_queue.put((month_date, retries + 1))
                     date_queue.task_done()
                     continue
-            except Exception as e: # Includes MarkItDown conversion errors
-                logger.exception(f"Unexpected error converting {url} (month: {month_date.strftime('%Y-%B')}, attempt {retries + 1}/{RETRY_MAX_ATTEMPTS}): {e}")
+            except Exception as e:  # Includes MarkItDown conversion errors
+                logger.exception(
+                    f"Unexpected error converting {url} (month: {month_date.strftime('%Y-%B')}, attempt {retries + 1}/{RETRY_MAX_ATTEMPTS}): {e}"
+                )
                 time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
                 date_queue.put((month_date, retries + 1))
                 date_queue.task_done()
@@ -237,7 +264,9 @@ def worker(date_queue, output_dir, logger):
             daily_events = split_and_clean_monthly_markdown(monthly_raw_markdown, month_date, logger)
 
             if not daily_events:
-                logger.warning(f"No daily events found or extracted for month: {month_date.strftime('%Y-%B')}. This might be normal for very recent archives or if the content structure changed.")
+                logger.warning(
+                    f"No daily events found or extracted for month: {month_date.strftime('%Y-%B')}. This might be normal for very recent archives or if the content structure changed."
+                )
 
             for event_date, daily_markdown in daily_events:
                 logger.info(f"Processing extracted day: {event_date.strftime('%Y-%m-%d')} from month {month_date.strftime('%Y-%B')}")
@@ -245,7 +274,9 @@ def worker(date_queue, output_dir, logger):
                 if full_content and "published: true" in full_content:
                     save_news(event_date, full_content, output_dir, logger)
                 else:
-                    logger.warning(f"Skipping save for {event_date.strftime('%Y-%m-%d')}: Content marked as unpublished or generation failed.")
+                    logger.warning(
+                        f"Skipping save for {event_date.strftime('%Y-%m-%d')}: Content marked as unpublished or generation failed."
+                    )
 
         except Exception as e:
             # This is a general catch-all for errors not handled by the retry logic for fetching/conversion,
@@ -259,12 +290,6 @@ def main():
     # Set up argument parsing
     parser = argparse.ArgumentParser(description="Download Wikipedia News")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose logging")
-    parser.add_argument(
-        "-a",
-        "--all",
-        action="store_true",
-        help="Download news from Jan 1, 2025, to today",
-    )
     parser.add_argument(
         "-o",
         "--output-dir",
