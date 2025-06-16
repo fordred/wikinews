@@ -166,7 +166,7 @@ def save_news(date: datetime, full_content: str, output_dir: str, logger: loggin
     logger.info(f"Saved markdown to: {markdown_path}")
 
 
-def generate_jekyll_content(date: datetime, markdown_body: str, logger: logging.Logger) -> str | None:
+def generate_jekyll_content(date: datetime, markdown_body: str, logger: logging.Logger) -> str:
     """Jekyll front matter generator.
 
     Generates the full page content with Jekyll front matter.
