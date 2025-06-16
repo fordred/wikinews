@@ -76,23 +76,61 @@ def _clean_daily_markdown_content(daily_md: str) -> str:
     return cleaned_text.rstrip() + "\n"
 
 
+def _process_daily_segment(match, monthly_markdown: str, matches: list, i: int, logger: logging.Logger, month_datetime: datetime) -> tuple[datetime, str] | None:
+    """Processes a single daily segment from the monthly markdown."""
+    month_str = day_str = year_str = None  # Ensure variables are always defined
+    try:
+        month_str, day_str, year_str = match.groups()
+        day = int(day_str)
+        year = int(year_str)
+        month = MONTH_NAME_TO_NUMBER.get(month_str)
+
+        if not month:
+            logger.warning(f"Could not parse month: {month_str} for segment {i + 1} in {month_datetime.strftime('%Y-%B')}. Skipping.")
+            return None
+
+        day_dt = datetime(year, month, day)
+        logger.debug(f"Extracted date for segment {i + 1} in {month_datetime.strftime('%Y-%B')}: {day_dt.strftime('%Y-%m-%d')}")
+
+        # Determine the content of the current day's segment
+        segment_start_pos = match.end()  # Content starts after the matched delimiter
+        if i + 1 < len(matches):
+            # Next day's header starts where this day's content ends
+            segment_end_pos = matches[i + 1].start()
+        else:
+            # This is the last segment, so it goes to the end of the markdown
+            segment_end_pos = len(monthly_markdown)
+
+        daily_raw_content = monthly_markdown[segment_start_pos:segment_end_pos]
+
+        # The header (e.g. "June 1, 2025 ... (action=watch)\n") has already been excluded by segment_start_pos.
+        # Now apply further cleaning.
+        cleaned_daily_md = _clean_daily_markdown_content(daily_raw_content.strip())
+
+        if cleaned_daily_md.strip():  # Ensure there's some content
+            return day_dt, cleaned_daily_md
+        else:
+            logger.debug(f"Segment {i + 1} for {day_dt.strftime('%Y-%m-%d')} in {month_datetime.strftime('%Y-%B')} is empty after cleaning. Skipping.")
+            return None
+
+    except ValueError:
+        logger.exception(f"Error parsing date for segment {i + 1} ({month_str} {day_str}, {year_str}) in {month_datetime.strftime('%Y-%B')}. Skipping.")
+        return None
+    except Exception:
+        logger.exception(f"Unexpected error processing segment {i + 1} for {month_datetime.strftime('%Y-%B')}")
+        return None
+
+
 def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: datetime, logger: logging.Logger) -> list[tuple[datetime, str]]:
-    """Split markdown by day.
+    """Split markdown by day using queue.Queue and threading.Thread.
 
     Splits markdown from a monthly Wikipedia Current Events page into daily segments,
-    extracts dates, and cleans each segment.
+    extracts dates, and cleans each segment in parallel.
     """
     # Remove the trailing text that is not part of the daily events.
     monthly_markdown = re.sub(r"\[◀\].*", "", monthly_markdown, flags=re.DOTALL)
 
-    daily_events = []
     # Regex to find the start of each day's content block, capturing month name, day, and year.
-    # Example: June 1, 2025 (2025-06-01) (Sunday) ... [watch]
-    # \xa0 is a non-breaking space often found in Wikipedia dates.
-    # Regex to capture Month, Day, Year from a line like:
-    # June 1, 2025 (2025-06-01) (Sunday)
-    # followed by lines for edit, history, watch links.
-    # The content for the day starts AFTER the "* [watch](...)\n" line.
     day_delimiter_regex = re.compile(
         r"([A-Za-z]+)\xa0(\d{1,2}),\xa0(\d{4})(?:[^\n]*)\n\n"  # Month Day, Year line (captures M, D, Y), rest of line, then two newlines
         r"\* \[edit\]\(.*?\)\n"  # * [edit](...) line
@@ -100,54 +138,85 @@ def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: date
         r"\* \[watch\]\(.*?\)\n",  # * [watch](...) line
     )
 
-    # Find all starting positions of daily segments
     matches = list(day_delimiter_regex.finditer(monthly_markdown))
-    logger.debug(f"Found {len(matches)} potential daily segments in markdown for {month_datetime.strftime('%Y-%B')}.")
+    month_name_for_log = month_datetime.strftime('%Y-%B')
+    logger.debug(f"Found {len(matches)} potential daily segments in markdown for {month_name_for_log}.")
 
+    processed_events = []
+    # Lock for thread-safe access to processed_events list
+    results_lock = threading.Lock()
+    # Queue for tasks to be processed by worker threads
+    input_queue = queue.Queue()
+
+    def segment_worker():
+        while True:
+            try:
+                # Get task from queue, item is (index, match_object)
+                item = input_queue.get()
+                if item is None:  # Sentinel to stop the worker
+                    input_queue.task_done() # Signal that the sentinel is processed
+                    break
+
+                i, match = item
+                # Process the segment
+                segment_result = _process_daily_segment(match, monthly_markdown, matches, i, logger, month_datetime)
+
+                if segment_result:
+                    with results_lock:
+                        processed_events.append(segment_result)
+                input_queue.task_done()
+            except Exception: # Catch any unexpected errors in the worker
+                logger.exception(f"Error in segment_worker for month {month_name_for_log}")
+                # Ensure task_done is called even if an error occurs within the loop,
+                # but before breaking if item was None or if the error is fatal.
+                # If item was valid, task_done should be called.
+                # If get() timed out or item was None, this might not be needed or handled differently.
+                # For simplicity, assuming task_done is called correctly within the loop for valid items.
+                # If an exception occurs after getting an item, we still need to mark it done.
+                # However, if the thread is about to die, it might not matter as much.
+                # The current structure calls task_done() for valid items and sentinel.
+                # If an error happens before task_done() for a valid item, queue.join() might hang.
+                # A robust way:
+                # try: ... item = input_queue.get() ... finally: input_queue.task_done() (if item not None)
+                # But this example uses a simpler structure.
+                # Let's ensure task_done is called if an item was retrieved before an unexpected error.
+                if item is not None: # Check if an item was actually retrieved
+                    input_queue.task_done() # Mark task as done to prevent join() from blocking
+
+
+    # Determine number of worker threads
+    num_threads = min(10, len(matches) if len(matches) > 0 else 1)
+    threads = []
+
+    logger.debug(f"Starting {num_threads} segment worker threads for {month_name_for_log}.")
+    for _ in range(num_threads):
+        thread = threading.Thread(target=segment_worker)
+        thread.daemon = True  # Allow main program to exit even if threads are blocked
+        thread.start()
+        threads.append(thread)
+
+    # Populate the queue with tasks
     for i, match in enumerate(matches):
-        month_str = day_str = year_str = None  # Ensure variables are always defined
-        try:
-            month_str, day_str, year_str = match.groups()
-            day = int(day_str)
-            year = int(year_str)
-            month = MONTH_NAME_TO_NUMBER.get(month_str)
+        input_queue.put((i, match))
 
-            if not month:
-                logger.warning(f"Could not parse month: {month_str} for segment {i + 1}. Skipping.")
-                continue
+    # Wait for all tasks in the queue to be processed
+    input_queue.join()
+    logger.debug(f"All segments processed for {month_name_for_log}. Signaling workers to stop.")
 
-            day_dt = datetime(year, month, day)
-            logger.debug(f"Extracted date for segment {i + 1}: {day_dt.strftime('%Y-%m-%d')}")
+    # Signal worker threads to stop by putting sentinels
+    for _ in range(num_threads):
+        input_queue.put(None)
 
-            # Determine the content of the current day's segment
-            segment_start_pos = match.end()  # Content starts after the matched delimiter
-            if i + 1 < len(matches):
-                # Next day's header starts where this day's content ends
-                segment_end_pos = matches[i + 1].start()
-            else:
-                # This is the last segment, so it goes to the end of the markdown
-                segment_end_pos = len(monthly_markdown)
+    # Wait for all worker threads to complete
+    for thread in threads:
+        thread.join()
+    logger.debug(f"All segment worker threads joined for {month_name_for_log}.")
 
-            daily_raw_content = monthly_markdown[segment_start_pos:segment_end_pos]
+    # Sort events by date after all are processed
+    processed_events.sort(key=lambda x: x[0])
 
-            # The header (e.g. "June 1, 2025 ... (action=watch)\n") has already been excluded by segment_start_pos.
-            # Now apply further cleaning.
-            cleaned_daily_md = _clean_daily_markdown_content(daily_raw_content.strip())
-
-            if cleaned_daily_md.strip():  # Ensure there's some content
-                daily_events.append((day_dt, cleaned_daily_md))
-            else:
-                logger.debug(f"Segment {i + 1} for {day_dt.strftime('%Y-%m-%d')} is empty after cleaning. Skipping.")
-
-        except ValueError:
-            logger.exception(f"Error parsing date for segment {i + 1} ({month_str} {day_str}, {year_str}). Skipping.")
-            continue
-        except Exception:
-            logger.exception(f"Unexpected error processing segment {i + 1} for {month_datetime.strftime('%Y-%B')}")
-            continue
-
-    logger.info(f"Successfully processed {len(daily_events)} daily segments from {month_datetime.strftime('%Y-%B')}.")
-    return daily_events
+    logger.info(f"Successfully processed {len(processed_events)} daily segments from {month_name_for_log}.")
+    return processed_events
 
 
 def save_news(date: datetime, full_content: str, output_dir: str, logger: logging.Logger) -> None:
@@ -194,6 +263,24 @@ def generate_jekyll_content(date: datetime, markdown_body: str, logger: logging.
     # Combine front matter and content (use empty body if not published)
     content_body = markdown_body if is_published else ""
     return "\n".join(front_matter_lines) + content_body
+
+
+def _process_and_save_daily_event(event_date: datetime, daily_markdown: str, output_dir: str, logger: logging.Logger, month_date_str: str) -> None:
+    """Generates Jekyll content and saves a single daily event."""
+    try:
+        logger.info(f"Processing extracted day: {event_date.strftime('%Y-%m-%d')} from month {month_date_str}")
+        full_content = generate_jekyll_content(event_date, daily_markdown, logger)
+        if full_content and "published: true" in full_content:
+            save_news(event_date, full_content, output_dir, logger)
+        else:
+            logger.warning(
+                f"Skipping save for {event_date.strftime('%Y-%m-%d')} from month {month_date_str}: "
+                "Content marked as unpublished or generation failed."
+            )
+    except Exception:
+        logger.exception(
+            f"Unexpected error processing and saving daily event {event_date.strftime('%Y-%m-%d')} for month {month_date_str}"
+        )
 
 
 def worker(date_queue, output_dir, logger) -> None:
@@ -261,26 +348,60 @@ def worker(date_queue, output_dir, logger) -> None:
             logger.info(f"Successfully fetched content for month: {month_date.strftime('%Y-%B')}")
 
             daily_events = split_and_clean_monthly_markdown(monthly_raw_markdown, month_date, logger)
+            month_date_str = month_date.strftime('%Y-%B')
 
             if not daily_events:
                 logger.warning(
-                    f"No daily events found or extracted for month: {month_date.strftime('%Y-%B')}. "
+                    f"No daily events found or extracted for month: {month_date_str}. "
                     f"This might be normal for very recent archives or if the content structure changed.",
                 )
+            else:
+                logger.info(f"Submitting {len(daily_events)} daily events from {month_date_str} for processing and saving.")
+                logger.info(f"Submitting {len(daily_events)} daily events from {month_date_str} for processing and saving using queue/threading.")
 
-            for event_date, daily_markdown in daily_events:
-                logger.info(f"Processing extracted day: {event_date.strftime('%Y-%m-%d')} from month {month_date.strftime('%Y-%B')}")
-                full_content = generate_jekyll_content(event_date, daily_markdown, logger)
-                if full_content and "published: true" in full_content:
-                    save_news(event_date, full_content, output_dir, logger)
-                else:
-                    logger.warning(
-                        f"Skipping save for {event_date.strftime('%Y-%m-%d')}: Content marked as unpublished or generation failed.",
-                    )
+                daily_event_queue = queue.Queue()
+
+                def event_saver_worker():
+                    while True:
+                        try:
+                            task_data = daily_event_queue.get()
+                            if task_data is None:  # Sentinel
+                                daily_event_queue.task_done()
+                                break
+
+                            event_date, daily_md = task_data
+                            _process_and_save_daily_event(event_date, daily_md, output_dir, logger, month_date_str)
+                            daily_event_queue.task_done()
+                        except Exception:
+                            logger.exception(f"Error in event_saver_worker for month {month_date_str}")
+                            if task_data is not None: # Ensure task_done if item was pulled before error
+                                daily_event_queue.task_done()
+
+                num_saver_threads = min(8, len(daily_events) if daily_events else 1)
+                saver_threads = []
+                logger.debug(f"Starting {num_saver_threads} event saver threads for {month_date_str}.")
+                for _ in range(num_saver_threads):
+                    thread = threading.Thread(target=event_saver_worker)
+                    thread.daemon = True
+                    thread.start()
+                    saver_threads.append(thread)
+
+                for event_date, daily_markdown_content in daily_events:
+                    daily_event_queue.put((event_date, daily_markdown_content))
+
+                daily_event_queue.join()
+                logger.debug(f"All daily events processed for {month_date_str}. Signaling saver workers to stop.")
+
+                for _ in range(num_saver_threads):
+                    daily_event_queue.put(None)
+
+                for thread in saver_threads:
+                    thread.join()
+                logger.debug(f"All event saver threads joined for {month_date_str}.")
 
         except Exception:
             # This is a general catch-all for errors not handled by the retry logic for fetching/conversion,
-            # such as unexpected errors within split_and_clean_monthly_markdown or the daily processing loop.
+            # or errors from split_and_clean_monthly_markdown itself.
             logger.exception(f"Unexpected error processing month {month_date.strftime('%Y-%B')}")
         finally:
             date_queue.task_done()
