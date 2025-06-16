@@ -10,6 +10,8 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "mypy>=1.16.0",
+    "pyright>=1.1.402",
     "pytest>=8.4.0",
     "ruff>=0.11.13",
     "types-requests>=2.32.4.20250611",
@@ -37,3 +39,12 @@ ignore = [
     "S101",
     "SIM108",
 ]
+
+[tool.pyright]
+typeCheckingMode = "strict"
+
+[tool.mypy]
+strict = "true"
+
+[tool.uv]
+python-preference = "managed"
