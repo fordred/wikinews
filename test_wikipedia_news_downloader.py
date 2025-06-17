@@ -31,7 +31,7 @@ class TestSplitAndCleanMarkdown(unittest.TestCase):
         assert event_dt_june1 == datetime(2025, 6, 1)
 
         # Check start of content
-        assert md_june1.startswith("**Sports**"), "June 1 MD should start with Sports"
+        assert md_june1.startswith("#### Sports"), "June 1 MD should start with Sports"
         # Check link cleaning (absolute links)
         assert "[2025 CONCACAF Champions Cup](https://en.wikipedia.org/wiki/2025_CONCACAF_Champions_Cup" in md_june1
         # Check original daily header is removed
@@ -48,7 +48,7 @@ class TestSplitAndCleanMarkdown(unittest.TestCase):
         # --- Assertions for June 2 ---
         event_dt_june2, md_june2 = daily_events[1]
         assert event_dt_june2 == datetime(2025, 6, 2)
-        assert md_june2.startswith("**Disasters and accidents**"), "June 2 MD should start with Disasters"
+        assert md_june2.startswith("#### Disasters and accidents"), "June 2 MD should start with Disasters"
         assert "[2025 Nigeria floods](https://en.wikipedia.org/wiki/2025_Nigeria_floods" in md_june2
         assert "June\xa02,\xa02025" not in md_june2
         assert md_june2.strip().endswith(
@@ -58,7 +58,7 @@ class TestSplitAndCleanMarkdown(unittest.TestCase):
         # --- Assertions for June 3 ---
         event_dt_june3, md_june3 = daily_events[2]
         assert event_dt_june3 == datetime(2025, 6, 3)
-        assert md_june3.startswith("**Arts and culture**"), "June 3 MD should start with Arts"
+        assert md_june3.startswith("#### Arts and culture"), "June 3 MD should start with Arts"
         assert "[CJ Opiaza](https://en.wikipedia.org/wiki/CJ_Opiaza" in md_june3  # Check a name that had a redlink in original example
         assert "June\xa03,\xa02025" not in md_june3
         assert md_june3.strip().endswith(
@@ -95,7 +95,7 @@ class TestSplitAndCleanMarkdown(unittest.TestCase):
         assert len(daily_events) == 1
         if len(daily_events) == 1:
             assert daily_events[0][0] == datetime(2025, 7, 5)
-            assert daily_events[0][1].startswith("**Real Content**")
+            assert daily_events[0][1].startswith("#### Real Content")
 
 
 class TestCleanDailyMarkdownContent(unittest.TestCase):

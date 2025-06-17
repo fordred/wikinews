@@ -27,6 +27,9 @@ RELATIVE_WIKI_LINK_RE = re.compile(r"\(/wiki/")
 REDLINK_RE = re.compile(r'\[([^\]]+)\]\(/w/index\.php\?title=[^&\s]+&action=edit&redlink=1\s*"[^"]*"\)')
 CITATION_LINK_RE = re.compile(r"\[\[\d+\]\]\(#cite_note-\d+\)")
 TRAILING_SPACES_RE = re.compile(r"[ \t]+$", flags=re.MULTILINE)
+BOLD_HEADINGS_RE = re.compile(r"^\*\*(.*?)\*\*$", flags=re.MULTILINE)
+PLUS_LIST_RE = re.compile(r"^ {2}\+", flags=re.MULTILINE)
+DASH_LIST_RE = re.compile(r"^ {4}\-", flags=re.MULTILINE)
 
 
 def setup_logging(verbose: bool = False) -> logging.Logger:
@@ -74,6 +77,11 @@ def _clean_daily_markdown_content(daily_md: str) -> str:
     # Remove trailing spaces or tabs from the end of each individual line.
     # This doesn't remove empty lines but cleans lines that only contained spaces/tabs.
     cleaned_text = TRAILING_SPACES_RE.sub("", cleaned_text)
+
+    # Turn bold headings into H4 headings.
+    cleaned_text = BOLD_HEADINGS_RE.sub(r"#### \1", cleaned_text)
+    cleaned_text = PLUS_LIST_RE.sub("  *", cleaned_text)
+    cleaned_text = DASH_LIST_RE.sub("    *", cleaned_text)
 
     # Ensure the entire text block ends with a single newline and has no other trailing whitespace.
     # This also handles cases where the original text might not end with a newline,
