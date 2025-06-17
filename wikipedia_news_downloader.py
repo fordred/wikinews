@@ -22,6 +22,12 @@ RETRY_BASE_WAIT_SECONDS = 20  # Start wait time for retries
 MIN_MARKDOWN_LENGTH_PUBLISH = 10  # Minimum length to consider content valid for publishing
 # --- End Constants ---
 
+# Precompiled regex patterns
+RELATIVE_WIKI_LINK_RE = re.compile(r"\(/wiki/")
+REDLINK_RE = re.compile(r'\[([^\]]+)\]\(/w/index\.php\?title=[^&\s]+&action=edit&redlink=1\s*"[^"]*"\)')
+CITATION_LINK_RE = re.compile(r"\[\[\d+\]\]\(#cite_note-\d+\)")
+TRAILING_SPACES_RE = re.compile(r"[ \t]+$", flags=re.MULTILINE)
+
 
 def setup_logging(verbose: bool = False) -> logging.Logger:
     """Configure logging based on verbosity level."""
@@ -56,24 +62,39 @@ MONTH_NAME_TO_NUMBER = {
 def _clean_daily_markdown_content(daily_md: str) -> str:
     """Helper to apply common cleaning rules to daily markdown."""
     # Replace relative links with absolute links
-    cleaned_text = re.sub(r"\(/wiki/", r"(https://en.wikipedia.org/wiki/", daily_md)
+    cleaned_text = RELATIVE_WIKI_LINK_RE.sub(r"(https://en.wikipedia.org/wiki/", daily_md)
     # Remove markdown links to non-existent pages (redlinks), leaving only the text
-    cleaned_text = re.sub(
-        r'\[([^\]]+)\]\(/w/index\.php\?title=[^&\s]+&action=edit&redlink=1\s*"[^"]*"\)',
+    cleaned_text = REDLINK_RE.sub(
         r"\1",
         cleaned_text,
     )
     # Remove any text that looks like [[1]](#cite_note-1)
-    cleaned_text = re.sub(r"\[\[\d+\]\]\(#cite_note-\d+\)", "", cleaned_text)
+    cleaned_text = CITATION_LINK_RE.sub("", cleaned_text)
 
     # Remove trailing spaces or tabs from the end of each individual line.
     # This doesn't remove empty lines but cleans lines that only contained spaces/tabs.
-    cleaned_text = re.sub(r"[ \t]+$", "", cleaned_text, flags=re.MULTILINE)
+    cleaned_text = TRAILING_SPACES_RE.sub("", cleaned_text)
 
     # Ensure the entire text block ends with a single newline and has no other trailing whitespace.
     # This also handles cases where the original text might not end with a newline,
     # or collapses multiple trailing newlines from the block into one.
     return cleaned_text.rstrip() + "\n"
+
+
+# Regex to find the start of each day's content block, capturing month name, day, and year.
+# Example: June 1, 2025 (2025-06-01) (Sunday) ... [watch]
+# \xa0 is a non-breaking space often found in Wikipedia dates.
+# Regex to capture Month, Day, Year from a line like:
+# June 1, 2025 (2025-06-01) (Sunday)
+# followed by lines for edit, history, watch links.
+# The content for the day starts AFTER the "* [watch](...)\n" line.
+DAY_DELIMITER_RE = re.compile(
+    r"([A-Za-z]+)\xa0(\d{1,2}),\xa0(\d{4})(?:[^\n]*)\n\n"  # Month Day, Year line (captures M, D, Y), rest of line, then two newlines
+    r"\* \[edit\]\(.*?\)\n"  # * [edit](...) line
+    r"\* \[history\]\(.*?\)\n"  # * [history](...) line
+    r"\* \[watch\]\(.*?\)\n",  # * [watch](...) line
+)
+MONTHLY_MARKDOWN_RE = re.compile(r"\[◀\].*", flags=re.DOTALL)
 
 
 def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: datetime, logger: logging.Logger) -> list[tuple[datetime, str]]:
@@ -83,25 +104,11 @@ def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: date
     extracts dates, and cleans each segment.
     """
     # Remove the trailing text that is not part of the daily events.
-    monthly_markdown = re.sub(r"\[◀\].*", "", monthly_markdown, flags=re.DOTALL)
+    monthly_markdown = MONTHLY_MARKDOWN_RE.sub( "", monthly_markdown)
 
     daily_events = []
-    # Regex to find the start of each day's content block, capturing month name, day, and year.
-    # Example: June 1, 2025 (2025-06-01) (Sunday) ... [watch]
-    # \xa0 is a non-breaking space often found in Wikipedia dates.
-    # Regex to capture Month, Day, Year from a line like:
-    # June 1, 2025 (2025-06-01) (Sunday)
-    # followed by lines for edit, history, watch links.
-    # The content for the day starts AFTER the "* [watch](...)\n" line.
-    day_delimiter_regex = re.compile(
-        r"([A-Za-z]+)\xa0(\d{1,2}),\xa0(\d{4})(?:[^\n]*)\n\n"  # Month Day, Year line (captures M, D, Y), rest of line, then two newlines
-        r"\* \[edit\]\(.*?\)\n"  # * [edit](...) line
-        r"\* \[history\]\(.*?\)\n"  # * [history](...) line
-        r"\* \[watch\]\(.*?\)\n",  # * [watch](...) line
-    )
-
     # Find all starting positions of daily segments
-    matches = list(day_delimiter_regex.finditer(monthly_markdown))
+    matches = list(DAY_DELIMITER_RE.finditer(monthly_markdown))
     logger.debug(f"Found {len(matches)} potential daily segments in markdown for {month_datetime.strftime('%Y-%B')}.")
 
     for i, match in enumerate(matches):
