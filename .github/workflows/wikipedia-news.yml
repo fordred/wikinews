@@ -34,6 +34,6 @@ jobs:
     - name: Download Wikipedia News
       run: uv run --upgrade wikipedia_news_downloader.py
 
-    - uses: stefanzweifel/git-auto-commit-action@v6.0.1
+    - uses: stefanzweifel/git-auto-commit-action@v6
       with:
         commit_message: "Update Wikipedia News on ${{ steps.save-date.outputs.date }}"
