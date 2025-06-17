@@ -1,0 +1,101 @@
+name: Python Type Checking
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  type_check_pytype:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [
+          "3.11",
+          "3.12",
+          # "3.13"
+        ]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        version: "latest"
+        pyproject-file: "pyproject.toml"
+        python-version: ${{ matrix.python-version }}
+
+    - name: Run Pytype
+      run: uv run pytype .
+
+  type_check_pyrefly:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        version: "latest"
+        pyproject-file: "pyproject.toml"
+
+    - name: Run Pyrefly
+      run: uv run pyrefly check
+
+  type_check_mypy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        version: "latest"
+        pyproject-file: "pyproject.toml"
+
+    - name: Run Mypy
+      run: uv run mypy --strict .
+
+  type_check_pyright:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        version: "latest"
+        pyproject-file: "pyproject.toml"
+
+    - name: Run Pyright
+      run: uv run pyright --stats .
+
+  # type_check_pyre:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v4
+
+  #   - name: Install uv
+  #     uses: astral-sh/setup-uv@v6
+  #     with:
+  #       version: "latest"
+  #       pyproject-file: "pyproject.toml"
+
+  #   - name: Create Pyre configuration
+  #     run: |
+  #       echo '{
+  #         "source_directories": ["."],
+  #         "search_path": ["/home/runner/.local/lib/python3.13/site-packages"]
+  #       }' > .pyre_configuration
+
+  #   - name: Run Pyre
+  #     run: $HOME/.cargo/bin/uv run pyre check

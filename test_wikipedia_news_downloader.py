@@ -1,10 +1,11 @@
 import logging
-import unittest
 from datetime import datetime
+
+import pytest
 
 from wikipedia_news_downloader import (
     MIN_MARKDOWN_LENGTH_PUBLISH,
-    _clean_daily_markdown_content,
+    clean_daily_markdown_content,
     generate_jekyll_content,
     split_and_clean_monthly_markdown,
 )
@@ -15,10 +16,10 @@ raw_markdown_example = """
 
 # A basic logger for the function call, can be configured if more detail is needed
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)  # So we can see logs if test fails
+# Pytest handles log capture, so basicConfig is not needed here.
 
 
-class TestSplitAndCleanMarkdown(unittest.TestCase):
+class TestSplitAndCleanMarkdown:
     @staticmethod
     def test_split_and_clean_from_issue_example() -> None:
         month_dt = datetime(2025, 6, 1)
@@ -98,106 +99,113 @@ class TestSplitAndCleanMarkdown(unittest.TestCase):
             assert daily_events[0][1].startswith("#### Real Content")
 
 
-class TestCleanDailyMarkdownContent(unittest.TestCase):
-    def test_remove_redlinks(self) -> None:
-        # Test various redlink formats
-        inputs = [
-            "Text with a [redlink](/w/index.php?title=Red_Link&action=edit&redlink=1).",
-            "Text with another [redlink](//en.wikipedia.org/w/index.php?title=Another_Red_Link&action=edit&redlink=1).",
-            "Text with [redlink with spaces](/w/index.php?title=Red%20Link%20Spaces&action=edit&redlink=1).",
-            # Assuming simple non-existent page links are treated as redlinks if they lead to an edit page or similar non-content page,
-            # which the function might not distinguish from true redlinks without web access. The current function focuses on
-            # specific patterns.
-            "A [simple redlink](Red_Link_Page_Not_Exist).",
-        ]
-        expected_outputs = [
-            # Not removed due to missing title attribute in link
-            "Text with a [redlink](/w/index.php?title=Red_Link&action=edit&redlink=1).\n",
-            # Not removed
-            "Text with another [redlink](//en.wikipedia.org/w/index.php?title=Another_Red_Link&action=edit&redlink=1).\n",
-            # Not removed
-            "Text with [redlink with spaces](/w/index.php?title=Red%20Link%20Spaces&action=edit&redlink=1).\n",
-            # Not a redlink pattern
-            "A [simple redlink](Red_Link_Page_Not_Exist).\n",
-        ]
+class TestCleanDailyMarkdownContent:
+    @pytest.mark.parametrize(
+        ("text_input", "expected_output"),
+        [
+            (
+                "Text with a [redlink](/w/index.php?title=Red_Link&action=edit&redlink=1).",
+                "Text with a [redlink](/w/index.php?title=Red_Link&action=edit&redlink=1).\n",
+            ),
+            (
+                "Text with another [redlink](//en.wikipedia.org/w/index.php?title=Another_Red_Link&action=edit&redlink=1).",
+                "Text with another [redlink](//en.wikipedia.org/w/index.php?title=Another_Red_Link&action=edit&redlink=1).\n",
+            ),
+            (
+                "Text with [redlink with spaces](/w/index.php?title=Red%20Link%20Spaces&action=edit&redlink=1).",
+                "Text with [redlink with spaces](/w/index.php?title=Red%20Link%20Spaces&action=edit&redlink=1).\n",
+            ),
+            (
+                "A [simple redlink](Red_Link_Page_Not_Exist).",
+                "A [simple redlink](Red_Link_Page_Not_Exist).\n",
+            ),
+        ],
+    )
+    def test_remove_redlinks_various_formats(self, text_input: str, expected_output: str) -> None:
+        # The original test had comments about why these are not removed,
+        # which is due to the specific regex in clean_daily_markdown_content.
+        # The assertions reflect the current behavior.
+        assert clean_daily_markdown_content(text_input) == expected_output
 
-        for i, text_input in enumerate(inputs):
-            with self.subTest(i=i):
-                assert _clean_daily_markdown_content(text_input) == expected_outputs[i]
-
-        # Test specific case from the original code for redlink removal (assuming it had a title attribute in its original context)
-        # If the function is intended to remove [Text](/w/index.php?title=...&action=edit&redlink=1 "Title") format
-        # For the test string "[CJ Opiaza](/w/index.php?title=CJ_Opiaza&action=edit&redlink=1)"
-        # it will NOT be cleaned as it lacks the hover title part "CJ Opiaza"
+    def test_remove_redlink_specific_non_match(self) -> None:
+        # Test specific case from the original code for redlink removal
+        # This link lacks the hover title part and won't be cleaned by the current REDLINK_RE
         redlink_from_code_no_title_attr = "[CJ Opiaza](/w/index.php?title=CJ_Opiaza&action=edit&redlink=1)"
-        cleaned_redlink_from_code_no_title_attr = "[CJ Opiaza](/w/index.php?title=CJ_Opiaza&action=edit&redlink=1)\n"  # Stays the same
-        assert _clean_daily_markdown_content(redlink_from_code_no_title_attr) == cleaned_redlink_from_code_no_title_attr
+        cleaned_redlink_from_code_no_title_attr = "[CJ Opiaza](/w/index.php?title=CJ_Opiaza&action=edit&redlink=1)\n"
+        assert clean_daily_markdown_content(redlink_from_code_no_title_attr) == cleaned_redlink_from_code_no_title_attr
 
-        # Example that *would* be cleaned by the current regex
+    def test_remove_redlink_specific_match(self) -> None:
+        # Example that *would* be cleaned by the current regex due to presence of title attribute in quotes
         redlink_that_matches_regex = '[Example Link](/w/index.php?title=Example_Link&action=edit&redlink=1 "Example Link")'
         cleaned_matching_redlink = "Example Link\n"
-        assert _clean_daily_markdown_content(redlink_that_matches_regex) == cleaned_matching_redlink
+        assert clean_daily_markdown_content(redlink_that_matches_regex) == cleaned_matching_redlink
 
-    def test_remove_citation_markers(self) -> None:
-        inputs = [
-            "Text with a citation [[1]](#cite_note-1).",
-            "Another citation format [[citation needed]](#).",  # Assuming this also gets removed
-            "Text with multiple citations [[2]](#cite_note-2) and [[3]](#cite_note-3).",
-        ]
-        # Correcting expected output based on current function's known behavior (specific citation patterns)
-        expected_outputs = [
-            "Text with a citation .\n",  # Space remains before period after citation removal
-            "Another citation format [[citation needed]](#).\n",  # This format is not removed
-            "Text with multiple citations  and .\n",  # Spaces remain
-        ]
-        for i, text_input in enumerate(inputs):
-            with self.subTest(i=i):
-                assert _clean_daily_markdown_content(text_input) == expected_outputs[i]
+    @pytest.mark.parametrize(
+        ("text_input", "expected_output"),
+        [
+            (
+                "Text with a citation [[1]](#cite_note-1).",
+                "Text with a citation .\n",
+            ),
+            # This format is not removed by current regex
+            (
+                "Another citation format [[citation needed]](#).",
+                "Another citation format [[citation needed]](#).\n",
+            ),
+            (
+                "Text with multiple citations [[2]](#cite_note-2) and [[3]](#cite_note-3).",
+                "Text with multiple citations  and .\n",
+            ),
+        ],
+    )
+    def test_remove_citation_markers(self, text_input: str, expected_output: str) -> None:
+        assert clean_daily_markdown_content(text_input) == expected_output
 
-    def test_remove_trailing_spaces_and_tabs(self) -> None:
-        inputs = [
-            "Line with trailing space. \nAnother line with trailing tab.\t\nNo trailing here.",
-            "Single line with spaces and tabs. \t \t",
-        ]
-        expected_outputs = [
-            "Line with trailing space.\nAnother line with trailing tab.\nNo trailing here.\n",
-            "Single line with spaces and tabs.\n",
-        ]
-        for i, text_input in enumerate(inputs):
-            with self.subTest(i=i):
-                assert _clean_daily_markdown_content(text_input) == expected_outputs[i]
+    @pytest.mark.parametrize(
+        ("text_input", "expected_output"),
+        [
+            (
+                "Line with trailing space. \nAnother line with trailing tab.\t\nNo trailing here.",
+                "Line with trailing space.\nAnother line with trailing tab.\nNo trailing here.\n",
+            ),
+            ("Single line with spaces and tabs. \t \t", "Single line with spaces and tabs.\n"),
+        ],
+    )
+    def test_remove_trailing_spaces_and_tabs(self, text_input: str, expected_output: str) -> None:
+        assert clean_daily_markdown_content(text_input) == expected_output
 
-    def test_ensure_single_trailing_newline(self) -> None:
-        inputs = {
-            "No trailing newline": "Some text",
-            "One trailing newline": "Some text\n",
-            "Multiple trailing newlines": "Some text\n\n\n",
-            "Trailing spaces and newlines": "Some text  \n\n",
-            "Just spaces and newlines": "  \n\n",  # Will become empty string, then single newline
-        }
-        expected_output = "Some text\n"  # Default expected
-        for name, text_input in inputs.items():
-            with self.subTest(name=name):
-                if name == "Just spaces and newlines":
-                    assert _clean_daily_markdown_content(text_input) == "\n"
-                else:
-                    assert _clean_daily_markdown_content(text_input) == expected_output
-
-        assert _clean_daily_markdown_content("\n\n") == "\n"  # Test multiple newlines only
+    @pytest.mark.parametrize(
+        ("text_input", "expected_cleaned_output"),
+        [
+            ("Some text", "Some text\n"),  # No trailing newline
+            ("Some text\n", "Some text\n"),  # One trailing newline
+            ("Some text\n\n\n", "Some text\n"),  # Multiple trailing newlines
+            ("Some text  \n\n", "Some text\n"),  # Trailing spaces and newlines
+            ("  \n\n", "\n"),  # Just spaces and newlines
+            ("\n\n", "\n"),  # Multiple newlines only
+        ],
+    )
+    def test_ensure_single_trailing_newline(self, text_input: str, expected_cleaned_output: str) -> None:
+        assert clean_daily_markdown_content(text_input) == expected_cleaned_output
 
     def test_no_cleaning_needed(self) -> None:
         text_input = "This is a clean line.\nAnd another one."
-        # Expect single trailing newline
-        expected_output = "This is a clean line.\nAnd another one.\n"  # This already has a trailing newline, as per function's behavior
-        assert _clean_daily_markdown_content(text_input) == expected_output
+        # Expect single trailing newline to be added if not present, or maintained if present.
+        # The function adds a newline if one isn't at the very end.
+        expected_output = "This is a clean line.\nAnd another one.\n"
+        assert clean_daily_markdown_content(text_input) == expected_output
 
     def test_empty_string_input(self) -> None:
         text_input = ""
         expected_output = "\n"  # Empty string results in a single newline
-        assert _clean_daily_markdown_content(text_input) == expected_output
+        assert clean_daily_markdown_content(text_input) == expected_output
 
     def test_combined_cleaning_rules(self) -> None:
+        # This input tests redlink (non-matching due to no title attribute), citation (non-matching), trailing spaces, and extra newlines.
         text_input = (
+            # Note: The redlink and citation here don't match the strict patterns in clean_daily_markdown_content
+            # so they won't be removed/altered beyond general cleaning.
+            # The main things being tested here are trailing space removal and newline normalization.
             "Event with [a redlink](/w/index.php?title=Red_Link&action=edit&redlink=1) and citation [[CITE]](#cite-1). \t\n"
             "Another line with trailing spaces.   \n"
             "Final line without anything extra.\n\n\n"  # Extra newlines
@@ -207,75 +215,80 @@ class TestCleanDailyMarkdownContent(unittest.TestCase):
             "Another line with trailing spaces.\n"
             "Final line without anything extra.\n"
         )
-        assert _clean_daily_markdown_content(text_input) == expected_output
+        assert clean_daily_markdown_content(text_input) == expected_output
 
 
-class TestGenerateJekyllContent(unittest.TestCase):
-    def setUp(self) -> None:
-        self.test_date = datetime(2023, 10, 26)
-        self.logger = logging.getLogger(__name__)  # Use the same logger as other tests
+@pytest.fixture
+def common_test_date() -> datetime:
+    return datetime(2023, 10, 26)
 
-    def test_correct_front_matter_and_published_true(self) -> None:
-        markdown_body = "This is a valid markdown body.\n" + ("a" * MIN_MARKDOWN_LENGTH_PUBLISH)
+
+class TestGenerateJekyllContent:
+    def test_correct_front_matter_and_published_true(self, common_test_date: datetime) -> None:
+        text_input = "This is a valid markdown body.\n" + ("a" * MIN_MARKDOWN_LENGTH_PUBLISH)
         expected_title = "2023 October 26"
         expected_date_format = "2023-10-26"
 
-        full_content = generate_jekyll_content(self.test_date, markdown_body, self.logger)
+        full_content = generate_jekyll_content(common_test_date, text_input, logger)
 
         assert "---" in full_content
         assert "layout: post" in full_content
         assert f"title: {expected_title}" in full_content
         assert f"date: {expected_date_format}" in full_content
         assert "published: true" in full_content
-        assert full_content.endswith("\n\n\n" + markdown_body)  # 3 blank lines then body
+        assert full_content.endswith("\n\n\n" + text_input)  # 3 blank lines then body
 
-    def test_published_true_sufficient_body_length(self) -> None:
+    def test_published_true_sufficient_body_length(self, common_test_date: datetime) -> None:
         # Exactly MIN_MARKDOWN_LENGTH_PUBLISH
         markdown_body = "a" * MIN_MARKDOWN_LENGTH_PUBLISH
-        full_content = generate_jekyll_content(self.test_date, markdown_body, self.logger)
+        full_content = generate_jekyll_content(common_test_date, markdown_body, logger)
         assert "published: true" in full_content
         assert full_content.endswith(markdown_body)
 
         # More than MIN_MARKDOWN_LENGTH_PUBLISH
         markdown_body_long = "a" * (MIN_MARKDOWN_LENGTH_PUBLISH + 10)
-        full_content_long = generate_jekyll_content(self.test_date, markdown_body_long, self.logger)
+        full_content_long = generate_jekyll_content(common_test_date, markdown_body_long, logger)
         assert "published: true" in full_content_long
         assert full_content_long.endswith(markdown_body_long)
 
-    def test_published_false_insufficient_body_length(self) -> None:
+    def test_published_false_insufficient_body_length(self, common_test_date: datetime) -> None:
         # Less than MIN_MARKDOWN_LENGTH_PUBLISH
-        markdown_body = "a" * (MIN_MARKDOWN_LENGTH_PUBLISH - 1)
-        if not markdown_body:  # handle case where MIN_MARKDOWN_LENGTH_PUBLISH is 1 or 0
-            markdown_body = ""  # ensure it's less, but not by creating negative string length
+        markdown_body = "a" * max(0, MIN_MARKDOWN_LENGTH_PUBLISH - 1)
 
-        full_content = generate_jekyll_content(self.test_date, markdown_body, self.logger)
+        full_content = generate_jekyll_content(common_test_date, markdown_body, logger)
         assert "published: false" in full_content
 
         # Body should be empty when published is false
-        expected_ending = "\n\n\n"  # 3 blank lines after front matter
-        assert full_content.endswith(expected_ending)
-        # Check that the original markdown_body is NOT after the front matter
-        if markdown_body is not None:
-            assert (expected_ending + markdown_body) not in full_content
+        expected_front_matter_lines = [
+            "---",
+            "layout: post",
+            f"title: {common_test_date.strftime('%Y %B %d')}",
+            f"date: {common_test_date.strftime('%Y-%m-%d')}",
+            "published: false",
+            "---",
+            "",
+            "",
+            "",
+        ]
+        expected_full_content = "\n".join(expected_front_matter_lines)
+        assert full_content == expected_full_content
 
-    def test_published_false_empty_string_body(self) -> None:
+    def test_published_false_empty_string_body(self, common_test_date: datetime) -> None:
         markdown_body = ""
-        full_content = generate_jekyll_content(self.test_date, markdown_body, self.logger)
+        full_content = generate_jekyll_content(common_test_date, markdown_body, logger)
         assert "published: false" in full_content
 
         # Body should be empty
-        expected_ending = "\n\n\n"  # 3 blank lines after front matter
-        assert full_content.endswith(expected_ending)
-        # When markdown_body is empty, (expected_ending + markdown_body) is just expected_ending.
-        # The previous assertNotIn would incorrectly fail.
-        # The important check is that the content ends with just the newlines from the front matter.
-
-
-if __name__ == "__main__":
-    unittest.main()
-
-# Ensure MONTH_NAME_TO_NUMBER and _clean_daily_markdown_content are available if this file is run directly
-# For simplicity, they are imported from the main module, which is standard for testing.
-# If the main script wikipedia_news_downloader.py has its own if __name__ == '__main__': block,
-# then these functions won't be an issue when tests are run via `python -m unittest test_wikipedia_news_downloader.py`
-# or similar test runner.
+        expected_front_matter_lines = [
+            "---",
+            "layout: post",
+            f"title: {common_test_date.strftime('%Y %B %d')}",
+            f"date: {common_test_date.strftime('%Y-%m-%d')}",
+            "published: false",
+            "---",
+            "",
+            "",
+            "",
+        ]
+        expected_full_content = "\n".join(expected_front_matter_lines)
+        assert full_content == expected_full_content
