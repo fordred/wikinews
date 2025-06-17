@@ -62,7 +62,7 @@ MONTH_NAME_TO_NUMBER = {
 }
 
 
-def _clean_daily_markdown_content(daily_md: str) -> str:
+def clean_daily_markdown_content(daily_md: str) -> str:
     """Helper to apply common cleaning rules to daily markdown."""
     # Replace relative links with absolute links
     cleaned_text = RELATIVE_WIKI_LINK_RE.sub(r"(https://en.wikipedia.org/wiki/", daily_md)
@@ -112,9 +112,9 @@ def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: date
     extracts dates, and cleans each segment.
     """
     # Remove the trailing text that is not part of the daily events.
-    monthly_markdown = MONTHLY_MARKDOWN_RE.sub( "", monthly_markdown)
+    monthly_markdown = MONTHLY_MARKDOWN_RE.sub("", monthly_markdown)
 
-    daily_events = []
+    daily_events: list[tuple[datetime, str]] = []
     # Find all starting positions of daily segments
     matches = list(DAY_DELIMITER_RE.finditer(monthly_markdown))
     logger.debug(f"Found {len(matches)} potential daily segments in markdown for {month_datetime.strftime('%Y-%B')}.")
@@ -147,7 +147,7 @@ def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: date
 
             # The header (e.g. "June 1, 2025 ... (action=watch)\n") has already been excluded by segment_start_pos.
             # Now apply further cleaning.
-            cleaned_daily_md = _clean_daily_markdown_content(daily_raw_content.strip())
+            cleaned_daily_md = clean_daily_markdown_content(daily_raw_content.strip())
 
             if cleaned_daily_md.strip():  # Ensure there's some content
                 daily_events.append((day_dt, cleaned_daily_md))
@@ -211,7 +211,7 @@ def generate_jekyll_content(date: datetime, markdown_body: str, logger: logging.
     return "\n".join(front_matter_lines) + content_body
 
 
-def worker(date_queue, output_dir, logger) -> None:
+def worker(date_queue: queue.Queue[tuple[datetime, int]], output_dir: str, logger: logging.Logger) -> None:
     while True:
         try:
             item = date_queue.get(timeout=2)
@@ -357,7 +357,7 @@ def main() -> None:
         date_queue.put((date, 0))  # (date, retry_count)
 
     num_workers = args.workers or min(8, len(dates))
-    threads = []
+    threads: list[threading.Thread] = []
     for _ in range(num_workers):
         t = threading.Thread(target=worker, args=(date_queue, args.output_dir, logger))
         t.start()

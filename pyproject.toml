@@ -3,7 +3,7 @@ name = "wikinews"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.14"
 dependencies = [
     "markitdown",
 ]
@@ -11,8 +11,10 @@ dependencies = [
 [dependency-groups]
 dev = [
     "mypy>=1.16.0",
+    "pyrefly>=0.20.1",
     "pyright>=1.1.402",
     "pytest>=8.4.0",
+    "pytype>=2024.10.11 ; sys_platform == 'linux'",
     "ruff>=0.11.13",
     "types-requests>=2.32.4.20250611",
 ]
@@ -48,3 +50,5 @@ strict = "true"
 
 [tool.uv]
 python-preference = "managed"
+
+[tool.pyrefly]
