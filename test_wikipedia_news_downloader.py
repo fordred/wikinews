@@ -105,13 +105,20 @@ class TestCleanDailyMarkdownContent(unittest.TestCase):
             "Text with a [redlink](/w/index.php?title=Red_Link&action=edit&redlink=1).",
             "Text with another [redlink](//en.wikipedia.org/w/index.php?title=Another_Red_Link&action=edit&redlink=1).",
             "Text with [redlink with spaces](/w/index.php?title=Red%20Link%20Spaces&action=edit&redlink=1).",
-            "A [simple redlink](Red_Link_Page_Not_Exist).",  # Assuming simple non-existent page links are treated as redlinks if they lead to an edit page or similar non-content page, which the function might not distinguish from true redlinks without web access. The current function focuses on specific patterns.
+            # Assuming simple non-existent page links are treated as redlinks if they lead to an edit page or similar non-content page,
+            # which the function might not distinguish from true redlinks without web access. The current function focuses on
+            # specific patterns.
+            "A [simple redlink](Red_Link_Page_Not_Exist).",
         ]
         expected_outputs = [
-            "Text with a [redlink](/w/index.php?title=Red_Link&action=edit&redlink=1).\n",  # Not removed due to missing title attribute in link
-            "Text with another [redlink](//en.wikipedia.org/w/index.php?title=Another_Red_Link&action=edit&redlink=1).\n",  # Not removed
-            "Text with [redlink with spaces](/w/index.php?title=Red%20Link%20Spaces&action=edit&redlink=1).\n",  # Not removed
-            "A [simple redlink](Red_Link_Page_Not_Exist).\n",  # Not a redlink pattern
+            # Not removed due to missing title attribute in link
+            "Text with a [redlink](/w/index.php?title=Red_Link&action=edit&redlink=1).\n",
+            # Not removed
+            "Text with another [redlink](//en.wikipedia.org/w/index.php?title=Another_Red_Link&action=edit&redlink=1).\n",
+            # Not removed
+            "Text with [redlink with spaces](/w/index.php?title=Red%20Link%20Spaces&action=edit&redlink=1).\n",
+            # Not a redlink pattern
+            "A [simple redlink](Red_Link_Page_Not_Exist).\n",
         ]
 
         for i, text_input in enumerate(inputs):
