@@ -10,14 +10,14 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "mypy>=1.16.0",
-    "pyrefly>=0.20.1",
-    "pyright>=1.1.402",
-    "pytest>=8.4.0",
-    "pytest-cov>=6.2.1",
-    "pytype>=2024.10.11 ; sys_platform == 'linux'",
-    "ruff>=0.11.13",
-    "types-requests>=2.32.4.20250611",
+    "mypy",
+    "pyrefly",
+    "pyright",
+    "pytest",
+    "pytest-cov",
+    "pytype ; sys_platform == 'linux'",
+    "ruff",
+    "types-requests",
 ]
 
 [tool.ruff]
