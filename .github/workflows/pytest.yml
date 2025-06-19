@@ -27,4 +27,4 @@ jobs:
 
     - name: Test with pytest
       run: |
-        uv run --frozen pytest
+        uv run --frozen pytest --cov=wikipedia_news_downloader --cov-branch --cov-report term-missing --cov-report html:cov.html
