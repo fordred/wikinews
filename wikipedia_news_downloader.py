@@ -211,159 +211,254 @@ def generate_jekyll_content(date: datetime, markdown_body: str, logger: logging.
     return "\n".join(front_matter_lines) + content_body
 
 
-def worker(date_queue: queue.Queue[tuple[datetime, int]], output_dir: str, logger: logging.Logger) -> None:
+from typing import Union, Tuple
+
+# Define a more generic queue item type
+QueueItem = Union[Tuple[datetime, int], Path]
+
+def worker(processing_queue: queue.Queue[QueueItem], output_dir: str, logger: logging.Logger) -> None:
     while True:
         try:
-            item = date_queue.get(timeout=2)
+            queue_item = processing_queue.get(timeout=2)
         except queue.Empty:
             break  # No more items to process
 
-        # 'date' here is the first day of the month to be processed
-        month_date, retries = item
-        if retries > RETRY_MAX_ATTEMPTS:
-            logger.error(f"Exceeded max retries ({RETRY_MAX_ATTEMPTS}) for month {month_date.strftime('%Y-%B')}")
-            date_queue.task_done()
-            continue
+        monthly_raw_markdown = ""
+        source_name = "" # For logging
+        month_for_processing: datetime # datetime object representing the month being processed.
 
-        logger.info(f"Processing month: {month_date.strftime('%Y-%B')} (attempt {retries + 1})")
-        # URL is for the entire month, e.g., Portal:Current_events/January_2025
-        url = f"{BASE_WIKIPEDIA_URL}{month_date:%B}_{month_date.year}"
-        logger.debug(f"Prepare to fetch monthly page: {url}")
+        # --- Determine source and fetch/read content ---
+        if isinstance(queue_item, Path): # Processing a local HTML file
+            local_file_path = queue_item
+            source_name = local_file_path.name
+            logger.info(f"Processing local file: {source_name}")
 
-        try:
-            monthly_raw_markdown = ""
+            # Derive month_for_processing from filename, e.g., "january_2025.html"
+            try:
+                parts = local_file_path.stem.split("_")
+                month_name_str = parts[0].capitalize()
+                year_str = parts[1]
+                month_num = MONTH_NAME_TO_NUMBER[month_name_str]
+                month_for_processing = datetime(int(year_str), month_num, 1)
+            except (IndexError, KeyError, ValueError) as e:
+                logger.error(f"Could not derive date from filename {source_name}: {e}. Skipping.")
+                processing_queue.task_done()
+                continue
+
+            try:
+                md = MarkItDown()
+                # Use file URI scheme for local files
+                result = md.convert(f"file://{local_file_path.resolve()}")
+                monthly_raw_markdown = result.text_content
+                logger.debug(f"Raw MarkItDown result length for {source_name}: {len(monthly_raw_markdown)}")
+            except Exception: # Catch all exceptions during local file processing
+                logger.exception(f"Unexpected error converting local file {source_name}")
+                processing_queue.task_done()
+                continue # Skip to next item
+
+        elif isinstance(queue_item, tuple): # Processing a date (fetch from URL)
+            month_date, retries = queue_item
+            month_for_processing = month_date # Use the provided datetime
+            source_name = month_date.strftime('%Y-%B')
+
+            if retries > RETRY_MAX_ATTEMPTS:
+                logger.error(f"Exceeded max retries ({RETRY_MAX_ATTEMPTS}) for month {source_name}")
+                processing_queue.task_done()
+                continue
+
+            logger.info(f"Processing month: {source_name} (attempt {retries + 1})")
+            url = f"{BASE_WIKIPEDIA_URL}{month_date:%B}_{month_date.year}"
+            logger.debug(f"Prepare to fetch monthly page: {url}")
+
             try:
                 md = MarkItDown()
                 result = md.convert(url)
                 monthly_raw_markdown = result.text_content
-                logger.debug(f"Raw MarkItDown result length for month {month_date.strftime('%Y-%B')}: {len(monthly_raw_markdown)}")
+                logger.debug(f"Raw MarkItDown result length for month {source_name}: {len(monthly_raw_markdown)}")
             except requests.exceptions.RequestException as e:
                 status_code = getattr(e.response, "status_code", None)
-                if status_code == 429:
+                if status_code == 429: # Too Many Requests
                     logger.warning(
-                        (
-                            f"HTTP 429 Too Many Requests for {url}. "
-                            f"Re-queuing month {month_date.strftime('%Y-%B')} for later retry "
-                            f"(attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})..."
-                        ),
+                        f"HTTP 429 Too Many Requests for {url}. Re-queuing {source_name} (attempt {retries + 1})."
                     )
-                    date_queue.put((month_date, retries + 1))  # Re-queue with incremented retry count
-                    date_queue.task_done()
-                    continue
-                if status_code == 404:
-                    logger.warning(f"HTTP 404 Not Found for {url} (month: {month_date.strftime('%Y-%B')}). Skipping retries.")
-                    date_queue.task_done()
-                    continue
-                logger.warning(
-                    f"Request error fetching {url} (month: {month_date.strftime('%Y-%B')}): {e}. "
-                    f"Retrying (attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})...",
-                )
-                time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
-                date_queue.put((month_date, retries + 1))
-                date_queue.task_done()
+                    processing_queue.put((month_date, retries + 1))
+                elif status_code == 404: # Not Found
+                    logger.warning(f"HTTP 404 Not Found for {url} ({source_name}). Skipping.")
+                else: # Other request errors
+                    logger.warning(
+                        f"Request error fetching {url} ({source_name}): {e}. Retrying (attempt {retries + 1})."
+                    )
+                    time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
+                    processing_queue.put((month_date, retries + 1))
+                processing_queue.task_done()
                 continue
             except Exception:  # Includes MarkItDown conversion errors
                 logger.exception(
-                    f"Unexpected error converting {url} (month: {month_date.strftime('%Y-%B')}, "
-                    f"attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})",
+                    f"Unexpected error converting {url} ({source_name}, attempt {retries + 1})"
                 )
                 time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
-                date_queue.put((month_date, retries + 1))
-                date_queue.task_done()
+                processing_queue.put((month_date, retries + 1))
+                processing_queue.task_done()
+                continue
+        else:
+            logger.error(f"Unknown item type in queue: {type(queue_item)}. Skipping.")
+            processing_queue.task_done()
+            continue
+
+        # --- Process content (common for both local files and URLs) ---
+        try:
+            if not monthly_raw_markdown.strip():
+                logger.warning(f"No content extracted for {source_name}. Skipping further processing.")
+                processing_queue.task_done()
                 continue
 
-            # If we get here, monthly_raw_markdown is available
-            logger.info(f"Successfully fetched content for month: {month_date.strftime('%Y-%B')}")
-
-            daily_events = split_and_clean_monthly_markdown(monthly_raw_markdown, month_date, logger)
+            logger.info(f"Successfully fetched/read content for {source_name}")
+            daily_events = split_and_clean_monthly_markdown(monthly_raw_markdown, month_for_processing, logger)
 
             if not daily_events:
                 logger.warning(
-                    f"No daily events found or extracted for month: {month_date.strftime('%Y-%B')}. "
-                    f"This might be normal for very recent archives or if the content structure changed.",
+                    f"No daily events found or extracted for {source_name}. "
+                    "This might be normal for very recent archives or if the content structure changed."
                 )
 
             for event_date, daily_markdown in daily_events:
-                logger.info(f"Processing extracted day: {event_date.strftime('%Y-%m-%d')} from month {month_date.strftime('%Y-%B')}")
+                logger.info(f"Processing extracted day: {event_date.strftime('%Y-%m-%d')} from {source_name}")
                 full_content = generate_jekyll_content(event_date, daily_markdown, logger)
-                if full_content and "published: true" in full_content:
+                if full_content and "published: true" in full_content: # Check if content is publishable
                     save_news(event_date, full_content, output_dir, logger)
                 else:
                     logger.warning(
-                        f"Skipping save for {event_date.strftime('%Y-%m-%d')}: Content marked as unpublished or generation failed.",
+                        f"Skipping save for {event_date.strftime('%Y-%m-%d')}: Content marked as unpublished or generation failed."
                     )
-
         except Exception:
-            # This is a general catch-all for errors not handled by the retry logic for fetching/conversion,
-            # such as unexpected errors within split_and_clean_monthly_markdown or the daily processing loop.
-            logger.exception(f"Unexpected error processing month {month_date.strftime('%Y-%B')}")
+            # This is a general catch-all for errors during the processing part (splitting, saving)
+            logger.exception(f"Unexpected error processing content from {source_name}")
         finally:
-            date_queue.task_done()
+            processing_queue.task_done()
 
 
-def main() -> None:
+def main(local_html_files: list[Path] = None, output_dir: str = None) -> None:
     # Set up argument parsing
     parser = argparse.ArgumentParser(description="Download Wikipedia News")
+    # Add new argument for local HTML files, not exposed via CLI for now, but used programmatically.
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose logging")
+    parser.add_argument(
+        "--local-html-dir", # New CLI argument for a directory of local HTML files
+        type=Path,
+        default=None,
+        help="Directory containing local HTML files to process instead of fetching from Wikipedia.",
+    )
     parser.add_argument(
         "-o",
         "--output-dir",
         type=str,
-        default=DEFAULT_OUTPUT_DIR,
+        default=DEFAULT_OUTPUT_DIR, # Use constant for default
         help=f"Directory to save markdown files (default: {DEFAULT_OUTPUT_DIR})",
     )
     parser.add_argument(
         "-w",
         "--workers",
         type=int,
-        default=None,  # Default to ThreadPoolExecutor's choice
+        default=None,
         help="Maximum number of concurrent download workers",
     )
-    args = parser.parse_args()
+
+    # If local_html_files is provided, we are in programmatic/testing mode for file inputs.
+    # Avoid parsing sys.argv which might contain pytest arguments.
+    # We'll construct a minimal args object or use defaults for other settings.
+    if local_html_files is not None or output_dir is not None: # Programmatic call affecting inputs/outputs
+        # Parse with an empty list to use defaults for -v, -w unless also passed programmatically
+        # Or, create a Namespace with defaults. For now, empty list is simplest for current need.
+        parsed_args_list = []
+        # If specific CLI args like --verbose still need to be controllable, they'd need more handling here.
+        # For instance, if main got a `verbose_override` param.
+        # For this test, we assume default verbosity and worker counts are fine.
+        args = parser.parse_args(parsed_args_list)
+    else: # Standard CLI execution
+        args = parser.parse_args()
+
 
     # Setup logging
+    # If called programmatically and wanting to control verbosity, main() would need a verbose param.
+    # For now, it uses args.verbose which is False if `parsed_args_list` was empty.
     logger = setup_logging(args.verbose)
 
-    # Dates to download
-    now = datetime.now()
-    # Start from January 1, 2025
-    start_date = datetime(2025, 1, 1)
-    # End on the first day of the current month
-    end_date = datetime(now.year, now.month, 1)
-
-    # Use a set to avoid duplicates, populate with the first day of each month
-    dates: set[datetime] = set()
-    current_date = start_date
-    while current_date <= end_date:
-        dates.add(current_date)
-        # Move to the first day of the next month
-        if current_date.month == 12:
-            current_date = datetime(current_date.year + 1, 1, 1)
-        else:
-            current_date = datetime(current_date.year, current_date.month + 1, 1)
-
-    logger.info(
-        f"Starting download for {len(dates)} dates from {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
-        f" (first day of each month inclusive) using up to {args.workers or 'default'} workers."
-        f" Output directory: {args.output_dir}",
-    )
+    # Determine the effective output directory
+    # Priority: 1. output_dir param (if provided to main), 2. args.output_dir (CLI or its default)
+    current_output_dir = output_dir if output_dir is not None else args.output_dir
 
     # Ensure output directory exists
-    Path(args.output_dir).mkdir(parents=True, exist_ok=True)
+    Path(current_output_dir).mkdir(parents=True, exist_ok=True)
 
-    # Use a queue for cooperative retry handling
-    date_queue: queue.Queue[tuple[datetime, int]] = queue.Queue()
-    for date in sorted(dates):
-        date_queue.put((date, 0))  # (date, retry_count)
+    processing_queue: queue.Queue[QueueItem] = queue.Queue()
+    items_to_process_count = 0
+    operation_mode = "" # For logging clarity
 
-    num_workers = args.workers or min(8, len(dates))
+    # Determine if processing local files (either from main() param or CLI)
+    # local_html_files param (if provided to main) takes precedence over --local-html-dir CLI arg.
+    if local_html_files is not None: # Programmatic list of files
+        operation_mode = f"local files provided programmatically ({len(local_html_files)} files)"
+        for file_path in local_html_files:
+            if file_path.is_file() and file_path.suffix == ".html":
+                processing_queue.put(file_path)
+            else:
+                logger.warning(f"Skipping non-HTML file or directory from local_html_files list: {file_path}")
+        items_to_process_count = processing_queue.qsize()
+    elif args.local_html_dir:
+        operation_mode = f"local files from CLI directory: {args.local_html_dir}"
+        cli_local_files = list(Path(args.local_html_dir).glob("*.html"))
+        if not cli_local_files: # Should be caught by previous check if args.local_html_dir was used
+            logger.warning(f"No HTML files found in specified --local-html-dir: {args.local_html_dir}")
+            return
+        for file_path in cli_local_files: # Ensure these are Path objects
+            processing_queue.put(Path(file_path))
+        items_to_process_count = processing_queue.qsize()
+    else:
+        # Original behavior: Fetch from Wikipedia based on dates
+        operation_mode = "Wikipedia URL fetching mode"
+        now = datetime.now()
+        start_date = datetime(2025, 1, 1)
+        end_date = datetime(now.year, now.month, 1)
+
+        dates_set: set[datetime] = set()
+        current_date = start_date
+        while current_date <= end_date:
+            dates_set.add(current_date)
+            if current_date.month == 12:
+                current_date = datetime(current_date.year + 1, 1, 1)
+            else:
+                current_date = datetime(current_date.year, current_date.month + 1, 1)
+
+        items_to_process_count = len(dates_set)
+        for date_item in sorted(list(dates_set)):
+            processing_queue.put((date_item, 0)) # (date, retry_count)
+
+    if items_to_process_count == 0:
+        logger.info(f"No items to process in {operation_mode}.")
+        return
+
+    logger.info(
+        f"Starting processing in mode: {operation_mode}. "
+        f"Output directory: {current_output_dir}. "
+        f"Using up to {args.workers or min(8, items_to_process_count)} worker thread(s)."
+    )
+
+    # Determine num_workers based on args, ensuring it's at least 1 if items_to_process_count > 0
+    num_actual_workers = args.workers or min(8, items_to_process_count)
+    if items_to_process_count > 0 and num_actual_workers == 0: # min(8,0) could be 0
+        num_actual_workers = 1
+    elif items_to_process_count == 0: # Ensure no workers if nothing to process
+        num_actual_workers = 0
+
+
     threads: list[threading.Thread] = []
-    for _ in range(num_workers):
-        t = threading.Thread(target=worker, args=(date_queue, args.output_dir, logger))
+    for _ in range(num_actual_workers):
+        t = threading.Thread(target=worker, args=(processing_queue, current_output_dir, logger))
         t.start()
         threads.append(t)
 
-    date_queue.join()
+    if items_to_process_count > 0: # Only join if items were queued
+        processing_queue.join()
     for t in threads:
         t.join()
 
