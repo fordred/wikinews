@@ -30,7 +30,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Run Pytype
-      run: uv run pytype .
+      run: uv run --frozen pytype .
 
   type_check_pyrefly:
     runs-on: ubuntu-latest
@@ -44,7 +44,7 @@ jobs:
         version: "latest"
 
     - name: Run Pyrefly
-      run: uv run pyrefly check
+      run: uv run --frozen pyrefly check
 
   type_check_mypy:
     runs-on: ubuntu-latest
@@ -58,7 +58,7 @@ jobs:
         version: "latest"
 
     - name: Run Mypy
-      run: uv run mypy --strict .
+      run: uv run --frozen mypy --strict .
 
   type_check_pyright:
     runs-on: ubuntu-latest
@@ -72,7 +72,7 @@ jobs:
         version: "latest"
 
     - name: Run Pyright
-      run: uv run pyright --stats .
+      run: uv run --frozen pyright --stats .
 
   # type_check_pyre:
   #   runs-on: ubuntu-latest
