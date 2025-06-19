@@ -20,3 +20,4 @@ Gemfile.lock
 wikipedia_news_downloader.log
 .vscode/launch.json
 __pycache__
+*.code-workspace
