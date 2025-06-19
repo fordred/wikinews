@@ -1,0 +1,76 @@
+import requests
+import pathlib
+import os
+import sys
+from markitdown import MarkItDown # Added import
+
+URLS = [
+    "https://en.m.wikipedia.org/wiki/Portal:Current_events/January_2025",
+    "https://en.m.wikipedia.org/wiki/Portal:Current_events/February_2025",
+]
+OUTPUT_DIR = pathlib.Path("tests/golden_html_references/")
+
+def download_and_save_html(url: str, output_dir: pathlib.Path):
+    """Downloads HTML content from a URL and saves it to a file,
+       then converts the HTML to markdown and saves it.
+
+    Args:
+        url: The URL to download HTML from.
+        output_dir: The directory to save the HTML and markdown files in.
+    """
+    html_filepath = None # Initialize to ensure it's defined for error messages
+    md_filepath = None # Initialize
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+
+        # Simplified filename extraction for HTML
+        base_filename = url.split("/")[-1].lower()
+        if "portal:current_events" in base_filename: # january_2025, february_2025 etc.
+            base_filename = base_filename.replace("portal:current_events_", "")
+
+        html_filename = base_filename + ".html" # e.g., january_2025.html
+        md_filename = base_filename + "_reference.md" # e.g., january_2025_reference.md
+
+        html_filepath = output_dir / html_filename
+        md_filepath = output_dir / md_filename
+
+        # Save HTML content
+        with open(html_filepath, "w", encoding="utf-8") as f:
+            f.write(response.text)
+        print(f"Successfully downloaded and saved HTML for {url} to {html_filepath}")
+
+        # Convert HTML to Markdown and save
+        try:
+            md_converter = MarkItDown()
+            # Pass the path to the downloaded HTML file as a string
+            result = md_converter.convert(str(html_filepath))
+
+            if result is None or not hasattr(result, 'text_content') or not isinstance(result.text_content, str):
+                print(f"Error: MarkItDown().convert() did not return a valid 'text_content' string for {html_filepath}", file=sys.stderr)
+            else:
+                with open(md_filepath, "w", encoding="utf-8") as f:
+                    f.write(result.text_content)
+                print(f"Successfully converted HTML and saved reference markdown to {md_filepath}")
+
+        except Exception as e_md:
+            print(f"Error converting HTML to Markdown for {html_filepath} or saving to {md_filepath}: {e_md}", file=sys.stderr)
+
+    except requests.exceptions.RequestException as e_req:
+        print(f"Error downloading {url}: {e_req}", file=sys.stderr)
+    except IOError as e_io:
+        if html_filepath: # Check if html_filepath was assigned
+            print(f"Error saving HTML for {url} to {html_filepath}: {e_io}", file=sys.stderr)
+        else:
+            print(f"Error saving HTML for {url} (filepath not determined): {e_io}", file=sys.stderr)
+
+
+if __name__ == "__main__":
+    try:
+        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    except OSError as e:
+        print(f"Error creating output directory {OUTPUT_DIR}: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    for url in URLS:
+        download_and_save_html(url, OUTPUT_DIR)
