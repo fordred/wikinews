@@ -53,3 +53,6 @@ strict = "true"
 python-preference = "managed"
 
 [tool.pyrefly]
+
+[tool.pytest.ini_options]
+addopts = "--cov=wikipedia_news_downloader --cov-branch"
