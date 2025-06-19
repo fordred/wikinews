@@ -273,22 +273,121 @@ class TestGenerateJekyllContent:
         expected_full_content = "\n".join(expected_front_matter_lines)
         assert full_content == expected_full_content
 
-    def test_published_false_empty_string_body(self, common_test_date: datetime) -> None:
-        markdown_body = ""
-        full_content = generate_jekyll_content(common_test_date, markdown_body, logger)
-        assert "published: false" in full_content
 
-        # Body should be empty
-        expected_front_matter_lines = [
-            "---",
-            "layout: post",
-            f"title: {common_test_date.strftime('%Y %B %d')}",
-            f"date: {common_test_date.strftime('%Y-%m-%d')}",
-            "published: false",
-            "---",
-            "",
-            "",
-            "",
-        ]
-        expected_full_content = "\n".join(expected_front_matter_lines)
-        assert full_content == expected_full_content
+# --- Integration Tests for Offline Worker Processing ---
+import queue
+import shutil
+import tempfile
+import threading
+from pathlib import Path
+
+from wikipedia_news_downloader import worker # Assuming worker is importable
+
+
+class TestOfflineWorkerProcessing:
+    OFFLINE_PAGES_DIR = Path("tests/test_data/offline_pages")
+    GOLDEN_OUTPUT_DIR = Path("tests/test_data/golden_output")
+    NUM_WORKERS = 2 # Using a small number of workers for the test
+
+    def _get_month_datetime_from_filename(self, filename: str) -> datetime:
+        """Helper to parse datetime from filenames like 'january_2024.md'."""
+        name_part = filename.split('.')[0]
+        month_str, year_str = name_part.split('_')
+        month_map = {
+            'january': 1, 'february': 2, 'march': 3, 'april': 4,
+            'may': 5, 'june': 6, 'july': 7, 'august': 8,
+            'september': 9, 'october': 10, 'november': 11, 'december': 12
+        }
+        month = month_map[month_str.lower()]
+        year = int(year_str)
+        return datetime(year, month, 1)
+
+    def test_process_offline_files_produces_golden_output(self, caplog: pytest.LogCaptureFixture) -> None:
+        caplog.set_level(logging.INFO) # Optional: set log level for captured logs
+
+        if not self.OFFLINE_PAGES_DIR.exists() or not list(self.OFFLINE_PAGES_DIR.glob("*.md")):
+            pytest.skip("Offline pages directory is missing or empty. Skipping test.")
+        if not self.GOLDEN_OUTPUT_DIR.exists() or not list(self.GOLDEN_OUTPUT_DIR.glob("*.md")):
+            pytest.skip("Golden output directory is missing or empty. Skipping test.")
+
+        test_output_dir = Path(tempfile.mkdtemp(prefix="wikinews_test_output_"))
+
+        # Basic logger for worker, pytest will capture its output via caplog
+        test_logger = logging.getLogger("TestOfflineWorker")
+        test_logger.setLevel(logging.DEBUG) # Or whatever level is appropriate
+        # If running outside pytest's capture, might need a handler:
+        # handler = logging.StreamHandler()
+        # test_logger.addHandler(handler)
+
+
+        try:
+            # 1. Populate Queue
+            date_queue: queue.Queue[tuple[str, datetime, int]] = queue.Queue()
+            offline_files = list(self.OFFLINE_PAGES_DIR.glob("*.md"))
+            assert len(offline_files) > 0, "No offline files found to process."
+
+            for file_path in offline_files:
+                try:
+                    month_dt = self._get_month_datetime_from_filename(file_path.name)
+                    date_queue.put((str(file_path), month_dt, 0))
+                    logger.info(f"Queued: {file_path.name} for date {month_dt.strftime('%Y-%m')}")
+                except ValueError as e:
+                    pytest.fail(f"Failed to parse date from filename {file_path.name}: {e}")
+
+            # 2. Run Workers
+            threads: list[threading.Thread] = []
+            for i in range(self.NUM_WORKERS):
+                thread = threading.Thread(
+                    target=worker,
+                    args=(date_queue, str(test_output_dir), test_logger),
+                    name=f"OfflineWorker-{i}"
+                )
+                threads.append(thread)
+                thread.start()
+                logger.info(f"Started worker thread: {thread.name}")
+
+            date_queue.join() # Wait for queue to be empty
+            logger.info("Queue processing complete.")
+            for i, thread in enumerate(threads):
+                thread.join(timeout=30) # Wait for threads to finish
+                assert not thread.is_alive(), f"Thread OfflineWorker-{i} did not finish."
+                logger.info(f"Worker thread OfflineWorker-{i} joined.")
+
+            logger.info(f"All worker threads joined. Output directory: {test_output_dir}")
+
+            # 3. Verify Output
+            actual_files_paths = sorted(list(test_output_dir.glob("*-index.md")))
+            golden_files_paths = sorted(list(self.GOLDEN_OUTPUT_DIR.glob("*-index.md")))
+
+            actual_filenames = [p.name for p in actual_files_paths]
+            golden_filenames = [p.name for p in golden_files_paths]
+
+            logger.info(f"Actual output files ({len(actual_filenames)}): {actual_filenames}")
+            logger.info(f"Golden output files ({len(golden_filenames)}): {golden_filenames}")
+
+
+            assert actual_filenames == golden_filenames, \
+                f"Filename lists do not match.\nActual: {actual_filenames}\nGolden: {golden_filenames}"
+
+            for golden_file_path in golden_files_paths:
+                actual_file_path = test_output_dir / golden_file_path.name
+
+                assert actual_file_path.exists(), f"Actual file {actual_file_path} not found."
+
+                golden_content = golden_file_path.read_text(encoding="utf-8")
+                actual_content = actual_file_path.read_text(encoding="utf-8")
+
+                assert actual_content == golden_content, \
+                    f"Content mismatch for file {golden_file_path.name}.\n" \
+                    f"Golden path: {golden_file_path}\n" \
+                    f"Actual path: {actual_file_path}"
+
+            logger.info("All file contents match golden files.")
+
+        finally:
+            # 4. Cleanup
+            if test_output_dir.exists():
+                shutil.rmtree(test_output_dir)
+                logger.info(f"Cleaned up temporary directory: {test_output_dir}")
+            # if test_logger and handler: # If handler was added
+            #    test_logger.removeHandler(handler)

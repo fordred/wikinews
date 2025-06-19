@@ -211,69 +211,77 @@ def generate_jekyll_content(date: datetime, markdown_body: str, logger: logging.
     return "\n".join(front_matter_lines) + content_body
 
 
-def worker(date_queue: queue.Queue[tuple[datetime, int]], output_dir: str, logger: logging.Logger) -> None:
+def worker(date_queue: queue.Queue[tuple[str, datetime, int]], output_dir: str, logger: logging.Logger) -> None:
     while True:
         try:
             item = date_queue.get(timeout=2)
         except queue.Empty:
             break  # No more items to process
 
-        # 'date' here is the first day of the month to be processed
-        month_date, retries = item
-        if retries > RETRY_MAX_ATTEMPTS:
-            logger.error(f"Exceeded max retries ({RETRY_MAX_ATTEMPTS}) for month {month_date.strftime('%Y-%B')}")
+        source_identifier, month_date, retries = item
+        if retries > RETRY_MAX_ATTEMPTS and source_identifier.startswith("http"): # Only apply max retries to URLs
+            logger.error(f"Exceeded max retries ({RETRY_MAX_ATTEMPTS}) for URL {source_identifier}")
             date_queue.task_done()
             continue
 
-        logger.info(f"Processing month: {month_date.strftime('%Y-%B')} (attempt {retries + 1})")
-        # URL is for the entire month, e.g., Portal:Current_events/January_2025
-        url = f"{BASE_WIKIPEDIA_URL}{month_date:%B}_{month_date.year}"
-        logger.debug(f"Prepare to fetch monthly page: {url}")
+        logger.info(f"Processing month: {month_date.strftime('%Y-%B')} from {source_identifier} (attempt {retries + 1})")
 
         try:
             monthly_raw_markdown = ""
-            try:
-                md = MarkItDown()
-                result = md.convert(url)
-                monthly_raw_markdown = result.text_content
-                logger.debug(f"Raw MarkItDown result length for month {month_date.strftime('%Y-%B')}: {len(monthly_raw_markdown)}")
-            except requests.exceptions.RequestException as e:
-                status_code = getattr(e.response, "status_code", None)
-                if status_code == 429:
+            is_url = source_identifier.startswith("http://") or source_identifier.startswith("https://")
+
+            if is_url:
+                try:
+                    md = MarkItDown()
+                    result = md.convert(source_identifier)
+                    # Assuming result has a .text_content attribute for the main textual content
+                    monthly_raw_markdown = result.text_content
+                    logger.debug(f"Raw MarkItDown result length for month {month_date.strftime('%Y-%B')} from URL: {len(monthly_raw_markdown)}")
+                except requests.exceptions.RequestException as e:
+                    status_code = getattr(e.response, "status_code", None)
+                    if status_code == 429:
+                        logger.warning(
+                            (
+                                f"HTTP 429 Too Many Requests for {source_identifier}. "
+                                f"Re-queuing month {month_date.strftime('%Y-%B')} for later retry "
+                                f"(attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})..."
+                            ),
+                        )
+                        date_queue.put((source_identifier, month_date, retries + 1))
+                        date_queue.task_done()
+                        continue
+                    if status_code == 404:
+                        logger.warning(f"HTTP 404 Not Found for {source_identifier}. Skipping retries.")
+                        date_queue.task_done()
+                        continue
                     logger.warning(
-                        (
-                            f"HTTP 429 Too Many Requests for {url}. "
-                            f"Re-queuing month {month_date.strftime('%Y-%B')} for later retry "
-                            f"(attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})..."
-                        ),
+                        f"Request error fetching {source_identifier}: {e}. "
+                        f"Retrying (attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})...",
                     )
-                    date_queue.put((month_date, retries + 1))  # Re-queue with incremented retry count
+                    time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
+                    date_queue.put((source_identifier, month_date, retries + 1))
                     date_queue.task_done()
                     continue
-                if status_code == 404:
-                    logger.warning(f"HTTP 404 Not Found for {url} (month: {month_date.strftime('%Y-%B')}). Skipping retries.")
+                except Exception:  # Includes MarkItDown conversion errors
+                    logger.exception(
+                        f"Unexpected error converting {source_identifier} (month: {month_date.strftime('%Y-%B')}, "
+                        f"attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})",
+                    )
+                    time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
+                    date_queue.put((source_identifier, month_date, retries + 1))
                     date_queue.task_done()
                     continue
-                logger.warning(
-                    f"Request error fetching {url} (month: {month_date.strftime('%Y-%B')}): {e}. "
-                    f"Retrying (attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})...",
-                )
-                time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
-                date_queue.put((month_date, retries + 1))
-                date_queue.task_done()
-                continue
-            except Exception:  # Includes MarkItDown conversion errors
-                logger.exception(
-                    f"Unexpected error converting {url} (month: {month_date.strftime('%Y-%B')}, "
-                    f"attempt {retries + 1}/{RETRY_MAX_ATTEMPTS})",
-                )
-                time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
-                date_queue.put((month_date, retries + 1))
-                date_queue.task_done()
-                continue
+            else: # It's a file path
+                try:
+                    monthly_raw_markdown = Path(source_identifier).read_text(encoding="utf-8")
+                    logger.debug(f"Read content from file {source_identifier} for month {month_date.strftime('%Y-%B')}, length: {len(monthly_raw_markdown)}")
+                except (FileNotFoundError, IOError) as e:
+                    logger.error(f"Error reading file {source_identifier}: {e}. Skipping.")
+                    date_queue.task_done()
+                    continue
 
             # If we get here, monthly_raw_markdown is available
-            logger.info(f"Successfully fetched content for month: {month_date.strftime('%Y-%B')}")
+            logger.info(f"Successfully fetched/read content for month: {month_date.strftime('%Y-%B')} from {source_identifier}")
 
             daily_events = split_and_clean_monthly_markdown(monthly_raw_markdown, month_date, logger)
 
@@ -319,44 +327,101 @@ def main() -> None:
         default=None,  # Default to ThreadPoolExecutor's choice
         help="Maximum number of concurrent download workers",
     )
+    parser.add_argument(
+        "--offline-source-dir",
+        type=str,
+        default=None,
+        help="Path to a directory containing pre-downloaded monthly Markdown files (e.g., january_2024.md). If set, the script runs in offline mode using these files."
+    )
     args = parser.parse_args()
 
     # Setup logging
     logger = setup_logging(args.verbose)
 
-    # Dates to download
-    now = datetime.now()
-    # Start from January 1, 2025
-    start_date = datetime(2025, 1, 1)
-    # End on the first day of the current month
-    end_date = datetime(now.year, now.month, 1)
-
-    # Use a set to avoid duplicates, populate with the first day of each month
-    dates: set[datetime] = set()
-    current_date = start_date
-    while current_date <= end_date:
-        dates.add(current_date)
-        # Move to the first day of the next month
-        if current_date.month == 12:
-            current_date = datetime(current_date.year + 1, 1, 1)
-        else:
-            current_date = datetime(current_date.year, current_date.month + 1, 1)
-
-    logger.info(
-        f"Starting download for {len(dates)} dates from {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
-        f" (first day of each month inclusive) using up to {args.workers or 'default'} workers."
-        f" Output directory: {args.output_dir}",
-    )
-
     # Ensure output directory exists
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
 
-    # Use a queue for cooperative retry handling
-    date_queue: queue.Queue[tuple[datetime, int]] = queue.Queue()
-    for date in sorted(dates):
-        date_queue.put((date, 0))  # (date, retry_count)
+    date_queue: queue.Queue[tuple[str, datetime, int]] = queue.Queue()
+    num_items_to_process = 0
 
-    num_workers = args.workers or min(8, len(dates))
+    if args.offline_source_dir:
+        logger.info(f"Running in OFFLINE mode. Source directory: {args.offline_source_dir}")
+        offline_dir = Path(args.offline_source_dir)
+        if not offline_dir.is_dir():
+            logger.error(f"Offline source directory not found or is not a directory: {offline_dir}")
+            sys.exit(1) # Or raise an error
+
+        offline_files_queued = 0
+        for file_path in offline_dir.glob("*.md"): # Assuming markdown files
+            try:
+                # Attempt to parse filename like 'january_2024.md'
+                name_part = file_path.stem # e.g., 'january_2024'
+                month_str, year_str = name_part.split('_')
+
+                month_num = None
+                # Try parsing month name (case-insensitive)
+                for k, v in MONTH_NAME_TO_NUMBER.items():
+                    if k.lower() == month_str.lower():
+                        month_num = v
+                        break
+
+                if not month_num:
+                    logger.warning(f"Could not parse month from filename: {file_path.name}. Skipping.")
+                    continue
+
+                year = int(year_str)
+                month_date = datetime(year, month_num, 1)
+
+                date_queue.put((str(file_path.resolve()), month_date, 0))
+                logger.info(f"Queued offline file: {file_path.name} for processing as {month_date.strftime('%Y-%B')}")
+                offline_files_queued += 1
+            except ValueError:
+                logger.warning(f"Could not parse year/month from filename {file_path.name}. Skipping.")
+            except Exception as e:
+                logger.error(f"Error queuing file {file_path.name}: {e}. Skipping.")
+
+        if offline_files_queued == 0:
+            logger.warning(f"No valid offline files found in {args.offline_source_dir}. Exiting.")
+            sys.exit(0)
+        num_items_to_process = offline_files_queued
+        logger.info(f"Successfully queued {offline_files_queued} offline files for processing.")
+
+    else:
+        logger.info("Running in ONLINE mode. Fetching dates from Wikipedia.")
+        # Dates to download
+        now = datetime.now()
+        # Start from January 1, 2025
+        start_date = datetime(2025, 1, 1)
+        # End on the first day of the current month
+        end_date = datetime(now.year, now.month, 1)
+
+        # Use a set to avoid duplicates, populate with the first day of each month
+        dates: set[datetime] = set()
+        current_date = start_date
+        while current_date <= end_date:
+            dates.add(current_date)
+            # Move to the first day of the next month
+            if current_date.month == 12:
+                current_date = datetime(current_date.year + 1, 1, 1)
+            else:
+                current_date = datetime(current_date.year, current_date.month + 1, 1)
+
+        num_items_to_process = len(dates)
+        if num_items_to_process == 0:
+            logger.info("No date range specified or dates are in the future relative to script's hardcoded start. Nothing to process.")
+            sys.exit(0)
+
+        logger.info(
+            f"Starting download for {len(dates)} dates from {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
+            f" (first day of each month inclusive) using up to {args.workers or 'default'} workers."
+            f" Output directory: {args.output_dir}",
+        )
+
+        for date_val in sorted(dates):
+            url = f"{BASE_WIKIPEDIA_URL}{date_val:%B}_{date_val.year}"
+            date_queue.put((url, date_val, 0))
+
+    num_workers = args.workers or min(8, num_items_to_process if num_items_to_process > 0 else 1)
     threads: list[threading.Thread] = []
     for _ in range(num_workers):
         t = threading.Thread(target=worker, args=(date_queue, args.output_dir, logger))
