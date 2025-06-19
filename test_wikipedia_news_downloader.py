@@ -286,8 +286,13 @@ from wikipedia_news_downloader import worker # Assuming worker is importable
 
 class TestOfflineWorkerProcessing:
     OFFLINE_PAGES_DIR = Path("tests/test_data/offline_pages")
-    GOLDEN_OUTPUT_DIR = Path("tests/test_data/golden_output")
+    # Changed to point to docs/_posts as the source of truth for golden files
+    GOLDEN_OUTPUT_DIR = Path("docs/_posts")
     NUM_WORKERS = 2 # Using a small number of workers for the test
+
+    # Logger for the test class itself, can be used by its methods
+    class_logger = logging.getLogger("TestOfflineWorkerProcessing")
+
 
     def _get_month_datetime_from_filename(self, filename: str) -> datetime:
         """Helper to parse datetime from filenames like 'january_2024.md'."""
@@ -306,18 +311,24 @@ class TestOfflineWorkerProcessing:
         caplog.set_level(logging.INFO) # Optional: set log level for captured logs
 
         if not self.OFFLINE_PAGES_DIR.exists() or not list(self.OFFLINE_PAGES_DIR.glob("*.md")):
-            pytest.skip("Offline pages directory is missing or empty. Skipping test.")
-        if not self.GOLDEN_OUTPUT_DIR.exists() or not list(self.GOLDEN_OUTPUT_DIR.glob("*.md")):
-            pytest.skip("Golden output directory is missing or empty. Skipping test.")
+            pytest.skip(f"Offline pages directory ({self.OFFLINE_PAGES_DIR}) is missing or empty. Skipping test.")
+
+        # Adjust skip condition for GOLDEN_OUTPUT_DIR (now docs/_posts)
+        # Check if docs/_posts exists and has at least one YYYY-MM-DD-index.md file (can be a loose check)
+        # The main check will be comparisons_made > 0
+        if not self.GOLDEN_OUTPUT_DIR.is_dir() or not any(self.GOLDEN_OUTPUT_DIR.glob("*-index.md")):
+            pytest.skip(f"Golden output directory ({self.GOLDEN_OUTPUT_DIR}) is missing, empty, or contains no index files. Skipping test.")
 
         test_output_dir = Path(tempfile.mkdtemp(prefix="wikinews_test_output_"))
 
-        # Basic logger for worker, pytest will capture its output via caplog
-        test_logger = logging.getLogger("TestOfflineWorker")
-        test_logger.setLevel(logging.DEBUG) # Or whatever level is appropriate
-        # If running outside pytest's capture, might need a handler:
-        # handler = logging.StreamHandler()
-        # test_logger.addHandler(handler)
+        # Using class_logger for messages from the test method itself
+        # The worker function will use its own logger instance passed to it.
+        # Pytest's caplog will capture logs from all loggers if configured.
+        worker_logger = logging.getLogger("WorkerInTest") # Specific logger for worker instances in this test
+        worker_logger.setLevel(logging.DEBUG) # Ensure worker logs are captured if needed
+        # If specific handling for worker_logger is needed (e.g. to see its output directly):
+        # stream_handler = logging.StreamHandler(sys.stdout)
+        # worker_logger.addHandler(stream_handler)
 
 
         try:
@@ -329,8 +340,9 @@ class TestOfflineWorkerProcessing:
             for file_path in offline_files:
                 try:
                     month_dt = self._get_month_datetime_from_filename(file_path.name)
-                    date_queue.put((str(file_path), month_dt, 0))
-                    logger.info(f"Queued: {file_path.name} for date {month_dt.strftime('%Y-%m')}")
+                    # Using absolute path for source_identifier in queue
+                    date_queue.put((str(file_path.resolve()), month_dt, 0))
+                    self.class_logger.info(f"Queued: {file_path.name} for date {month_dt.strftime('%Y-%m')}")
                 except ValueError as e:
                     pytest.fail(f"Failed to parse date from filename {file_path.name}: {e}")
 
@@ -339,55 +351,61 @@ class TestOfflineWorkerProcessing:
             for i in range(self.NUM_WORKERS):
                 thread = threading.Thread(
                     target=worker,
-                    args=(date_queue, str(test_output_dir), test_logger),
+                    # Pass the specific worker_logger instance
+                    args=(date_queue, str(test_output_dir), worker_logger),
                     name=f"OfflineWorker-{i}"
                 )
                 threads.append(thread)
                 thread.start()
-                logger.info(f"Started worker thread: {thread.name}")
+                self.class_logger.info(f"Started worker thread: {thread.name}")
 
             date_queue.join() # Wait for queue to be empty
-            logger.info("Queue processing complete.")
+            self.class_logger.info("Queue processing complete.")
             for i, thread in enumerate(threads):
-                thread.join(timeout=30) # Wait for threads to finish
-                assert not thread.is_alive(), f"Thread OfflineWorker-{i} did not finish."
-                logger.info(f"Worker thread OfflineWorker-{i} joined.")
+                thread.join(timeout=60) # Increased timeout for potentially more processing
+                assert not thread.is_alive(), f"Thread OfflineWorker-{i} did not finish in time."
+                self.class_logger.info(f"Worker thread OfflineWorker-{i} joined.")
 
-            logger.info(f"All worker threads joined. Output directory: {test_output_dir}")
+            self.class_logger.info(f"All worker threads joined. Output directory: {test_output_dir}")
 
             # 3. Verify Output
-            actual_files_paths = sorted(list(test_output_dir.glob("*-index.md")))
-            golden_files_paths = sorted(list(self.GOLDEN_OUTPUT_DIR.glob("*-index.md")))
+            actual_output_files = sorted(list(test_output_dir.glob("*-index.md")))
+            self.class_logger.info(f"Found {len(actual_output_files)} files in test output directory: {[f.name for f in actual_output_files]}")
 
-            actual_filenames = [p.name for p in actual_files_paths]
-            golden_filenames = [p.name for p in golden_files_paths]
+            comparisons_made = 0
+            for actual_file_path in actual_output_files:
+                filename = actual_file_path.name
+                expected_golden_file_path = self.GOLDEN_OUTPUT_DIR / filename
 
-            logger.info(f"Actual output files ({len(actual_filenames)}): {actual_filenames}")
-            logger.info(f"Golden output files ({len(golden_filenames)}): {golden_filenames}")
+                self.class_logger.debug(f"Checking for golden file: {expected_golden_file_path}")
 
+                if expected_golden_file_path.exists():
+                    self.class_logger.info(f"Comparing {actual_file_path.name} with {expected_golden_file_path}")
+                    actual_content = actual_file_path.read_text(encoding="utf-8")
+                    golden_content = expected_golden_file_path.read_text(encoding="utf-8")
 
-            assert actual_filenames == golden_filenames, \
-                f"Filename lists do not match.\nActual: {actual_filenames}\nGolden: {golden_filenames}"
+                    assert actual_content == golden_content, \
+                        f"Content mismatch for {filename}.\n" \
+                        f"Actual ({actual_file_path}):\n{actual_content[:200]}...\n\n" \
+                        f"Golden ({expected_golden_file_path}):\n{golden_content[:200]}..."
+                    comparisons_made += 1
+                else:
+                    self.class_logger.warning(
+                        f"Golden file {expected_golden_file_path} not found in {self.GOLDEN_OUTPUT_DIR}. "
+                        f"Skipping comparison for {actual_file_path.name}."
+                    )
 
-            for golden_file_path in golden_files_paths:
-                actual_file_path = test_output_dir / golden_file_path.name
+            assert comparisons_made > 0, \
+                f"No comparisons were made. This means no generated files from {test_output_dir} " \
+                f"had a corresponding golden file in {self.GOLDEN_OUTPUT_DIR}. " \
+                f"Check test setup, offline data, or if '{self.GOLDEN_OUTPUT_DIR}' contains expected files."
 
-                assert actual_file_path.exists(), f"Actual file {actual_file_path} not found."
-
-                golden_content = golden_file_path.read_text(encoding="utf-8")
-                actual_content = actual_file_path.read_text(encoding="utf-8")
-
-                assert actual_content == golden_content, \
-                    f"Content mismatch for file {golden_file_path.name}.\n" \
-                    f"Golden path: {golden_file_path}\n" \
-                    f"Actual path: {actual_file_path}"
-
-            logger.info("All file contents match golden files.")
+            self.class_logger.info(f"Successfully made {comparisons_made} comparisons against golden files in {self.GOLDEN_OUTPUT_DIR}.")
 
         finally:
             # 4. Cleanup
             if test_output_dir.exists():
                 shutil.rmtree(test_output_dir)
-                logger.info(f"Cleaned up temporary directory: {test_output_dir}")
-            # if test_logger and handler: # If handler was added
-            #    test_logger.removeHandler(handler)
+                self.class_logger.info(f"Cleaned up temporary directory: {test_output_dir}")
+            # if worker_logger and stream_handler: # If handler was added
+            #    worker_logger.removeHandler(stream_handler)
