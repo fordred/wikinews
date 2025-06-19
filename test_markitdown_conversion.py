@@ -1,10 +1,7 @@
 import pytest
 from pathlib import Path
 from markitdown import MarkItDown
-# Removed: wikipedia_news_downloader imports, datetime, clean_daily_markdown_content
-import logging # Kept for caplog, though might not be strictly necessary for the new logic
-
-# Removed get_markdown_body_from_jekyll_file function
+import logging # Kept for caplog
 
 @pytest.mark.parametrize(
     "golden_html_path_str, golden_reference_md_path_str",
@@ -51,3 +48,56 @@ def test_markitdown_conversion_consistency(golden_html_path_str: str, golden_ref
 
 # Example of how to run this test (assuming pytest is installed):
 # python3 -m pytest test_markitdown_conversion.py
+
+def test_markitdown_conversion_detects_mismatch(caplog):
+    caplog.set_level(logging.INFO) # Optional: if you want to log info during this test
+
+    # Use one of the existing golden file pairs
+    golden_html_path_str = "tests/golden_html_references/january_2025.html"
+    golden_reference_md_path_str = "tests/golden_html_references/january_2025_reference.md"
+
+    golden_html_path = Path(golden_html_path_str)
+    golden_reference_md_path = Path(golden_reference_md_path_str)
+
+    assert golden_html_path.exists(), f"Golden HTML file {golden_html_path} does not exist for mismatch test."
+    assert golden_reference_md_path.exists(), f"Golden Reference MD file {golden_reference_md_path} does not exist for mismatch test."
+
+    # 1. Get current raw markdown from HTML
+    md_converter = MarkItDown()
+    try:
+        result = md_converter.convert(golden_html_path_str)
+        if result is None or not hasattr(result, 'text_content') or not isinstance(result.text_content, str):
+            pytest.fail(f"MarkItDown().convert() did not return valid text_content for {golden_html_path_str}")
+        current_raw_markdown = result.text_content
+    except Exception as e:
+        pytest.fail(f"MarkItDown().convert() failed for {golden_html_path_str}: {e}")
+
+    # 2. Read original golden reference markdown
+    original_reference_markdown = golden_reference_md_path.read_text(encoding='utf-8')
+
+    # Normalize both for a baseline comparison (optional, but good for sanity)
+    normalized_current_raw_md = current_raw_markdown.strip() + "\n"
+    normalized_original_reference_md = original_reference_markdown.strip() + "\n"
+
+    # Sanity check: Ensure they are normally equal (this should pass based on the other tests)
+    assert normalized_current_raw_md == normalized_original_reference_md, \
+        "Baseline comparison failed: the original files do not match as expected."
+
+    # 3. Create a deliberately modified version of the reference markdown
+    modified_reference_markdown_content = original_reference_markdown + " deliberate modification"
+
+    # Normalize the modified version
+    normalized_modified_reference_md = modified_reference_markdown_content.strip() + "\n"
+
+    # 4. Assert that the comparison between current and MODIFIED reference fails
+    with pytest.raises(AssertionError):
+        assert normalized_current_raw_md == normalized_modified_reference_md, \
+            "AssertionError was expected but not raised for mismatched content."
+
+    # Optional: also test the other way around (modifying current_raw_markdown)
+    modified_current_raw_markdown = current_raw_markdown + " another deliberate modification"
+    normalized_modified_current_raw_md = modified_current_raw_markdown.strip() + "\n"
+
+    with pytest.raises(AssertionError):
+        assert normalized_modified_current_raw_md == normalized_original_reference_md, \
+            "AssertionError was expected but not raised when current MD was modified."
