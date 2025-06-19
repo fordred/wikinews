@@ -977,12 +977,12 @@ requires-dist = [{ name = "markitdown" }]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "mypy", specifier = ">=1.16.0" },
-    { name = "pyrefly", specifier = ">=0.20.1" },
-    { name = "pyright", specifier = ">=1.1.402" },
-    { name = "pytest", specifier = ">=8.4.0" },
-    { name = "pytest-cov", specifier = ">=6.2.1" },
-    { name = "pytype", marker = "sys_platform == 'linux'", specifier = ">=2024.10.11" },
-    { name = "ruff", specifier = ">=0.11.13" },
-    { name = "types-requests", specifier = ">=2.32.4.20250611" },
+    { name = "mypy" },
+    { name = "pyrefly" },
+    { name = "pyright" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "pytype", marker = "sys_platform == 'linux'" },
+    { name = "ruff" },
+    { name = "types-requests" },
 ]
