@@ -25,7 +25,6 @@ jobs:
       uses: astral-sh/setup-uv@v6
       with:
         version: "latest"
-        pyproject-file: "pyproject.toml"
 
     - name: Save date
       id: save-date
