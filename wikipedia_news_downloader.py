@@ -214,122 +214,113 @@ def generate_jekyll_content(date: datetime, markdown_body: str, logger: logging.
 from typing import Union, Tuple, cast
 
 # Define the new structured queue item type
-# Mode: 'online' (datetime, for URL fetching) or 'offline' (str path, for local file)
-# Data: datetime object or string (representing a file path)
+# Mode: 'online' or 'offline'
+# Data: datetime object (representing the first of the month for both modes)
 # Retries: integer
-StructuredQueueItem = Tuple[str, Union[datetime, str], int]
+StructuredQueueItem = Tuple[str, datetime, int]
 
 def worker(processing_queue: queue.Queue[StructuredQueueItem], output_dir: str, logger: logging.Logger) -> None:
     while True:
         try:
-            mode, data, retries = processing_queue.get(timeout=2)
+            mode, month_dt, retries = processing_queue.get(timeout=2) # data is now always month_dt
         except queue.Empty:
             break  # No more items to process
 
         monthly_raw_markdown = ""
         source_name = "" # For logging (filename or month-year)
-        month_for_processing: datetime # Datetime object representing the month being processed.
+        month_for_processing: datetime = month_dt # Use month_dt directly as the basis for processing
+        source_name_suffix = month_dt.strftime('%B_%Y') # e.g., "January_2025"
 
         if mode == 'offline':
-            file_path_str = cast(str, data) # Data is a string path
-            local_file_path = Path(file_path_str) # Convert to Path object for processing
-            source_name = local_file_path.name
-            logger.info(f"Processing local file: {source_name} (retries: {retries} - ignored for offline)")
+            source_name = f"local file for {source_name_suffix}"
+            logger.info(f"Processing in offline mode for {month_dt.strftime('%Y-%B')} (retries: {retries} - ignored)")
 
-            try:
-                parts = local_file_path.stem.lower().split("_") # Use Path object for stem
-                month_name_str = parts[0].capitalize() # e.g. "January"
-                year_str = parts[1] # e.g. "2025"
-                month_num = MONTH_NAME_TO_NUMBER[month_name_str]
-                month_for_processing = datetime(int(year_str), month_num, 1)
-            except (IndexError, KeyError, ValueError) as e: # More specific exceptions
-                logger.error(f"Could not derive date from filename {source_name}: {e}. Skipping.")
+            # Construct path to local HTML file
+            # Standardized to use tests/golden_html_references for offline mode source files
+            offline_html_filename = f"{month_dt.strftime('%B').lower()}_{month_dt.year}.html"
+            local_html_file_path = Path("tests/golden_html_references/") / offline_html_filename
+
+            if not local_html_file_path.exists():
+                logger.error(f"Offline mode: Source HTML file not found at {local_html_file_path}. Skipping.")
                 processing_queue.task_done()
                 continue
 
+            logger.debug(f"Offline mode: Reading from {local_html_file_path}")
             try:
                 md_converter = MarkItDown()
-                result = md_converter.convert(f"file://{local_file_path.resolve()}")
+                result = md_converter.convert(f"file://{local_html_file_path.resolve()}") # Corrected variable name here
                 monthly_raw_markdown = result.text_content
                 logger.debug(f"Raw MarkItDown result length for {source_name}: {len(monthly_raw_markdown)}")
-            except Exception as e: # Catch all exceptions during local file processing
-                logger.exception(f"Unexpected error converting local file {source_name}: {e}")
+            except Exception as e:
+                logger.exception(f"Unexpected error converting local file {local_html_file_path}: {e}")
                 processing_queue.task_done()
                 continue
 
         elif mode == 'online':
-            month_date = cast(datetime, data) # Cast datetime for type checker
-            month_for_processing = month_date
-            source_name = month_date.strftime('%Y-%B') # e.g. "2025-January"
+            source_name = f"online source for {source_name_suffix}"
+            logger.info(f"Processing in online mode for {month_dt.strftime('%Y-%B')} (attempt {retries + 1})")
 
             if retries > RETRY_MAX_ATTEMPTS:
-                logger.error(f"Exceeded max retries ({RETRY_MAX_ATTEMPTS}) for month {source_name} (URL: {month_date.strftime('%B_%Y')})")
+                logger.error(f"Exceeded max retries ({RETRY_MAX_ATTEMPTS}) for {source_name}")
                 processing_queue.task_done()
                 continue
 
-            logger.info(f"Processing online for month: {source_name} (attempt {retries + 1})")
-            url = f"{BASE_WIKIPEDIA_URL}{month_date.strftime('%B_%Y')}"
+            url = f"{BASE_WIKIPEDIA_URL}{source_name_suffix}"
             logger.debug(f"Prepare to fetch monthly page: {url}")
 
             try:
                 md_converter = MarkItDown()
                 result = md_converter.convert(url)
                 monthly_raw_markdown = result.text_content
-                logger.debug(f"Raw MarkItDown result length for online source {source_name}: {len(monthly_raw_markdown)}")
+                logger.debug(f"Raw MarkItDown result length for {source_name}: {len(monthly_raw_markdown)}")
             except requests.exceptions.RequestException as e:
                 status_code = getattr(e.response, "status_code", None)
                 if status_code == 429:
-                    logger.warning(f"HTTP 429 Too Many Requests for {url}. Re-queuing {source_name} (attempt {retries + 1}).")
-                    processing_queue.put(('online', month_date, retries + 1))
+                    logger.warning(f"HTTP 429 Too Many Requests for {url}. Re-queuing {source_name_suffix} (attempt {retries + 1}).")
+                    processing_queue.put(('online', month_dt, retries + 1))
                 elif status_code == 404:
-                    logger.warning(f"HTTP 404 Not Found for {url} ({source_name}). Skipping.")
+                    logger.warning(f"HTTP 404 Not Found for {url} ({source_name_suffix}). Skipping.")
                 else:
-                    logger.warning(f"Request error fetching {url} ({source_name}): {e}. Retrying (attempt {retries + 1}).")
+                    logger.warning(f"Request error fetching {url} ({source_name_suffix}): {e}. Retrying (attempt {retries + 1}).")
                     time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries)) # Exponential backoff
-                    processing_queue.put(('online', month_date, retries + 1))
+                    processing_queue.put(('online', month_dt, retries + 1))
                 processing_queue.task_done()
                 continue
             except Exception as e:
-                logger.exception(f"Unexpected error converting URL {url} ({source_name}, attempt {retries + 1}): {e}")
+                logger.exception(f"Unexpected error converting URL {url} ({source_name_suffix}, attempt {retries + 1}): {e}")
                 time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
-                processing_queue.put(('online', month_date, retries + 1))
+                processing_queue.put(('online', month_dt, retries + 1))
                 processing_queue.task_done()
                 continue
         else: # Should not happen if queue is populated correctly
-            logger.error(f"Unknown mode in queue item: {mode}. Item: {(mode, data, retries)}. Skipping.")
+            logger.error(f"Unknown mode in queue item: {mode}. Item: {(mode, month_dt, retries)}. Skipping.")
             processing_queue.task_done()
             continue
 
         # --- Common content processing ---
         try:
             if not monthly_raw_markdown.strip():
-                logger.warning(f"No content extracted for {source_name}. Skipping further processing.")
-                processing_queue.task_done() # Mark task as done even if content is empty
+                logger.warning(f"No content extracted for {source_name_suffix} (mode: {mode}). Skipping further processing.")
+                processing_queue.task_done()
                 continue
 
-            logger.info(f"Successfully fetched/read content for {source_name} (mode: {mode})")
+            logger.info(f"Successfully fetched/read content for {source_name_suffix} (mode: {mode})")
 
-            # Ensure month_for_processing is valid before splitting
-            if not month_for_processing: # Should be set by mode-specific logic
-                 logger.error(f"month_for_processing not set for {source_name}. Skipping split.")
-                 processing_queue.task_done()
-                 continue
-
-            daily_events = split_and_clean_monthly_markdown(monthly_raw_markdown, month_for_processing, logger)
+            daily_events = split_and_clean_monthly_markdown(monthly_raw_markdown, month_dt, logger)
 
             if not daily_events:
-                logger.warning(f"No daily events found or extracted for {source_name} (month: {month_for_processing.strftime('%Y-%B')}).")
+                logger.warning(f"No daily events found or extracted for {source_name_suffix} (month_dt: {month_dt.strftime('%Y-%B')}).")
 
             for event_date, daily_md_content in daily_events:
-                logger.info(f"Processing extracted day: {event_date.strftime('%Y-%m-%d')} from {source_name}")
+                logger.info(f"Processing extracted day: {event_date.strftime('%Y-%m-%d')} from {source_name_suffix}")
                 full_jekyll_content = generate_jekyll_content(event_date, daily_md_content, logger)
                 if full_jekyll_content and "published: true" in full_jekyll_content:
                     save_news(event_date, full_jekyll_content, output_dir, logger)
                 else:
-                    logger.warning(f"Skipping save for {event_date.strftime('%Y-%m-%d')}: Content marked unpublished or generation failed.")
+                    logger.warning(f"Skipping save for {event_date.strftime('%Y-%m-%d')} from {source_name_suffix}: Content marked unpublished or generation failed.")
 
         except Exception as e:
-            logger.exception(f"Unexpected error processing content from {source_name} (mode: {mode}): {e}")
+            logger.exception(f"Unexpected error processing content from {source_name_suffix} (mode: {mode}): {e}")
         finally: # Ensure task_done is always called
             processing_queue.task_done()
 
@@ -383,23 +374,40 @@ def main(local_html_files: list[Path] = None, output_dir: str = None) -> None: #
     operation_mode = "" # For logging clarity
 
     # Determine if processing local files (either from main() param or CLI)
-    # local_html_files param (if provided to main) takes precedence over --local-html-dir CLI arg.
-    if local_html_files is not None: # Programmatic list of files (list of Path objects)
-        operation_mode = f"local files provided programmatically ({len(local_html_files)} files)"
-        for file_path_obj in local_html_files: # file_path_obj is a Path
+    # local_html_files param takes precedence.
+    if local_html_files is not None:
+        operation_mode = f"local HTML files provided programmatically ({len(local_html_files)} files)"
+        for file_path_obj in local_html_files: # These are Path objects
             if file_path_obj.is_file() and file_path_obj.suffix == ".html":
-                processing_queue.put(('offline', str(file_path_obj), 0)) # Enqueue str(path)
+                try:
+                    # Parse month/year from filename e.g. "january_2025.html"
+                    name_parts = file_path_obj.stem.lower().split("_")
+                    month_name = name_parts[0].capitalize()
+                    year = int(name_parts[1])
+                    month_number = MONTH_NAME_TO_NUMBER[month_name]
+                    month_datetime_obj = datetime(year, month_number, 1)
+                    processing_queue.put(('offline', month_datetime_obj, 0))
+                except (IndexError, KeyError, ValueError) as e:
+                    logger.warning(f"Could not parse valid date from filename {file_path_obj.name}: {e}. Skipping.")
             else:
                 logger.warning(f"Skipping non-HTML file or directory from local_html_files input: {file_path_obj}")
         items_to_process_count = processing_queue.qsize()
     elif args.local_html_dir: # CLI specifies a directory of local HTMLs
-        operation_mode = f"local files from CLI directory: {args.local_html_dir}"
-        cli_html_files = list(Path(args.local_html_dir).glob("*.html")) # List of Path objects
+        operation_mode = f"local HTML files from CLI directory: {args.local_html_dir}"
+        cli_html_files = list(Path(args.local_html_dir).glob("*.html"))
         if not cli_html_files:
             logger.warning(f"No HTML files found in --local-html-dir: {args.local_html_dir}")
-            return # Exit if no files found
-        for file_path_obj in cli_html_files: # file_path_obj is a Path
-            processing_queue.put(('offline', str(file_path_obj), 0)) # Enqueue str(path)
+            return
+        for file_path_obj in cli_html_files: # These are Path objects
+            try:
+                name_parts = file_path_obj.stem.lower().split("_")
+                month_name = name_parts[0].capitalize()
+                year = int(name_parts[1])
+                month_number = MONTH_NAME_TO_NUMBER[month_name]
+                month_datetime_obj = datetime(year, month_number, 1)
+                processing_queue.put(('offline', month_datetime_obj, 0))
+            except (IndexError, KeyError, ValueError) as e:
+                logger.warning(f"Could not parse valid date from filename {file_path_obj.name} in --local-html-dir: {e}. Skipping.")
         items_to_process_count = processing_queue.qsize()
     else:
         # Original behavior: Fetch from Wikipedia based on dates
