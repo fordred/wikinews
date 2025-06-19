@@ -409,3 +409,90 @@ class TestOfflineWorkerProcessing:
                 self.class_logger.info(f"Cleaned up temporary directory: {test_output_dir}")
             # if worker_logger and stream_handler: # If handler was added
             #    worker_logger.removeHandler(stream_handler)
+
+
+# --- Test for MarkItDown Conversion Consistency ---
+import requests # For requests.exceptions.RequestException
+from markitdown import MarkItDown
+from wikipedia_news_downloader import BASE_WIKIPEDIA_URL # Get the base URL
+
+@pytest.mark.network
+class TestMarkItDownConsistency:
+    OFFLINE_PAGES_DIR = Path("tests/test_data/offline_pages")
+    # Using BASE_WIKIPEDIA_URL from the main script
+
+    # Logger for this test class
+    class_logger = logging.getLogger("TestMarkItDownConsistency")
+
+    def _parse_filename_to_url_parts(self, filename: str) -> tuple[str, str] | None:
+        """
+        Parses filenames like 'january_2025.md' into ('January', '2025').
+        Capitalizes month name for URL construction.
+        Returns None if parsing fails.
+        """
+        if not filename.endswith(".md"):
+            return None
+
+        name_part = filename.split('.')[0] # e.g., 'january_2025'
+        parts = name_part.split('_')
+        if len(parts) != 2:
+            return None
+
+        month_str, year_str = parts
+        # Capitalize the month name for URL consistency (e.g., "January", not "january")
+        return month_str.capitalize(), year_str
+
+    def test_compare_fresh_conversion_with_stored_markdown(self, caplog: pytest.LogCaptureFixture) -> None:
+        caplog.set_level(logging.INFO)
+        self.class_logger.info("Starting MarkItDown consistency test. This test requires network access.")
+
+        if not self.OFFLINE_PAGES_DIR.is_dir() or not list(self.OFFLINE_PAGES_DIR.glob("*.md")):
+            pytest.skip(f"Offline pages directory ({self.OFFLINE_PAGES_DIR}) is missing or empty. Nothing to compare.")
+
+        stored_markdown_files = list(self.OFFLINE_PAGES_DIR.glob("*.md"))
+        assert len(stored_markdown_files) > 0, "No *.md files found in offline pages directory for comparison."
+
+        self.class_logger.info(f"Found {len(stored_markdown_files)} stored markdown files to check.")
+
+        md_converter = MarkItDown()
+        files_compared = 0
+
+        for stored_markdown_path in stored_markdown_files:
+            self.class_logger.info(f"Processing stored file: {stored_markdown_path.name}")
+
+            parsed_parts = self._parse_filename_to_url_parts(stored_markdown_path.name)
+            if not parsed_parts:
+                self.class_logger.warning(f"Could not parse filename {stored_markdown_path.name} to get URL parts. Skipping.")
+                continue
+
+            month_name, year = parsed_parts
+            # Construct URL, e.g., "https://en.m.wikipedia.org/wiki/Portal:Current_events/January_2025"
+            url = f"{BASE_WIKIPEDIA_URL}{month_name}_{year}"
+            self.class_logger.info(f"Constructed URL for fresh fetch: {url}")
+
+            try:
+                fresh_markdown_result = md_converter.convert(url)
+                fresh_markdown_text = fresh_markdown_result.text_content
+                self.class_logger.debug(f"Successfully fetched and converted fresh markdown from {url}. Length: {len(fresh_markdown_text)}")
+            except requests.exceptions.RequestException as e:
+                pytest.fail(f"Network error fetching {url}: {e}. This test expects network access.")
+            except Exception as e:
+                pytest.fail(f"Error during MarkItDown conversion for {url}: {e}")
+
+            stored_markdown_text = stored_markdown_path.read_text(encoding="utf-8")
+            self.class_logger.debug(f"Read stored markdown from {stored_markdown_path.name}. Length: {len(stored_markdown_text)}")
+
+            assert fresh_markdown_text == stored_markdown_text, \
+                (f"Markdown content mismatch for {month_name} {year} (URL: {url}, File: {stored_markdown_path.name}).\n"
+                 f"This means the live Wikipedia page's MarkItDown output (using .text_content) has diverged "
+                 f"from the version stored in '{self.OFFLINE_PAGES_DIR}'.\n"
+                 f"Consider updating the stored file if the change is intentional or investigate MarkItDown if unexpected.\n"
+                 f"Length Fresh: {len(fresh_markdown_text)}, Length Stored: {len(stored_markdown_text)}\n"
+                 f"Start of Fresh:\n{fresh_markdown_text[:500]}...\n"
+                 f"Start of Stored:\n{stored_markdown_text[:500]}...")
+
+            self.class_logger.info(f"Content for {stored_markdown_path.name} matches fresh conversion from {url}.")
+            files_compared +=1
+
+        assert files_compared > 0, "No files were actually compared. Check parsing or file iteration logic."
+        self.class_logger.info(f"Successfully compared {files_compared} files. All matched.")
