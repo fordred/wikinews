@@ -217,42 +217,48 @@ from typing import Union, Tuple, cast
 # Mode: 'online' or 'offline'
 # Data: datetime object (representing the first of the month for both modes)
 # Retries: integer
-StructuredQueueItem = Tuple[str, datetime, int]
+StructuredQueueItem = Tuple[str, datetime, int] # (mode, month_datetime, retry_count)
 
-def worker(processing_queue: queue.Queue[StructuredQueueItem], output_dir: str, logger: logging.Logger) -> None:
+def worker(processing_queue: queue.Queue[StructuredQueueItem], output_dir: str, logger: logging.Logger, local_html_input_dir: str | None = None) -> None:
+    md_converter = MarkItDown() # Instantiated once per worker
     while True:
         try:
-            mode, month_dt, retries = processing_queue.get(timeout=2) # data is now always month_dt
+            mode, month_dt, retries = processing_queue.get(timeout=2)
         except queue.Empty:
             break  # No more items to process
 
         monthly_raw_markdown = ""
         source_name = "" # For logging (filename or month-year)
-        month_for_processing: datetime = month_dt # Use month_dt directly as the basis for processing
+        # month_for_processing removed, use month_dt directly
         source_name_suffix = month_dt.strftime('%B_%Y') # e.g., "January_2025"
 
         if mode == 'offline':
-            source_name = f"local file for {source_name_suffix}"
-            logger.info(f"Processing in offline mode for {month_dt.strftime('%Y-%B')} (retries: {retries} - ignored)")
+            source_name = f"local file for {source_name_suffix}" # Used for logging
+            logger.info(f"Processing in offline mode for {month_dt.strftime('%Y-%B')} (retries ignored: {retries})")
 
-            # Construct path to local HTML file
-            # Standardized to use tests/golden_html_references for offline mode source files
-            offline_html_filename = f"{month_dt.strftime('%B').lower()}_{month_dt.year}.html"
-            local_html_file_path = Path("tests/golden_html_references/") / offline_html_filename
-
-            if not local_html_file_path.exists():
-                logger.error(f"Offline mode: Source HTML file not found at {local_html_file_path}. Skipping.")
+            if not local_html_input_dir:
+                logger.error("Cannot process offline mode: local_html_input_dir not provided to worker.")
                 processing_queue.task_done()
                 continue
 
-            logger.debug(f"Offline mode: Reading from {local_html_file_path}")
+            month_name_lower = month_dt.strftime("%B").lower()
+            file_name = f"{month_name_lower}_{month_dt.year}.html"
+            # full_path is a string, to be used with file URI scheme
+            full_path_obj = Path(local_html_input_dir) / file_name
+
+            if not full_path_obj.exists():
+                logger.error(f"Offline mode: Source HTML file not found at {full_path_obj}. Skipping.")
+                processing_queue.task_done()
+                continue
+
+            logger.debug(f"Offline mode: Reading from {full_path_obj}")
             try:
-                md_converter = MarkItDown()
-                result = md_converter.convert(f"file://{local_html_file_path.resolve()}") # Corrected variable name here
+                # md_converter is already instantiated
+                result = md_converter.convert(f"file://{full_path_obj.resolve()}")
                 monthly_raw_markdown = result.text_content
                 logger.debug(f"Raw MarkItDown result length for {source_name}: {len(monthly_raw_markdown)}")
             except Exception as e:
-                logger.exception(f"Unexpected error converting local file {local_html_file_path}: {e}")
+                logger.exception(f"Unexpected error converting local file {full_path_obj}: {e}")
                 processing_queue.task_done()
                 continue
 
@@ -269,25 +275,26 @@ def worker(processing_queue: queue.Queue[StructuredQueueItem], output_dir: str, 
             logger.debug(f"Prepare to fetch monthly page: {url}")
 
             try:
-                md_converter = MarkItDown()
+                # md_converter is already instantiated
                 result = md_converter.convert(url)
                 monthly_raw_markdown = result.text_content
                 logger.debug(f"Raw MarkItDown result length for {source_name}: {len(monthly_raw_markdown)}")
-            except requests.exceptions.RequestException as e:
+            except requests.exceptions.RequestException as e: # Network related errors for online mode
                 status_code = getattr(e.response, "status_code", None)
                 if status_code == 429:
-                    logger.warning(f"HTTP 429 Too Many Requests for {url}. Re-queuing {source_name_suffix} (attempt {retries + 1}).")
+                    logger.warning(f"HTTP 429 Too Many Requests for {url}. Re-queuing {source_name} (attempt {retries + 1}).")
                     processing_queue.put(('online', month_dt, retries + 1))
                 elif status_code == 404:
-                    logger.warning(f"HTTP 404 Not Found for {url} ({source_name_suffix}). Skipping.")
+                    logger.warning(f"HTTP 404 Not Found for {url} ({source_name}). Skipping.")
                 else:
-                    logger.warning(f"Request error fetching {url} ({source_name_suffix}): {e}. Retrying (attempt {retries + 1}).")
-                    time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries)) # Exponential backoff
+                    logger.warning(f"Request error fetching {url} ({source_name}): {e}. Retrying (attempt {retries + 1}).")
+                    time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
                     processing_queue.put(('online', month_dt, retries + 1))
                 processing_queue.task_done()
                 continue
-            except Exception as e:
-                logger.exception(f"Unexpected error converting URL {url} ({source_name_suffix}, attempt {retries + 1}): {e}")
+            except Exception as e: # Other errors during online conversion (e.g. MarkItDown internal)
+                logger.exception(f"Unexpected error converting URL {url} ({source_name}, attempt {retries + 1}): {e}")
+                # Decide if retry is appropriate for non-network errors; for now, yes.
                 time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
                 processing_queue.put(('online', month_dt, retries + 1))
                 processing_queue.task_done()
@@ -362,43 +369,50 @@ def main(local_html_files: list[Path] = None, output_dir: str = None) -> None: #
 
     # Setup logging based on verbosity (either from programmatic default or CLI)
     # If main were to have a verbose param: logger = setup_logging(verbose_param if is_programmatic_input else args.verbose)
-    logger = setup_logging(args.verbose if not is_programmatic_input else False) # Default to not verbose for programmatic calls unless main gets a verbose param
+    logger = setup_logging(args.verbose if not is_programmatic_input else False)
 
     # Determine effective output directory
-    # Priority: output_dir parameter > args.output_dir (from CLI or its default)
-    effective_output_dir = output_dir if output_dir is not None else args.output_dir
-    Path(effective_output_dir).mkdir(parents=True, exist_ok=True)
+    current_output_dir = output_dir if output_dir is not None else args.output_dir
+    Path(current_output_dir).mkdir(parents=True, exist_ok=True)
 
-    processing_queue: queue.Queue[StructuredQueueItem] = queue.Queue()
+    processing_queue: queue.Queue[StructuredQueueItem] = queue.Queue() # Moved definition here
     items_to_process_count = 0
     operation_mode = "" # For logging clarity
 
-    # Determine if processing local files (either from main() param or CLI)
-    # local_html_files param takes precedence.
-    if local_html_files is not None:
-        operation_mode = f"local HTML files provided programmatically ({len(local_html_files)} files)"
-        for file_path_obj in local_html_files: # These are Path objects
-            if file_path_obj.is_file() and file_path_obj.suffix == ".html":
-                try:
-                    # Parse month/year from filename e.g. "january_2025.html"
-                    name_parts = file_path_obj.stem.lower().split("_")
-                    month_name = name_parts[0].capitalize()
-                    year = int(name_parts[1])
-                    month_number = MONTH_NAME_TO_NUMBER[month_name]
-                    month_datetime_obj = datetime(year, month_number, 1)
-                    processing_queue.put(('offline', month_datetime_obj, 0))
-                except (IndexError, KeyError, ValueError) as e:
-                    logger.warning(f"Could not parse valid date from filename {file_path_obj.name}: {e}. Skipping.")
-            else:
-                logger.warning(f"Skipping non-HTML file or directory from local_html_files input: {file_path_obj}")
-        items_to_process_count = processing_queue.qsize()
+    # Determine effective local HTML input directory (only relevant for 'offline' mode if triggered via specific file list)
+    # This logic determines where the worker should look for HTML files if main() was called with local_html_files.
+    # If --local-html-dir is used, main() directly uses that to parse and queue.
+    # If online mode, this is not used by the worker.
+    effective_local_html_input_dir_str: str | None = None
+    if local_html_files: # Programmatic list of Path objects
+        if local_html_files: # Ensure not empty
+            # Assuming all files in the list are from the same parent directory for simplicity.
+            # This directory is passed to the worker for it to reconstruct paths.
+            effective_local_html_input_dir_str = str(local_html_files[0].parent)
+            operation_mode = f"local HTML files provided programmatically (input dir: {effective_local_html_input_dir_str})"
+            for file_path_obj in local_html_files: # Iterate through the provided list of Path objects
+                if file_path_obj.is_file() and file_path_obj.suffix == ".html":
+                    try:
+                        name_parts = file_path_obj.stem.lower().split("_")
+                        month_name = name_parts[0].capitalize()
+                        year = int(name_parts[1])
+                        month_number = MONTH_NAME_TO_NUMBER[month_name]
+                        month_datetime_obj = datetime(year, month_number, 1)
+                        processing_queue.put(('offline', month_datetime_obj, 0))
+                    except (IndexError, KeyError, ValueError) as e:
+                        logger.warning(f"Could not parse valid date from filename {file_path_obj.name}: {e}. Skipping.")
+                else:
+                    logger.warning(f"Skipping non-HTML file or directory from local_html_files input: {file_path_obj}")
+            items_to_process_count = processing_queue.qsize() # Update count after processing
     elif args.local_html_dir: # CLI specifies a directory of local HTMLs
-        operation_mode = f"local HTML files from CLI directory: {args.local_html_dir}"
-        cli_html_files = list(Path(args.local_html_dir).glob("*.html"))
+        # For --local-html-dir, this directory itself is where files are located.
+        effective_local_html_input_dir_str = str(args.local_html_dir)
+        operation_mode = f"local HTML files from CLI directory: {effective_local_html_input_dir_str}"
+        cli_html_files = list(Path(args.local_html_dir).glob("*.html")) # Already Path objects
         if not cli_html_files:
             logger.warning(f"No HTML files found in --local-html-dir: {args.local_html_dir}")
             return
-        for file_path_obj in cli_html_files: # These are Path objects
+        for file_path_obj in cli_html_files: # Iterate through Path objects
             try:
                 name_parts = file_path_obj.stem.lower().split("_")
                 month_name = name_parts[0].capitalize()
@@ -408,14 +422,13 @@ def main(local_html_files: list[Path] = None, output_dir: str = None) -> None: #
                 processing_queue.put(('offline', month_datetime_obj, 0))
             except (IndexError, KeyError, ValueError) as e:
                 logger.warning(f"Could not parse valid date from filename {file_path_obj.name} in --local-html-dir: {e}. Skipping.")
-        items_to_process_count = processing_queue.qsize()
-    else:
-        # Original behavior: Fetch from Wikipedia based on dates
+        items_to_process_count = processing_queue.qsize() # Update count
+    else: # Online mode
         operation_mode = "Wikipedia URL fetching mode"
+        # effective_local_html_input_dir_str remains None for online mode
         now = datetime.now()
         start_date = datetime(2025, 1, 1)
         end_date = datetime(now.year, now.month, 1)
-
         dates_set: set[datetime] = set()
         current_date = start_date
         while current_date <= end_date:
@@ -424,29 +437,28 @@ def main(local_html_files: list[Path] = None, output_dir: str = None) -> None: #
                 current_date = datetime(current_date.year + 1, 1, 1)
             else:
                 current_date = datetime(current_date.year, current_date.month + 1, 1)
-
-        items_to_process_count = len(dates_set)
+        items_to_process_count = len(dates_set) # Update count
         for date_item in sorted(list(dates_set)):
-            processing_queue.put(('online', date_item, 0)) # mode, data, retries
+            processing_queue.put(('online', date_item, 0))
 
-    if items_to_process_count == 0:
-        logger.info(f"No items to process for mode: {operation_mode}.")
+    if items_to_process_count == 0: # Check after all modes of populating queue
+        logger.info(f"No items to process for mode: {operation_mode}.") # Log final mode and count
         return
 
     logger.info(
         f"Starting processing in mode: {operation_mode}. "
-        f"Output directory: {effective_output_dir}. "
-        f"Using up to {args.workers or min(8, items_to_process_count)} worker thread(s)." # Use effective_output_dir here
+        f"Output directory: {current_output_dir}. "
+        f"Input dir for offline (if applicable): {effective_local_html_input_dir_str}. "
+        f"Using up to {args.workers or min(8, items_to_process_count)} worker thread(s)."
     )
 
     num_workers = args.workers or min(8, items_to_process_count)
-    if items_to_process_count > 0 and num_workers == 0: num_workers = 1 # Ensure at least 1 worker if items exist
+    if items_to_process_count > 0 and num_workers == 0: num_workers = 1
     elif items_to_process_count == 0: num_workers = 0
 
-
     threads: list[threading.Thread] = []
-    for _ in range(num_workers): # Use calculated num_workers
-        t = threading.Thread(target=worker, args=(processing_queue, effective_output_dir, logger)) # Pass effective_output_dir
+    for _ in range(num_workers):
+        t = threading.Thread(target=worker, args=(processing_queue, current_output_dir, logger, effective_local_html_input_dir_str))
         t.start()
         threads.append(t)
 
