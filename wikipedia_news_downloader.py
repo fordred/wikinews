@@ -10,6 +10,9 @@ import time  # Import time at the top level
 from datetime import datetime
 from pathlib import Path
 
+import functools # For functools.partial
+import http.server
+import socketserver
 import requests  # Import requests to catch its exceptions
 from markitdown import MarkItDown
 
@@ -87,6 +90,47 @@ def clean_daily_markdown_content(daily_md: str) -> str:
     # This also handles cases where the original text might not end with a newline,
     # or collapses multiple trailing newlines from the block into one.
     return cleaned_text.rstrip() + "\n"
+
+
+# --- Helper function for local HTTP server ---
+def start_local_http_server(html_file_path_str: str, logger: logging.Logger) -> tuple[str | None, http.server.HTTPServer | None, threading.Thread | None]:
+    """
+    Starts a local HTTP server in a daemon thread to serve a single HTML file's directory.
+
+    Args:
+        html_file_path_str: Absolute path to the HTML file to be served.
+        logger: Logger instance for logging messages.
+
+    Returns:
+        A tuple (base_url, server_instance, server_thread).
+        Returns (None, None, None) if server fails to start.
+    """
+    try:
+        html_file_path = Path(html_file_path_str)
+        serve_directory = str(html_file_path.parent)
+
+        # Find a free port
+        with socketserver.TCPServer(('localhost', 0), None) as s:
+            port = s.server_address[1]
+
+        if not port:
+            logger.error("Could not find a free port for the local HTTP server.")
+            return None, None, None
+
+        handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=serve_directory)
+
+        server_instance = http.server.HTTPServer(('localhost', port), handler)
+
+        server_thread = threading.Thread(target=server_instance.serve_forever, daemon=True)
+        server_thread.start()
+
+        base_url = f"http://localhost:{port}"
+        logger.info(f"Local HTTP server started for directory {serve_directory} on {base_url}, serving {html_file_path.name}")
+        return base_url, server_instance, server_thread
+
+    except Exception as e:
+        logger.error(f"Failed to start local HTTP server for {html_file_path_str}: {e}")
+        return None, None, None
 
 
 # Regex to find the start of each day's content block, capturing month name, day, and year.
@@ -271,17 +315,50 @@ def worker(date_queue: queue.Queue[tuple[str, datetime, int]], output_dir: str, 
                     date_queue.put((source_identifier, month_date, retries + 1))
                     date_queue.task_done()
                     continue
-            else: # It's a file path
+            else: # It's a file path (assumed to be HTML)
+                server_instance = None
+                server_thread = None
+                monthly_raw_markdown = None # Ensure it's None if server/conversion fails
+
                 try:
-                    monthly_raw_markdown = Path(source_identifier).read_text(encoding="utf-8")
-                    logger.debug(f"Read content from file {source_identifier} for month {month_date.strftime('%Y-%B')}, length: {len(monthly_raw_markdown)}")
-                except (FileNotFoundError, IOError) as e:
-                    logger.error(f"Error reading file {source_identifier}: {e}. Skipping.")
+                    # Resolve path in case it's relative, and ensure it's what the server expects
+                    abs_html_path = str(Path(source_identifier).resolve())
+                    base_url, server_instance, server_thread = start_local_http_server(abs_html_path, logger)
+
+                    if not base_url or not server_instance or not server_thread:
+                        logger.error(f"Local HTTP server failed to start for {source_identifier}. Skipping.")
+                        date_queue.task_done()
+                        continue
+
+                    html_filename = Path(source_identifier).name
+                    local_url = f"{base_url}/{html_filename}"
+
+                    logger.info(f"Attempting MarkItDown conversion for {source_identifier} via local URL: {local_url}")
+                    md = MarkItDown()
+                    result = md.convert(local_url) # This could raise RequestException or others
+                    monthly_raw_markdown = result.text_content
+                    logger.debug(f"Local HTML conversion to Markdown successful for {source_identifier}. Length: {len(monthly_raw_markdown)}")
+
+                except Exception as e:
+                    logger.error(f"Failed to process HTML file {source_identifier} via local server: {e}")
+                    monthly_raw_markdown = None # Explicitly set to None on error
+                finally:
+                    if server_instance:
+                        logger.info(f"Shutting down local HTTP server for {source_identifier}...")
+                        server_instance.shutdown()
+                        server_instance.server_close()
+                        logger.debug(f"Server for {source_identifier} shut down.")
+                    if server_thread:
+                        server_thread.join(timeout=5)
+                        logger.debug(f"Server thread for {source_identifier} joined.")
+
+                if monthly_raw_markdown is None:
+                    logger.warning(f"Skipping further processing for {source_identifier} due to conversion failure or server error.")
                     date_queue.task_done()
                     continue
 
-            # If we get here, monthly_raw_markdown is available
-            logger.info(f"Successfully fetched/read content for month: {month_date.strftime('%Y-%B')} from {source_identifier}")
+            # If we get here, monthly_raw_markdown is available (either from URL or local HTML processing)
+            logger.info(f"Successfully obtained Markdown content for month: {month_date.strftime('%Y-%B')} from {source_identifier}")
 
             daily_events = split_and_clean_monthly_markdown(monthly_raw_markdown, month_date, logger)
 
@@ -348,14 +425,15 @@ def main() -> None:
         logger.info(f"Running in OFFLINE mode. Source directory: {args.offline_source_dir}")
         offline_dir = Path(args.offline_source_dir)
         if not offline_dir.is_dir():
-            logger.error(f"Offline source directory not found or is not a directory: {offline_dir}")
-            sys.exit(1) # Or raise an error
+            logger.error(f"Offline source directory not found or is not a directory: {offline_dir}. Please provide a valid directory of HTML files.")
+            sys.exit(1)
 
         offline_files_queued = 0
-        for file_path in offline_dir.glob("*.md"): # Assuming markdown files
+        # Now expecting HTML files, e.g. *.html, for offline mode
+        for file_path in offline_dir.glob("*.html"):
             try:
-                # Attempt to parse filename like 'january_2024.md'
-                name_part = file_path.stem # e.g., 'january_2024'
+                # Attempt to parse filename like 'january_2025.html'
+                name_part = file_path.stem # e.g., 'january_2025'
                 month_str, year_str = name_part.split('_')
 
                 month_num = None
@@ -366,27 +444,28 @@ def main() -> None:
                         break
 
                 if not month_num:
-                    logger.warning(f"Could not parse month from filename: {file_path.name}. Skipping.")
+                    logger.warning(f"Could not parse month from HTML filename: {file_path.name}. Skipping.")
                     continue
 
                 year = int(year_str)
                 month_date = datetime(year, month_num, 1)
 
+                # Queue the HTML file path
                 date_queue.put((str(file_path.resolve()), month_date, 0))
-                logger.info(f"Queued offline file: {file_path.name} for processing as {month_date.strftime('%Y-%B')}")
+                logger.info(f"Queued offline HTML file: {file_path.name} for processing as {month_date.strftime('%Y-%B')}")
                 offline_files_queued += 1
             except ValueError:
-                logger.warning(f"Could not parse year/month from filename {file_path.name}. Skipping.")
+                logger.warning(f"Could not parse year/month from HTML filename {file_path.name}. Skipping.")
             except Exception as e:
-                logger.error(f"Error queuing file {file_path.name}: {e}. Skipping.")
+                logger.error(f"Error queuing HTML file {file_path.name}: {e}. Skipping.")
 
         if offline_files_queued == 0:
-            logger.warning(f"No valid offline files found in {args.offline_source_dir}. Exiting.")
+            logger.warning(f"No valid offline HTML files (*.html) found in {args.offline_source_dir}. Exiting.")
             sys.exit(0)
         num_items_to_process = offline_files_queued
-        logger.info(f"Successfully queued {offline_files_queued} offline files for processing.")
+        logger.info(f"Successfully queued {offline_files_queued} offline HTML files for processing.")
 
-    else:
+    else: # Online mode
         logger.info("Running in ONLINE mode. Fetching dates from Wikipedia.")
         # Dates to download
         now = datetime.now()

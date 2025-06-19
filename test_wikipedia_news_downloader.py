@@ -277,6 +277,7 @@ class TestGenerateJekyllContent:
 # --- Integration Tests for Offline Worker Processing ---
 import queue
 import shutil
+import sys # For potential stream_handler for debugging worker logs
 import tempfile
 import threading
 from pathlib import Path
@@ -285,18 +286,18 @@ from wikipedia_news_downloader import worker # Assuming worker is importable
 
 
 class TestOfflineWorkerProcessing:
-    OFFLINE_PAGES_DIR = Path("tests/test_data/offline_pages")
-    # Changed to point to docs/_posts as the source of truth for golden files
+    # Updated to point to the source HTML files
+    OFFLINE_PAGES_DIR = Path("tests/test_data/source_html")
+    # Golden output is still the final Markdown in docs/_posts
     GOLDEN_OUTPUT_DIR = Path("docs/_posts")
-    NUM_WORKERS = 2 # Using a small number of workers for the test
+    NUM_WORKERS = 2
 
-    # Logger for the test class itself, can be used by its methods
     class_logger = logging.getLogger("TestOfflineWorkerProcessing")
 
-
     def _get_month_datetime_from_filename(self, filename: str) -> datetime:
-        """Helper to parse datetime from filenames like 'january_2024.md'."""
-        name_part = filename.split('.')[0]
+        """Helper to parse datetime from filenames like 'january_2025.html' or 'february_2025.md'."""
+        # Use Path(filename).stem to handle either .html or .md if needed for flexibility, though current use is .html
+        name_part = Path(filename).stem
         month_str, year_str = name_part.split('_')
         month_map = {
             'january': 1, 'february': 2, 'march': 3, 'april': 4,
@@ -310,10 +311,10 @@ class TestOfflineWorkerProcessing:
     def test_process_offline_files_produces_golden_output(self, caplog: pytest.LogCaptureFixture) -> None:
         caplog.set_level(logging.INFO) # Optional: set log level for captured logs
 
-        if not self.OFFLINE_PAGES_DIR.exists() or not list(self.OFFLINE_PAGES_DIR.glob("*.md")):
-            pytest.skip(f"Offline pages directory ({self.OFFLINE_PAGES_DIR}) is missing or empty. Skipping test.")
+        if not self.OFFLINE_PAGES_DIR.is_dir() or not list(self.OFFLINE_PAGES_DIR.glob("*.html")):
+            pytest.skip(f"Offline HTML source directory ({self.OFFLINE_PAGES_DIR}) is missing or empty of HTML files. Skipping test.")
 
-        # Adjust skip condition for GOLDEN_OUTPUT_DIR (now docs/_posts)
+        # Skip condition for GOLDEN_OUTPUT_DIR (docs/_posts) remains the same
         # Check if docs/_posts exists and has at least one YYYY-MM-DD-index.md file (can be a loose check)
         # The main check will be comparisons_made > 0
         if not self.GOLDEN_OUTPUT_DIR.is_dir() or not any(self.GOLDEN_OUTPUT_DIR.glob("*-index.md")):
@@ -332,12 +333,13 @@ class TestOfflineWorkerProcessing:
 
 
         try:
-            # 1. Populate Queue
+            # 1. Populate Queue with HTML file paths
             date_queue: queue.Queue[tuple[str, datetime, int]] = queue.Queue()
-            offline_files = list(self.OFFLINE_PAGES_DIR.glob("*.md"))
-            assert len(offline_files) > 0, "No offline files found to process."
+            # Look for *.html files now
+            offline_html_files = list(self.OFFLINE_PAGES_DIR.glob("*.html"))
+            assert len(offline_html_files) > 0, "No offline HTML files (*.html) found to process."
 
-            for file_path in offline_files:
+            for file_path in offline_html_files:
                 try:
                     month_dt = self._get_month_datetime_from_filename(file_path.name)
                     # Using absolute path for source_identifier in queue
@@ -418,7 +420,7 @@ from wikipedia_news_downloader import BASE_WIKIPEDIA_URL # Get the base URL
 
 @pytest.mark.network
 class TestMarkItDownConsistency:
-    OFFLINE_PAGES_DIR = Path("tests/test_data/offline_pages")
+    OFFLINE_PAGES_DIR = Path("tests/test_data/offline_pages") # This refers to the *Markdown* files for comparison
     # Using BASE_WIKIPEDIA_URL from the main script
 
     # Logger for this test class
@@ -426,14 +428,16 @@ class TestMarkItDownConsistency:
 
     def _parse_filename_to_url_parts(self, filename: str) -> tuple[str, str] | None:
         """
-        Parses filenames like 'january_2025.md' into ('January', '2025').
+        Parses Markdown filenames like 'january_2025.md' into ('January', '2025').
         Capitalizes month name for URL construction.
         Returns None if parsing fails.
         """
+        # Expecting .md files from OFFLINE_PAGES_DIR for this specific test
         if not filename.endswith(".md"):
+            self.class_logger.warning(f"_parse_filename_to_url_parts expected .md file, got {filename}")
             return None
 
-        name_part = filename.split('.')[0] # e.g., 'january_2025'
+        name_part = Path(filename).stem # e.g., 'january_2025'
         parts = name_part.split('_')
         if len(parts) != 2:
             return None
@@ -446,13 +450,13 @@ class TestMarkItDownConsistency:
         caplog.set_level(logging.INFO)
         self.class_logger.info("Starting MarkItDown consistency test. This test requires network access.")
 
-        if not self.OFFLINE_PAGES_DIR.is_dir() or not list(self.OFFLINE_PAGES_DIR.glob("*.md")):
-            pytest.skip(f"Offline pages directory ({self.OFFLINE_PAGES_DIR}) is missing or empty. Nothing to compare.")
+        if not self.OFFLINE_PAGES_DIR.is_dir() or not list(self.OFFLINE_PAGES_DIR.glob("*.md")): # Still checks for .md files here
+            pytest.skip(f"Stored Markdown directory ({self.OFFLINE_PAGES_DIR}) for comparison is missing or empty. Nothing to compare.")
 
-        stored_markdown_files = list(self.OFFLINE_PAGES_DIR.glob("*.md"))
-        assert len(stored_markdown_files) > 0, "No *.md files found in offline pages directory for comparison."
+        stored_markdown_files = list(self.OFFLINE_PAGES_DIR.glob("*.md")) # Iterates .md files
+        assert len(stored_markdown_files) > 0, "No *.md files found in stored Markdown directory for comparison."
 
-        self.class_logger.info(f"Found {len(stored_markdown_files)} stored markdown files to check.")
+        self.class_logger.info(f"Found {len(stored_markdown_files)} stored Markdown files to check for consistency.")
 
         md_converter = MarkItDown()
         files_compared = 0
