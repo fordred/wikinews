@@ -31,7 +31,7 @@ jobs:
       run: echo "date=$(date)" > $GITHUB_OUTPUT
 
     - name: Download Wikipedia News
-      run: uv run --upgrade wikipedia_news_downloader.py
+      run: uv run --no-dev --upgrade wikipedia_news_downloader.py
 
     - uses: stefanzweifel/git-auto-commit-action@v6
       with:
