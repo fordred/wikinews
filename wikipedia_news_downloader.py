@@ -368,14 +368,12 @@ def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def main(local_html_files: list[Path] | None = None, output_dir: str | None = None) -> None:  # RUF013
-    cli_args = parse_arguments()
+def main(output_dir_str: str, verbose: bool, num_workers: int | None, local_html_dir_str: Path | None, local_html_files_list: list[Path] | None) -> None:
+    # Setup logging based on the verbose parameter
+    logger = setup_logging(verbose)
 
-    # Setup logging based on verbosity from CLI args
-    logger = setup_logging(cli_args.verbose)
-
-    # Determine effective output directory, prioritizing function argument
-    current_output_dir = output_dir if output_dir is not None else cli_args.output_dir
+    # Use output_dir_str directly
+    current_output_dir = output_dir_str
     Path(current_output_dir).mkdir(parents=True, exist_ok=True)
 
     processing_queue: queue.Queue[StructuredQueueItem] = queue.Queue()
@@ -383,11 +381,14 @@ def main(local_html_files: list[Path] | None = None, output_dir: str | None = No
     operation_mode = ""
     effective_local_html_input_dir_str: str | None = None
 
-    if local_html_files:  # Programmatic list of Path objects takes precedence
-        if local_html_files:  # Ensure not empty
-            effective_local_html_input_dir_str = str(local_html_files[0].parent)
+    if local_html_files_list:  # Programmatic list of Path objects takes precedence
+        if local_html_files_list:  # Ensure not empty
+            # Assuming all files in the list are from the same parent directory for simplicity.
+            # This directory is passed to the worker for it to reconstruct paths.
+            # Guard against empty list for path determination, though `if local_html_files_list:` above helps
+            effective_local_html_input_dir_str = str(local_html_files_list[0].parent) if local_html_files_list else None
             operation_mode = f"local HTML files provided programmatically (input dir: {effective_local_html_input_dir_str})"
-            for file_path_obj in local_html_files:
+            for file_path_obj in local_html_files_list:
                 if file_path_obj.is_file() and file_path_obj.suffix == ".html":
                     try:
                         name_parts = file_path_obj.stem.lower().split("_")
@@ -401,19 +402,17 @@ def main(local_html_files: list[Path] | None = None, output_dir: str | None = No
                 else:
                     logger.warning(f"Skipping non-HTML file or directory from local_html_files input: {file_path_obj}")
             items_to_process_count = processing_queue.qsize()
-    elif cli_args.local_html_dir:  # Else, use CLI argument if provided
-        effective_local_html_input_dir_str = str(cli_args.local_html_dir)
-        operation_mode = f"local HTML files from CLI directory: {effective_local_html_input_dir_str}"
-        cli_html_files_path_obj = Path(cli_args.local_html_dir)
+    elif local_html_dir_str:  # Else, use local_html_dir_str if provided
+        effective_local_html_input_dir_str = str(local_html_dir_str)
+        operation_mode = f"local HTML files from directory parameter: {effective_local_html_input_dir_str}"
+        cli_html_files_path_obj = Path(local_html_dir_str) # Already a Path object
         if not cli_html_files_path_obj.is_dir():
-            logger.error(f"--local-html-dir is not a valid directory: {cli_args.local_html_dir}")
-            return
+            logger.error(f"local_html_dir_str is not a valid directory: {local_html_dir_str}")
+            return # Exit if the provided path isn't a directory
 
         cli_html_files = list(cli_html_files_path_obj.glob("*.html"))
         if not cli_html_files:
-            logger.warning(f"No HTML files found in --local-html-dir: {cli_args.local_html_dir}")
-            # No return here, allow falling through to online mode if desired,
-            # or let items_to_process_count remain 0 if this was the only intended mode.
+            logger.warning(f"No HTML files found in local_html_dir_str: {local_html_dir_str}")
         for file_path_obj in cli_html_files:
             try:
                 name_parts = file_path_obj.stem.lower().split("_")
@@ -423,18 +422,14 @@ def main(local_html_files: list[Path] | None = None, output_dir: str | None = No
                 month_datetime_obj = datetime(year, month_number, 1)
                 processing_queue.put(("offline", month_datetime_obj, 0))
             except (IndexError, KeyError, ValueError) as e:
-                logger.warning(f"Could not parse valid date from filename {file_path_obj.name} in --local-html-dir: {e}. Skipping.")
+                logger.warning(f"Could not parse valid date from filename {file_path_obj.name} in local_html_dir_str: {e}. Skipping.")
         items_to_process_count = processing_queue.qsize()
 
-    # If neither local_html_files (programmatic) nor cli_args.local_html_dir (CLI) resulted in items,
-    # and we intend online mode as a fallback or default, then populate for online mode.
-    # The current logic implies that if local modes are specified but yield no files, we don't automatically go online.
-    # If online is the default when no local files are processed, this needs to be explicit.
-    # For this refactoring, we assume if items_to_process_count is still 0, then it's online mode.
-    if items_to_process_count == 0 and not local_html_files and not cli_args.local_html_dir: # Only go online if no local mode was attempted
+    # If neither local_html_files_list nor local_html_dir_str resulted in items, operate in online mode.
+    if items_to_process_count == 0 and not local_html_files_list and not local_html_dir_str:
         operation_mode = "Wikipedia URL fetching mode"
         now = datetime.now()
-        start_date = datetime(2025, 1, 1) # Example start: Jan 2025, adjust as needed
+        start_date = datetime(2025, 1, 1)
         end_date = datetime(now.year, now.month, 1)
         dates_set: set[datetime] = set()
         current_date = start_date
@@ -452,22 +447,23 @@ def main(local_html_files: list[Path] | None = None, output_dir: str | None = No
         logger.info(f"No items to process for mode: {operation_mode}. Exiting.")
         return
 
+    # Use num_workers parameter for determining number of threads
+    resolved_num_workers = num_workers if num_workers is not None else min(8, items_to_process_count)
+    if items_to_process_count > 0 and resolved_num_workers == 0: # Ensure at least one worker if items exist
+        resolved_num_workers = 1
+    elif items_to_process_count == 0:
+        resolved_num_workers = 0
+
+
     logger.info(
         f"Starting processing in mode: {operation_mode}. "
         f"Output directory: {current_output_dir}. "
         f"Input dir for offline (if applicable): {effective_local_html_input_dir_str}. "
-        f"Using up to {cli_args.workers or min(8, items_to_process_count)} worker thread(s).",
+        f"Using up to {resolved_num_workers} worker thread(s).",
     )
 
-    num_workers = cli_args.workers or min(8, items_to_process_count)
-    # Ensure num_workers is at least 1 if there are items, and 0 if no items.
-    if items_to_process_count > 0 and num_workers == 0:
-        num_workers = 1
-    elif items_to_process_count == 0: # Should be caught by earlier return, but defensive
-        num_workers = 0
-
     threads: list[threading.Thread] = []
-    for _ in range(num_workers):
+    for _ in range(resolved_num_workers): # Use resolved_num_workers here
         t = threading.Thread(target=worker, args=(processing_queue, current_output_dir, logger, effective_local_html_input_dir_str))
         t.start()
         threads.append(t)
@@ -481,4 +477,11 @@ def main(local_html_files: list[Path] | None = None, output_dir: str | None = No
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_arguments()
+    main(
+        output_dir_str=args.output_dir,
+        verbose=args.verbose,
+        num_workers=args.workers,
+        local_html_dir_str=args.local_html_dir,
+        local_html_files_list=None,  # Not typically set when run as script
+    )
