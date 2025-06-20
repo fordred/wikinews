@@ -228,8 +228,8 @@ def worker(processing_queue: queue.Queue[StructuredQueueItem], output_dir: str, 
             break  # No more items to process
 
         monthly_raw_markdown = ""
+        source_uri = None # Initialize source_uri
         source_name = "" # For logging (filename or month-year)
-        # month_for_processing removed, use month_dt directly
         source_name_suffix = month_dt.strftime('%B_%Y') # e.g., "January_2025"
 
         if mode == 'offline':
@@ -243,22 +243,13 @@ def worker(processing_queue: queue.Queue[StructuredQueueItem], output_dir: str, 
 
             month_name_lower = month_dt.strftime("%B").lower()
             file_name = f"{month_name_lower}_{month_dt.year}.html"
-            # full_path is a string, to be used with file URI scheme
             full_path_obj = Path(local_html_input_dir) / file_name
 
-            if not full_path_obj.exists():
+            if full_path_obj.exists():
+                source_uri = f"file://{full_path_obj.resolve()}"
+                logger.debug(f"Offline mode: Source URI set to {source_uri}")
+            else:
                 logger.error(f"Offline mode: Source HTML file not found at {full_path_obj}. Skipping.")
-                processing_queue.task_done()
-                continue
-
-            logger.debug(f"Offline mode: Reading from {full_path_obj}")
-            try:
-                # md_converter is already instantiated
-                result = md_converter.convert(f"file://{full_path_obj.resolve()}")
-                monthly_raw_markdown = result.text_content
-                logger.debug(f"Raw MarkItDown result length for {source_name}: {len(monthly_raw_markdown)}")
-            except Exception as e:
-                logger.exception(f"Unexpected error converting local file {full_path_obj}: {e}")
                 processing_queue.task_done()
                 continue
 
@@ -272,43 +263,31 @@ def worker(processing_queue: queue.Queue[StructuredQueueItem], output_dir: str, 
                 continue
 
             url = f"{BASE_WIKIPEDIA_URL}{source_name_suffix}"
-            logger.debug(f"Prepare to fetch monthly page: {url}")
+            source_uri = url # Set source_uri to the URL for online mode
+            logger.debug(f"Online mode: Source URI set to {source_uri}")
 
-            try:
-                # md_converter is already instantiated
-                result = md_converter.convert(url)
-                monthly_raw_markdown = result.text_content
-                logger.debug(f"Raw MarkItDown result length for {source_name}: {len(monthly_raw_markdown)}")
-            except requests.exceptions.RequestException as e: # Network related errors for online mode
-                status_code = getattr(e.response, "status_code", None)
-                if status_code == 429:
-                    logger.warning(f"HTTP 429 Too Many Requests for {url}. Re-queuing {source_name} (attempt {retries + 1}).")
-                    processing_queue.put(('online', month_dt, retries + 1))
-                elif status_code == 404:
-                    logger.warning(f"HTTP 404 Not Found for {url} ({source_name}). Skipping.")
-                else:
-                    logger.warning(f"Request error fetching {url} ({source_name}): {e}. Retrying (attempt {retries + 1}).")
-                    time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
-                    processing_queue.put(('online', month_dt, retries + 1))
-                processing_queue.task_done()
-                continue
-            except Exception as e: # Other errors during online conversion (e.g. MarkItDown internal)
-                logger.exception(f"Unexpected error converting URL {url} ({source_name}, attempt {retries + 1}): {e}")
-                # Decide if retry is appropriate for non-network errors; for now, yes.
-                time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
-                processing_queue.put(('online', month_dt, retries + 1))
-                processing_queue.task_done()
-                continue
         else: # Should not happen if queue is populated correctly
             logger.error(f"Unknown mode in queue item: {mode}. Item: {(mode, month_dt, retries)}. Skipping.")
             processing_queue.task_done()
             continue
 
-        # --- Common content processing ---
+        # Check if source_uri is set after the if-elif block
+        if not source_uri:
+            logger.error(f"Source URI not set for {source_name_suffix} (mode: {mode}). This might be due to a file not found in offline mode or an unhandled condition. Skipping.")
+            processing_queue.task_done()
+            continue
+
         try:
+            # md_converter is already instantiated
+            logger.debug(f"Attempting to convert content from {source_uri} for {source_name}")
+            result = md_converter.convert(source_uri)
+            monthly_raw_markdown = result.text_content
+            logger.debug(f"Raw MarkItDown result length for {source_name}: {len(monthly_raw_markdown)}")
+
+            # --- Common content processing (moved inside this try block) ---
             if not monthly_raw_markdown.strip():
                 logger.warning(f"No content extracted for {source_name_suffix} (mode: {mode}). Skipping further processing.")
-                processing_queue.task_done()
+                # processing_queue.task_done() # Removed: task_done is called in the finally block
                 continue
 
             logger.info(f"Successfully fetched/read content for {source_name_suffix} (mode: {mode})")
@@ -326,9 +305,34 @@ def worker(processing_queue: queue.Queue[StructuredQueueItem], output_dir: str, 
                 else:
                     logger.warning(f"Skipping save for {event_date.strftime('%Y-%m-%d')} from {source_name_suffix}: Content marked unpublished or generation failed.")
 
-        except Exception as e:
-            logger.exception(f"Unexpected error processing content from {source_name_suffix} (mode: {mode}): {e}")
-        finally: # Ensure task_done is always called
+        except requests.exceptions.RequestException as e: # Specific to online mode fetching
+            if mode == 'online':
+                status_code = getattr(e.response, "status_code", None)
+                url_for_error = source_uri # In online mode, source_uri is the url
+                if status_code == 429:
+                    logger.warning(f"HTTP 429 Too Many Requests for {url_for_error}. Re-queuing {source_name} (attempt {retries + 1}).")
+                    processing_queue.put(('online', month_dt, retries + 1))
+                elif status_code == 404:
+                    logger.warning(f"HTTP 404 Not Found for {url_for_error} ({source_name}). Skipping.")
+                else:
+                    logger.warning(f"Request error fetching {url_for_error} ({source_name}): {e}. Retrying (attempt {retries + 1}).")
+                    time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
+                    processing_queue.put(('online', month_dt, retries + 1))
+            else: # Should not be a RequestException in offline mode if source_uri is file://
+                 logger.exception(f"Unexpected requests.exceptions.RequestException for {source_uri} in {mode} mode: {e}")
+            # processing_queue.task_done() is handled by the finally block
+
+        except Exception as e: # Catch other errors (MarkItDown conversion, content processing)
+            logger.exception(f"Error during content conversion or processing for {source_uri} ({source_name}, mode: {mode}, attempt {retries if mode == 'online' else 'N/A'}): {e}")
+            if mode == 'online': # Decide if retry is appropriate for non-network errors in online mode
+                # For now, retry as per previous logic for generic exceptions in online mode
+                time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
+                processing_queue.put(('online', month_dt, retries + 1))
+            # For offline mode, a general exception here usually means a conversion problem with the local file.
+            # No retry logic for offline mode post-conversion attempt.
+            # processing_queue.task_done() is handled by the finally block
+
+        finally: # Ensure task_done is always called once per item from the queue
             processing_queue.task_done()
 
 def main(local_html_files: list[Path] = None, output_dir: str = None) -> None: # Added output_dir parameter
