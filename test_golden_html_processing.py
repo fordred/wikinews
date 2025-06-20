@@ -67,7 +67,13 @@ def test_html_processing_with_refactored_main():
             # or adjust main to accept more direct params. For now, using its CLI defaults for other args.
             # The refactored `main` uses its own `setup_logging` based on its `args.verbose`.
             # We pass the `local_html_files` list directly.
-            wikipedia_main(local_html_files=golden_html_files, output_dir=str(temp_output_dir))
+            wikipedia_main(
+                output_dir_str=str(temp_output_dir),
+                verbose=False,  # Tests typically don't need verbose output from the script itself
+                num_workers=None, # Use default worker logic (or 1 for deterministic testing if issues arise)
+                local_html_dir_str=None, # This test uses a specific list of files
+                local_html_files_list=golden_html_files
+            )
         except Exception as e:
             pytest.fail(f"Call to wikipedia_main failed during test execution: {e}")
 
