@@ -3,7 +3,7 @@ import queue  # For queue.Queue and queue.Empty
 from datetime import datetime
 from pathlib import Path  # For Path object
 from typing import Any  # For fixture type hints
-from unittest.mock import MagicMock  # For mocking MarkItDown conversion result
+from unittest.mock import MagicMock, patch  # For mocking MarkItDown conversion result and patching
 
 import pytest
 import requests  # For requests.exceptions.RequestException
@@ -16,6 +16,7 @@ from wikipedia_news_downloader import (
     generate_jekyll_content,
     split_and_clean_monthly_markdown,
     worker,
+    main, # Import main for testing
 )
 
 # Raw markdown example from the issue description
@@ -934,3 +935,95 @@ class TestWorkerFunction:
         ]
         expected_full_content = "\n".join(expected_front_matter_lines)
         assert full_content == expected_full_content
+
+
+class TestMainFunctionLogging:
+    @patch('wikipedia_news_downloader.Path.mkdir')
+    @patch('threading.Thread')
+    @patch('wikipedia_news_downloader.setup_logging')
+    def test_main_with_provided_logger(self, mock_setup_logging: MagicMock, mock_thread: MagicMock, mock_mkdir: MagicMock) -> None:
+        mock_custom_logger = MagicMock(spec=logging.Logger)
+
+        dummy_file_path = MagicMock(spec=Path)
+        dummy_file_path.is_file.return_value = True
+        dummy_file_path.suffix = ".html"
+        dummy_file_path.stem = "january_2025"
+        dummy_file_path.name = "january_2025.html"
+        mock_parent_dir = MagicMock(spec=Path)
+        dummy_file_path.parent = mock_parent_dir
+
+        # Mock queue.Queue().qsize() to return 1 to indicate items to process
+        with patch('queue.Queue') as mock_queue_class:
+            mock_queue_instance = MagicMock()
+            mock_queue_instance.qsize.return_value = 1 # Indicates one item from local_html_files_list
+            mock_queue_class.return_value = mock_queue_instance
+
+            main(output_dir_str="dummy_output",
+                 verbose=False,
+                 num_workers=1,
+                 local_html_files_list=[dummy_file_path],
+                 logger=mock_custom_logger)
+
+        mock_setup_logging.assert_not_called()
+        # More specific check for the logger call related to starting processing
+        # Note: The exact string might need adjustment based on how str(mock_parent_dir) renders.
+        # If mock_parent_dir.name is "parent_dir_mock", str(mock_parent_dir) might be "parent_dir_mock".
+        # For robustness, we can convert the mock_parent_dir to string for the assertion.
+        expected_parent_dir_str = str(mock_parent_dir)
+        # Construct the exact expected log message
+        expected_log_message = (
+            f"Starting processing in mode: local HTML files provided programmatically (input dir: {expected_parent_dir_str}). "
+            f"Output directory: dummy_output. "
+            f"Input dir for offline (if applicable): {expected_parent_dir_str}. "
+            f"Using up to 1 worker thread(s)."
+        )
+        mock_custom_logger.info.assert_any_call(expected_log_message)
+
+        mock_thread.assert_called_once()
+        # Args for Thread: (target=worker, args=(processing_queue, current_output_dir, logger, effective_local_html_input_dir_str))
+        # mock_thread.call_args[1]['args'] is the tuple of arguments passed to the worker function.
+        thread_args_for_worker = mock_thread.call_args[1]['args']
+        assert len(thread_args_for_worker) >= 4, "Not enough arguments passed to worker thread target"
+        assert thread_args_for_worker[2] is mock_custom_logger # logger is the 3rd arg for worker
+
+    @patch('wikipedia_news_downloader.Path.mkdir')
+    @patch('threading.Thread')
+    @patch('wikipedia_news_downloader.setup_logging')
+    def test_main_with_default_logger(self, mock_setup_logging: MagicMock, mock_thread: MagicMock, mock_mkdir: MagicMock) -> None:
+        mock_default_logger_instance = MagicMock(spec=logging.Logger)
+        mock_setup_logging.return_value = mock_default_logger_instance
+
+        dummy_file_path = MagicMock(spec=Path)
+        dummy_file_path.is_file.return_value = True
+        dummy_file_path.suffix = ".html"
+        dummy_file_path.stem = "february_2025" # Different stem to avoid potential test interactions if any
+        dummy_file_path.name = "february_2025.html"
+        mock_parent_dir = MagicMock(spec=Path)
+        dummy_file_path.parent = mock_parent_dir
+
+        with patch('queue.Queue') as mock_queue_class:
+            mock_queue_instance = MagicMock()
+            mock_queue_instance.qsize.return_value = 1
+            mock_queue_class.return_value = mock_queue_instance
+
+            main(output_dir_str="dummy_output_default",
+                 verbose=False,
+                 num_workers=1,
+                 local_html_files_list=[dummy_file_path],
+                 logger=None)
+
+        mock_setup_logging.assert_called_once_with(False)
+        expected_parent_dir_str = str(mock_parent_dir)
+        # Construct the exact expected log message
+        expected_log_message = (
+            f"Starting processing in mode: local HTML files provided programmatically (input dir: {expected_parent_dir_str}). "
+            f"Output directory: dummy_output_default. "
+            f"Input dir for offline (if applicable): {expected_parent_dir_str}. "
+            f"Using up to 1 worker thread(s)."
+        )
+        mock_default_logger_instance.info.assert_any_call(expected_log_message)
+
+        mock_thread.assert_called_once()
+        thread_args_for_worker = mock_thread.call_args[1]['args']
+        assert len(thread_args_for_worker) >= 4
+        assert thread_args_for_worker[2] is mock_default_logger_instance
