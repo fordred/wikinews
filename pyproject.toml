@@ -15,6 +15,7 @@ dev = [
     "pyright",
     "pytest",
     "pytest-cov",
+    "pytest-mock",
     "pytype ; sys_platform == 'linux'",
     "ruff",
     "types-requests",
