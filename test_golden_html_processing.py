@@ -69,9 +69,12 @@ def test_html_processing_with_refactored_main():
             # We pass the `local_html_files` list directly.
             wikipedia_main(
                 output_dir_str=str(temp_output_dir),
-                verbose=False,  # Tests typically don't need verbose output from the script itself
-                num_workers=None, # Use default worker logic (or 1 for deterministic testing if issues arise)
-                local_html_files_list=golden_html_files
+                verbose=False,  # This verbose is for main's internal logger setup if no logger is passed.
+                                # Since we are passing a logger, main's verbose might be less critical,
+                                # but keeping it doesn't hurt.
+                num_workers=None,
+                local_html_files_list=golden_html_files,
+                logger=logger  # Pass the test's logger instance
             )
         except Exception as e:
             pytest.fail(f"Call to wikipedia_main failed during test execution: {e}")
