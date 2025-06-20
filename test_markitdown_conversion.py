@@ -38,7 +38,8 @@ def test_markitdown_conversion_consistency(
         result = md_converter.convert(golden_html_path_str)  # Pass the path string
         if result is None or not hasattr(result, "text_content") or not isinstance(result.text_content, str):
             pytest.fail(
-                f"MarkItDown().convert() did not return a result with a valid 'text_content' string attribute from {golden_html_path}. Got: {result}",
+                f"MarkItDown().convert() did not return a result with a valid 'text_content' string attribute "
+                f"from {golden_html_path}. Got: {result}",
             )
         current_raw_markdown = result.text_content
     except Exception as e:
