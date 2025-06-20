@@ -368,7 +368,7 @@ def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def main(output_dir_str: str, verbose: bool, num_workers: int | None, local_html_dir_str: Path | None, local_html_files_list: list[Path] | None) -> None:
+def main(output_dir_str: str, verbose: bool, num_workers: int | None, local_html_files_list: list[Path] | None) -> None:
     # Setup logging based on the verbose parameter
     logger = setup_logging(verbose)
 
@@ -402,31 +402,9 @@ def main(output_dir_str: str, verbose: bool, num_workers: int | None, local_html
                 else:
                     logger.warning(f"Skipping non-HTML file or directory from local_html_files input: {file_path_obj}")
             items_to_process_count = processing_queue.qsize()
-    elif local_html_dir_str:  # Else, use local_html_dir_str if provided
-        effective_local_html_input_dir_str = str(local_html_dir_str)
-        operation_mode = f"local HTML files from directory parameter: {effective_local_html_input_dir_str}"
-        cli_html_files_path_obj = Path(local_html_dir_str) # Already a Path object
-        if not cli_html_files_path_obj.is_dir():
-            logger.error(f"local_html_dir_str is not a valid directory: {local_html_dir_str}")
-            return # Exit if the provided path isn't a directory
 
-        cli_html_files = list(cli_html_files_path_obj.glob("*.html"))
-        if not cli_html_files:
-            logger.warning(f"No HTML files found in local_html_dir_str: {local_html_dir_str}")
-        for file_path_obj in cli_html_files:
-            try:
-                name_parts = file_path_obj.stem.lower().split("_")
-                month_name = name_parts[0].capitalize()
-                year = int(name_parts[1])
-                month_number = MONTH_NAME_TO_NUMBER[month_name]
-                month_datetime_obj = datetime(year, month_number, 1)
-                processing_queue.put(("offline", month_datetime_obj, 0))
-            except (IndexError, KeyError, ValueError) as e:
-                logger.warning(f"Could not parse valid date from filename {file_path_obj.name} in local_html_dir_str: {e}. Skipping.")
-        items_to_process_count = processing_queue.qsize()
-
-    # If neither local_html_files_list nor local_html_dir_str resulted in items, operate in online mode.
-    if items_to_process_count == 0 and not local_html_files_list and not local_html_dir_str:
+    # If local_html_files_list did not result in items (it's None or empty), operate in online mode.
+    if items_to_process_count == 0 and not local_html_files_list:
         operation_mode = "Wikipedia URL fetching mode"
         now = datetime.now()
         start_date = datetime(2025, 1, 1)
@@ -478,10 +456,24 @@ def main(output_dir_str: str, verbose: bool, num_workers: int | None, local_html
 
 if __name__ == "__main__":
     args = parse_arguments()
+    logger = setup_logging(args.verbose) # Setup logger here for potential early exit messages
+    html_files_to_pass = None
+
+    if args.local_html_dir:
+        local_dir_path = Path(args.local_html_dir)
+        if not local_dir_path.is_dir():
+            logger.error(f"Provided local HTML directory is not a valid directory: {args.local_html_dir}")
+            sys.exit(1) # Exit early
+        html_files_to_pass = list(local_dir_path.glob("*.html"))
+        if not html_files_to_pass:
+            logger.info(f"No *.html files found in {args.local_html_dir}. Proceeding without local HTML files from this directory.")
+        else:
+            logger.info(f"Found {len(html_files_to_pass)} HTML file(s) in {args.local_html_dir}.")
+
     main(
         output_dir_str=args.output_dir,
         verbose=args.verbose,
         num_workers=args.workers,
-        local_html_dir_str=args.local_html_dir,
-        local_html_files_list=None,  # Not typically set when run as script
+        local_html_dir_str=None, # As per plan, this will be None, main will use local_html_files_list
+        local_html_files_list=html_files_to_pass,
     )
