@@ -368,9 +368,10 @@ def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def main(output_dir_str: str, verbose: bool, num_workers: int | None, local_html_files_list: list[Path] | None) -> None:
+def main(output_dir_str: str, verbose: bool, num_workers: int | None, local_html_files_list: list[Path] | None, logger: logging.Logger | None = None) -> None:
     # Setup logging based on the verbose parameter
-    logger = setup_logging(verbose)
+    if logger is None:
+        logger = setup_logging(verbose)
 
     # Use output_dir_str directly
     current_output_dir = output_dir_str
@@ -474,6 +475,6 @@ if __name__ == "__main__":
         output_dir_str=args.output_dir,
         verbose=args.verbose,
         num_workers=args.workers,
-        local_html_dir_str=None, # As per plan, this will be None, main will use local_html_files_list
         local_html_files_list=html_files_to_pass,
+        logger=logger # Pass the logger instance here
     )
