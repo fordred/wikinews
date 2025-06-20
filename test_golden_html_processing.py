@@ -1,20 +1,22 @@
-import logging
-from pathlib import Path
-from datetime import datetime
 import tempfile
-import shutil
+from datetime import datetime
+from pathlib import Path
 
 import pytest
 
-# Import the refactored main and other necessary components
 from wikipedia_news_downloader import (
-    main as wikipedia_main,
     MONTH_NAME_TO_NUMBER,
     setup_logging,
 )
 
+# Import the refactored main and other necessary components
+from wikipedia_news_downloader import (
+    main as wikipedia_main,
+)
+
 # Setup logger for the test module, can use the one from the downloader or define its own
 logger = setup_logging(verbose=True)
+
 
 def get_month_year_from_golden_html(html_file_path: Path) -> tuple[int, int]:
     """Derives month and year from golden HTML filename e.g., january_2025.html -> (1, 2025)"""
@@ -23,6 +25,7 @@ def get_month_year_from_golden_html(html_file_path: Path) -> tuple[int, int]:
     year = int(parts[1])
     month_number = MONTH_NAME_TO_NUMBER[month_name]
     return month_number, year
+
 
 def test_html_processing_with_refactored_main():
     """
@@ -96,7 +99,7 @@ def test_html_processing_with_refactored_main():
                 source_html_candidate = f"{event_date.strftime('%B').lower()}_{event_date.year}.html"
                 errors.append(
                     f"Missing generated file: {generated_post_path.name} in temp output. "
-                    f"(Expected from: {source_html_candidate}, Reference: {ref_post_path})"
+                    f"(Expected from: {source_html_candidate}, Reference: {ref_post_path})",
                 )
                 continue
 
@@ -109,7 +112,7 @@ def test_html_processing_with_refactored_main():
                     f"Content mismatch for {generated_post_path.name}.\n"
                     f"  Source HTML (expected): {source_html_candidate}\n"
                     f"  Reference MD: {ref_post_path}\n"
-                    f"  Generated MD: {generated_post_path}\n"
+                    f"  Generated MD: {generated_post_path}\n",
                     # Consider adding a diff here if it's not too verbose, or a marker
                     # For now, full content is not included in assertion to avoid huge outputs
                     # Pytest diffing for strings might handle this well if we directly assert.
@@ -130,13 +133,14 @@ def test_html_processing_with_refactored_main():
                 if not corresponding_ref_path.exists():
                     errors.append(
                         f"Untested generated file: {gen_file_path.name} was created in temp output, "
-                        f"but no corresponding reference file exists in {reference_posts_root_dir}."
+                        f"but no corresponding reference file exists in {reference_posts_root_dir}.",
                     )
 
         if errors:
             error_summary = "\n\n".join(errors)
             logger.error(f"Test failed with the following errors:\n{error_summary}")
             pytest.fail(f"Golden HTML processing test failed with {len(errors)} error(s):\n{error_summary}")
+
 
 # Remove old test if it exists (or rename it to avoid running both)
 # For example, if the old one was test_golden_html_processing_with_workers

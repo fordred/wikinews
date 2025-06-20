@@ -1,21 +1,22 @@
 import logging
+import queue  # For queue.Queue and queue.Empty
 from datetime import datetime
+from pathlib import Path  # For Path object
+from typing import Any  # For fixture type hints
+from unittest.mock import MagicMock  # For mocking MarkItDown conversion result
 
 import pytest
+import requests  # For requests.exceptions.RequestException
 
 from wikipedia_news_downloader import (
+    BASE_WIKIPEDIA_URL,  # Import for use in tests
     MIN_MARKDOWN_LENGTH_PUBLISH,
+    RETRY_MAX_ATTEMPTS,  # Import for use in tests
     clean_daily_markdown_content,
     generate_jekyll_content,
     split_and_clean_monthly_markdown,
     worker,
-    RETRY_MAX_ATTEMPTS, # Import for use in tests
-    BASE_WIKIPEDIA_URL, # Import for use in tests
 )
-import queue # For queue.Queue and queue.Empty
-from pathlib import Path # For Path object
-import requests # For requests.exceptions.RequestException
-from unittest.mock import MagicMock # For mocking MarkItDown conversion result
 
 # Raw markdown example from the issue description
 raw_markdown_example = """
@@ -25,13 +26,15 @@ raw_markdown_example = """
 logger = logging.getLogger(__name__)
 # Pytest handles log capture, so basicConfig is not needed here.
 
+
 # --- Fixtures for worker tests ---
 @pytest.fixture
-def mock_logger(mocker):
+def mock_logger(mocker: Any) -> MagicMock:
     return mocker.MagicMock(spec=logging.Logger)
 
+
 @pytest.fixture
-def mock_queue(mocker):
+def mock_queue(mocker: Any) -> MagicMock:
     # Create a mock queue that can also raise queue.Empty
     q = mocker.MagicMock(spec=queue.Queue)
     # Configure get to raise queue.Empty after all pre-set items are retrieved
@@ -39,28 +42,33 @@ def mock_queue(mocker):
     q.get.side_effect = queue.Empty
     return q
 
+
 @pytest.fixture
-def mock_markitdown_converter(mocker):
+def mock_markitdown_converter(mocker: Any) -> MagicMock:
     mock_converter = mocker.MagicMock()
     # Default behavior for convert, can be overridden in tests
     mock_converter.convert.return_value = MagicMock(text_content="Mocked markdown content")
     return mock_converter
 
+
 @pytest.fixture
-def temp_output_dir(tmp_path):
+def temp_output_dir(tmp_path: Path) -> str:
     # Create a temporary directory for output files
     output_dir = tmp_path / "output"
     output_dir.mkdir()
     return str(output_dir)
 
+
 @pytest.fixture
-def temp_html_input_dir(tmp_path):
+def temp_html_input_dir(tmp_path: Path) -> str:
     # Create a temporary directory for local HTML files
     input_dir = tmp_path / "html_input"
     input_dir.mkdir()
     return str(input_dir)
 
+
 # --- End Fixtures ---
+
 
 class TestSplitAndCleanMarkdown:
     @staticmethod
@@ -319,20 +327,32 @@ class TestGenerateJekyllContent:
 
 # --- Tests for worker function ---
 
+
 class TestWorkerFunction:
-    def test_offline_mode_valid_html_file(self, mock_logger, mock_queue, mock_markitdown_converter, temp_output_dir, temp_html_input_dir, mocker):
+    def test_offline_mode_valid_html_file(  # PLR0913 potentially, but fixtures are common in pytest
+        self,
+        mock_logger: MagicMock,
+        mock_queue: MagicMock,
+        mock_markitdown_converter: MagicMock,
+        temp_output_dir: str,
+        temp_html_input_dir: str,
+        mocker: Any,
+    ) -> None:
         month_dt = datetime(2024, 1, 1)
         file_name = "january_2024.html"
         html_file_path = Path(temp_html_input_dir) / file_name
-        with open(html_file_path, "w") as f:
+        with html_file_path.open("w") as f:  # PTH123
             f.write("<html><body>Mock HTML</body></html>")
 
-        mock_queue.get.side_effect = [('offline', month_dt, 0), queue.Empty]
+        mock_queue.get.side_effect = [("offline", month_dt, 0), queue.Empty]
 
-        mocker.patch('wikipedia_news_downloader.MarkItDown', return_value=mock_markitdown_converter)
-        mocker.patch('wikipedia_news_downloader.split_and_clean_monthly_markdown', return_value=[(datetime(2024,1,1), "Cleaned daily content")])
-        mocker.patch('wikipedia_news_downloader.generate_jekyll_content', return_value="Jekyll content published: true")
-        mock_save_news = mocker.patch('wikipedia_news_downloader.save_news')
+        mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
+        mocker.patch(
+            "wikipedia_news_downloader.split_and_clean_monthly_markdown",
+            return_value=[(datetime(2024, 1, 1), "Cleaned daily content")],
+        )
+        mocker.patch("wikipedia_news_downloader.generate_jekyll_content", return_value="Jekyll content published: true")
+        mock_save_news = mocker.patch("wikipedia_news_downloader.save_news")
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=temp_html_input_dir)
 
@@ -341,11 +361,19 @@ class TestWorkerFunction:
         mock_queue.task_done.assert_called_once()
         mock_logger.info.assert_any_call(f"Processing in offline mode for {month_dt.strftime('%Y-%B')} (retries ignored: 0)")
 
-    def test_offline_mode_missing_html_file(self, mock_logger, mock_queue, mock_markitdown_converter, temp_output_dir, temp_html_input_dir, mocker):
-        month_dt = datetime(2024, 2, 1) # February
-        mock_queue.get.side_effect = [('offline', month_dt, 0), queue.Empty]
+    def test_offline_mode_missing_html_file(
+        self,
+        mock_logger: MagicMock,
+        mock_queue: MagicMock,
+        mock_markitdown_converter: MagicMock,
+        temp_output_dir: str,
+        temp_html_input_dir: str,
+        mocker: Any,
+    ) -> None:
+        month_dt = datetime(2024, 2, 1)  # February
+        mock_queue.get.side_effect = [("offline", month_dt, 0), queue.Empty]
 
-        mocker.patch('wikipedia_news_downloader.MarkItDown', return_value=mock_markitdown_converter)
+        mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
         # Path.exists will default to False for a non-existent file if not mocked, which is what we want to test
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=temp_html_input_dir)
@@ -355,14 +383,24 @@ class TestWorkerFunction:
         mock_markitdown_converter.convert.assert_not_called()
         mock_queue.task_done.assert_called_once()
 
-    def test_online_mode_successful_fetch(self, mock_logger, mock_queue, mock_markitdown_converter, temp_output_dir, mocker):
+    def test_online_mode_successful_fetch(
+        self,
+        mock_logger: MagicMock,
+        mock_queue: MagicMock,
+        mock_markitdown_converter: MagicMock,
+        temp_output_dir: str,
+        mocker: Any,
+    ) -> None:
         month_dt = datetime(2024, 3, 1)
-        mock_queue.get.side_effect = [('online', month_dt, 0), queue.Empty]
+        mock_queue.get.side_effect = [("online", month_dt, 0), queue.Empty]
 
-        mocker.patch('wikipedia_news_downloader.MarkItDown', return_value=mock_markitdown_converter)
-        mocker.patch('wikipedia_news_downloader.split_and_clean_monthly_markdown', return_value=[(datetime(2024,3,1), "Cleaned daily content")])
-        mocker.patch('wikipedia_news_downloader.generate_jekyll_content', return_value="Jekyll content published: true")
-        mock_save_news = mocker.patch('wikipedia_news_downloader.save_news')
+        mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
+        mocker.patch(
+            "wikipedia_news_downloader.split_and_clean_monthly_markdown",
+            return_value=[(datetime(2024, 3, 1), "Cleaned daily content")],
+        )
+        mocker.patch("wikipedia_news_downloader.generate_jekyll_content", return_value="Jekyll content published: true")
+        mock_save_news = mocker.patch("wikipedia_news_downloader.save_news")
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
@@ -372,10 +410,16 @@ class TestWorkerFunction:
         mock_queue.task_done.assert_called_once()
         mock_logger.info.assert_any_call(f"Processing in online mode for {month_dt.strftime('%Y-%B')} (attempt 1)")
 
-
-    def test_online_mode_request_exception_404_no_retry(self, mock_logger, mock_queue, mock_markitdown_converter, temp_output_dir, mocker):
+    def test_online_mode_request_exception_404_no_retry(
+        self,
+        mock_logger: MagicMock,
+        mock_queue: MagicMock,
+        mock_markitdown_converter: MagicMock,
+        temp_output_dir: str,
+        mocker: Any,
+    ) -> None:
         month_dt = datetime(2024, 4, 1)
-        mock_queue.get.side_effect = [('online', month_dt, 0), queue.Empty]
+        mock_queue.get.side_effect = [("online", month_dt, 0), queue.Empty]
 
         # Simulate a 404 error
         response_mock = MagicMock()
@@ -383,21 +427,28 @@ class TestWorkerFunction:
         error = requests.exceptions.RequestException("Not Found", response=response_mock)
         mock_markitdown_converter.convert.side_effect = error
 
-        mocker.patch('wikipedia_news_downloader.MarkItDown', return_value=mock_markitdown_converter)
-        mocker.patch('time.sleep') # Mock time.sleep to avoid delays
+        mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
+        mocker.patch("time.sleep")  # Mock time.sleep to avoid delays
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
         expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
         mock_markitdown_converter.convert.assert_called_once_with(expected_url)
         mock_logger.warning.assert_any_call(f"HTTP 404 Not Found for {expected_url} (online source for April_2024). Skipping.")
-        mock_queue.put.assert_not_called() # Should not re-queue for 404
+        mock_queue.put.assert_not_called()  # Should not re-queue for 404
         mock_queue.task_done.assert_called_once()
 
-    def test_online_mode_request_exception_429_retries(self, mock_logger, mock_queue, mock_markitdown_converter, temp_output_dir, mocker):
+    def test_online_mode_request_exception_429_retries(
+        self,
+        mock_logger: MagicMock,
+        mock_queue: MagicMock,
+        mock_markitdown_converter: MagicMock,
+        temp_output_dir: str,
+        mocker: Any,
+    ) -> None:
         month_dt = datetime(2024, 5, 1)
         # Simulate getting item, then queue becomes empty
-        mock_queue.get.side_effect = [('online', month_dt, 0), ('online', month_dt, 1), queue.Empty]
+        mock_queue.get.side_effect = [("online", month_dt, 0), ("online", month_dt, 1), queue.Empty]
 
         response_mock = MagicMock()
         response_mock.status_code = 429
@@ -406,36 +457,47 @@ class TestWorkerFunction:
         # First call raises 429, second call (retry) succeeds
         mock_markitdown_converter.convert.side_effect = [error, MagicMock(text_content="Successful content after retry")]
 
-        mocker.patch('wikipedia_news_downloader.MarkItDown', return_value=mock_markitdown_converter)
-        mocker.patch('time.sleep')
-        mocker.patch('wikipedia_news_downloader.split_and_clean_monthly_markdown', return_value=[(datetime(2024,5,1), "Cleaned daily content")])
-        mocker.patch('wikipedia_news_downloader.generate_jekyll_content', return_value="Jekyll content published: true")
-        mocker.patch('wikipedia_news_downloader.save_news')
+        mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
+        mocker.patch("time.sleep")
+        mocker.patch(
+            "wikipedia_news_downloader.split_and_clean_monthly_markdown",
+            return_value=[(datetime(2024, 5, 1), "Cleaned daily content")],
+        )
+        mocker.patch("wikipedia_news_downloader.generate_jekyll_content", return_value="Jekyll content published: true")
+        mocker.patch("wikipedia_news_downloader.save_news")
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
         expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
         assert mock_markitdown_converter.convert.call_count == 2
         mock_markitdown_converter.convert.assert_any_call(expected_url)
-        mock_logger.warning.assert_any_call(f"HTTP 429 Too Many Requests for {expected_url}. Re-queuing online source for May_2024 (attempt 1).")
-        mock_queue.put.assert_called_once_with(('online', month_dt, 1)) # Check re-queue
-        assert mock_queue.task_done.call_count == 2 # Once for initial attempt, once for retry that succeeded
+        mock_logger.warning.assert_any_call(
+            f"HTTP 429 Too Many Requests for {expected_url}. Re-queuing online source for May_2024 (attempt 1).",
+        )
+        mock_queue.put.assert_called_once_with(("online", month_dt, 1))  # Check re-queue
+        assert mock_queue.task_done.call_count == 2  # Once for initial attempt, once for retry that succeeded
 
-    def test_online_mode_generic_request_exception_retries_then_max_out(self, mock_logger, mock_queue, mock_markitdown_converter, temp_output_dir, mocker):
+    def test_online_mode_generic_request_exception_retries_then_max_out(  # E501 too long
+        self,
+        mock_logger: MagicMock,
+        mock_queue: MagicMock,
+        mock_markitdown_converter: MagicMock,
+        temp_output_dir: str,
+        mocker: Any,
+    ) -> None:
         month_dt = datetime(2024, 6, 1)
 
         # Simulate getting the item multiple times for retries
-        side_effects = []
-        for i in range(RETRY_MAX_ATTEMPTS + 2): # Enough attempts to exceed max retries
-            side_effects.append(('online', month_dt, i))
+        # PERF401: Use a list comprehension
+        side_effects = [("online", month_dt, i) for i in range(RETRY_MAX_ATTEMPTS + 2)]
         side_effects.append(queue.Empty)
         mock_queue.get.side_effect = side_effects
 
         error = requests.exceptions.RequestException("Some generic network error")
-        mock_markitdown_converter.convert.side_effect = error # Always fails
+        mock_markitdown_converter.convert.side_effect = error  # Always fails
 
-        mocker.patch('wikipedia_news_downloader.MarkItDown', return_value=mock_markitdown_converter)
-        mocker.patch('time.sleep')
+        mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
+        mocker.patch("time.sleep")
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
@@ -444,77 +506,119 @@ class TestWorkerFunction:
         assert mock_markitdown_converter.convert.call_count == RETRY_MAX_ATTEMPTS + 1
 
         # Check that it logged warnings for retries
-        for i in range(RETRY_MAX_ATTEMPTS +1 ):
-             mock_logger.warning.assert_any_call(f"Request error fetching {expected_url} (online source for June_2024): {error}. Retrying (attempt {i + 1}).")
+        for i in range(RETRY_MAX_ATTEMPTS + 1):
+            mock_logger.warning.assert_any_call(
+                f"Request error fetching {expected_url} (online source for June_2024): {error}. Retrying (attempt {i + 1}).",
+            )
 
         # Check that it logged error for exceeding max retries
         mock_logger.error.assert_any_call(f"Exceeded max retries ({RETRY_MAX_ATTEMPTS}) for online source for June_2024")
 
         # Check that it tried to put items back on queue for retries
-        assert mock_queue.put.call_count == RETRY_MAX_ATTEMPTS +1 # It will try to put one more time before the check for > RETRY_MAX_ATTEMPTS catches it in the next loop
+        assert (
+            mock_queue.put.call_count == RETRY_MAX_ATTEMPTS + 1
+        )  # It will try to put one more time before the check for > RETRY_MAX_ATTEMPTS catches it in the next loop
 
         # task_done should be called for each attempt that was processed from the queue
-        assert mock_queue.task_done.call_count == RETRY_MAX_ATTEMPTS + 2 # +1 for the initial attempt, +1 for the attempt that exceeds max_retries
+        assert (
+            mock_queue.task_done.call_count == RETRY_MAX_ATTEMPTS + 2
+        )  # +1 for the initial attempt, +1 for the attempt that exceeds max_retries
 
-    def test_offline_mode_generic_exception_on_convert(self, mock_logger, mock_queue, mock_markitdown_converter, temp_output_dir, temp_html_input_dir, mocker):
+    def test_offline_mode_generic_exception_on_convert(  # E501 too long
+        self,
+        mock_logger: MagicMock,
+        mock_queue: MagicMock,
+        mock_markitdown_converter: MagicMock,
+        temp_output_dir: str,
+        temp_html_input_dir: str,
+        mocker: Any,
+    ) -> None:
         month_dt = datetime(2024, 7, 1)
         file_name = "july_2024.html"
         html_file_path = Path(temp_html_input_dir) / file_name
-        with open(html_file_path, "w") as f:
+        with html_file_path.open("w") as f:  # PTH123
             f.write("<html><body>Mock HTML</body></html>")
 
-        mock_queue.get.side_effect = [('offline', month_dt, 0), queue.Empty]
+        mock_queue.get.side_effect = [("offline", month_dt, 0), queue.Empty]
 
         error = Exception("Something went wrong during conversion")
         mock_markitdown_converter.convert.side_effect = error
 
-        mocker.patch('wikipedia_news_downloader.MarkItDown', return_value=mock_markitdown_converter)
+        mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=temp_html_input_dir)
 
         mock_markitdown_converter.convert.assert_called_once_with(f"file://{html_file_path.resolve()}")
-        mock_logger.exception.assert_any_call(f"Error during content conversion or processing for file://{html_file_path.resolve()} (local file for July_2024, mode: offline, attempt N/A): {error}")
-        mock_queue.put.assert_not_called() # No retry for offline conversion error
+        mock_logger.exception.assert_any_call(
+            f"Error during content conversion or processing for file://{html_file_path.resolve()} "
+            f"(local file for July_2024, mode: offline, attempt N/A)" # Removed : {error}
+        )
+        mock_queue.put.assert_not_called()  # No retry for offline conversion error
         mock_queue.task_done.assert_called_once()
 
-    def test_online_mode_generic_exception_on_convert_retries(self, mock_logger, mock_queue, mock_markitdown_converter, temp_output_dir, mocker):
+    def test_online_mode_generic_exception_on_convert_retries(  # E501 too long
+        self,
+        mock_logger: MagicMock,
+        mock_queue: MagicMock,
+        mock_markitdown_converter: MagicMock,
+        temp_output_dir: str,
+        mocker: Any,
+    ) -> None:
         month_dt = datetime(2024, 8, 1)
-        mock_queue.get.side_effect = [('online', month_dt, 0), ('online', month_dt, 1), queue.Empty]
+        mock_queue.get.side_effect = [("online", month_dt, 0), ("online", month_dt, 1), queue.Empty]
 
         error = Exception("Something went wrong during conversion")
         # First call raises generic exception, second call (retry) succeeds
         mock_markitdown_converter.convert.side_effect = [error, MagicMock(text_content="Successful content after retry")]
 
-        mocker.patch('wikipedia_news_downloader.MarkItDown', return_value=mock_markitdown_converter)
-        mocker.patch('time.sleep')
-        mocker.patch('wikipedia_news_downloader.split_and_clean_monthly_markdown', return_value=[(datetime(2024,8,1), "Cleaned daily content")])
-        mocker.patch('wikipedia_news_downloader.generate_jekyll_content', return_value="Jekyll content published: true")
-        mocker.patch('wikipedia_news_downloader.save_news')
+        mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
+        mocker.patch("time.sleep")
+        mocker.patch(
+            "wikipedia_news_downloader.split_and_clean_monthly_markdown",
+            return_value=[(datetime(2024, 8, 1), "Cleaned daily content")],
+        )
+        mocker.patch("wikipedia_news_downloader.generate_jekyll_content", return_value="Jekyll content published: true")
+        mocker.patch("wikipedia_news_downloader.save_news")
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
         expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
         assert mock_markitdown_converter.convert.call_count == 2
-        mock_logger.exception.assert_any_call(f"Error during content conversion or processing for {expected_url} (online source for August_2024, mode: online, attempt 0): {error}")
-        mock_queue.put.assert_called_once_with(('online', month_dt, 1))
+        mock_logger.exception.assert_any_call(
+            f"Error during content conversion or processing for {expected_url} "
+            f"(online source for August_2024, mode: online, attempt 0)" # Removed : {error}
+        )
+        mock_queue.put.assert_called_once_with(("online", month_dt, 1))
         assert mock_queue.task_done.call_count == 2
 
-    def test_unknown_mode_in_queue(self, mock_logger, mock_queue, temp_output_dir, mocker):
+    def test_unknown_mode_in_queue(
+        self,
+        mock_logger: MagicMock,
+        mock_queue: MagicMock,
+        temp_output_dir: str,
+        mocker: Any,
+    ) -> None:
         month_dt = datetime(2024, 9, 1)
-        mock_queue.get.side_effect = [('unknown_mode', month_dt, 0), queue.Empty]
+        mock_queue.get.side_effect = [("unknown_mode", month_dt, 0), queue.Empty]
 
-        mocker.patch('wikipedia_news_downloader.MarkItDown') # Won't be used
+        mocker.patch("wikipedia_news_downloader.MarkItDown")  # Won't be used
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
         mock_logger.error.assert_any_call(f"Unknown mode in queue item: unknown_mode. Item: {('unknown_mode', month_dt, 0)}. Skipping.")
         mock_queue.task_done.assert_called_once()
 
-    def test_source_uri_not_set_due_to_missing_local_html_input_dir_in_offline_mode(self, mock_logger, mock_queue, temp_output_dir, mocker):
+    def test_source_uri_not_set_due_to_missing_local_html_input_dir_in_offline_mode(  # E501 too long
+        self,
+        mock_logger: MagicMock,
+        mock_queue: MagicMock,
+        temp_output_dir: str,
+        mocker: Any,
+    ) -> None:
         month_dt = datetime(2024, 10, 1)
-        mock_queue.get.side_effect = [('offline', month_dt, 0), queue.Empty]
+        mock_queue.get.side_effect = [("offline", month_dt, 0), queue.Empty]
 
-        mocker.patch('wikipedia_news_downloader.MarkItDown') # Won't be used
+        mocker.patch("wikipedia_news_downloader.MarkItDown")  # Won't be used
 
         # Crucially, local_html_input_dir is None, which should trigger the "cannot process offline mode" error path
         # This happens before source_uri would be checked, but tests an early exit where source_uri remains None.
@@ -526,40 +630,59 @@ class TestWorkerFunction:
         # For this test, the primary check is that the specific error about local_html_input_dir is logged.
         mock_queue.task_done.assert_called_once()
 
-    def test_worker_handles_empty_markdown_after_conversion(self, mock_logger, mock_queue, mock_markitdown_converter, temp_output_dir, mocker):
+    def test_worker_handles_empty_markdown_after_conversion(  # E501 too long
+        self,
+        mock_logger: MagicMock,
+        mock_queue: MagicMock,
+        mock_markitdown_converter: MagicMock,
+        temp_output_dir: str,
+        mocker: Any,
+    ) -> None:
         month_dt = datetime(2024, 11, 1)
-        mock_queue.get.side_effect = [('online', month_dt, 0), queue.Empty]
+        mock_queue.get.side_effect = [("online", month_dt, 0), queue.Empty]
 
-        mock_markitdown_converter.convert.return_value = MagicMock(text_content="  ") # Empty/whitespace content
-        mocker.patch('wikipedia_news_downloader.MarkItDown', return_value=mock_markitdown_converter)
-        mock_split_clean = mocker.patch('wikipedia_news_downloader.split_and_clean_monthly_markdown')
+        mock_markitdown_converter.convert.return_value = MagicMock(text_content="  ")  # Empty/whitespace content
+        mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
+        mock_split_clean = mocker.patch("wikipedia_news_downloader.split_and_clean_monthly_markdown")
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
         expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
         mock_markitdown_converter.convert.assert_called_once_with(expected_url)
-        mock_logger.warning.assert_any_call(f"No content extracted for {month_dt.strftime('%B_%Y')} (mode: online). Skipping further processing.")
-        mock_split_clean.assert_not_called() # Should not proceed to split/clean
+        mock_logger.warning.assert_any_call(
+            f"No content extracted for {month_dt.strftime('%B_%Y')} (mode: online). Skipping further processing.",
+        )
+        mock_split_clean.assert_not_called()  # Should not proceed to split/clean
         mock_queue.task_done.assert_called_once()
 
-    def test_worker_handles_no_daily_events_after_split(self, mock_logger, mock_queue, mock_markitdown_converter, temp_output_dir, mocker):
+    def test_worker_handles_no_daily_events_after_split(  # E501 too long
+        self,
+        mock_logger: MagicMock,
+        mock_queue: MagicMock,
+        mock_markitdown_converter: MagicMock,
+        temp_output_dir: str,
+        mocker: Any,
+    ) -> None:
         month_dt = datetime(2024, 12, 1)
-        mock_queue.get.side_effect = [('online', month_dt, 0), queue.Empty]
+        mock_queue.get.side_effect = [("online", month_dt, 0), queue.Empty]
 
         mock_markitdown_converter.convert.return_value = MagicMock(text_content="Valid markdown but no daily delimiters")
-        mocker.patch('wikipedia_news_downloader.MarkItDown', return_value=mock_markitdown_converter)
-        mocker.patch('wikipedia_news_downloader.split_and_clean_monthly_markdown', return_value=[]) # No events
-        mock_generate_jekyll = mocker.patch('wikipedia_news_downloader.generate_jekyll_content')
+        mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
+        mocker.patch("wikipedia_news_downloader.split_and_clean_monthly_markdown", return_value=[])  # No events
+        mock_generate_jekyll = mocker.patch("wikipedia_news_downloader.generate_jekyll_content")
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
-        mock_logger.warning.assert_any_call(f"No daily events found or extracted for {month_dt.strftime('%B_%Y')} (month_dt: {month_dt.strftime('%Y-%B')}).")
+        mock_logger.warning.assert_any_call(
+            f"No daily events found or extracted for {month_dt.strftime('%B_%Y')} (month_dt: {month_dt.strftime('%Y-%B')}).",
+        )
         mock_generate_jekyll.assert_not_called()
         mock_queue.task_done.assert_called_once()
-# --- End Tests for worker function ---
+
+    # --- End Tests for worker function ---
 
     def test_published_false_empty_string_body(self, common_test_date: datetime) -> None:
-        markdown_body = ""
+        markdown_body = ""  # type: ignore[var-annotated]
         full_content = generate_jekyll_content(common_test_date, markdown_body, logger)
         assert "published: false" in full_content
 
