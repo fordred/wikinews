@@ -27,7 +27,7 @@ def get_month_year_from_golden_html(html_file_path: Path) -> tuple[int, int]:
     return month_number, year
 
 
-def test_html_processing_with_refactored_main():
+def test_html_processing_with_refactored_main() -> None:
     """
     Tests HTML to Jekyll post conversion using the refactored main function
     from wikipedia_news_downloader.py.
@@ -70,8 +70,8 @@ def test_html_processing_with_refactored_main():
             wikipedia_main(
                 output_dir_str=str(temp_output_dir),
                 verbose=False,  # Tests typically don't need verbose output from the script itself
-                num_workers=None, # Use default worker logic (or 1 for deterministic testing if issues arise)
-                local_html_files_list=golden_html_files
+                num_workers=None,  # Use default worker logic (or 1 for deterministic testing if issues arise)
+                local_html_files_list=golden_html_files,
             )
         except Exception as e:
             pytest.fail(f"Call to wikipedia_main failed during test execution: {e}")

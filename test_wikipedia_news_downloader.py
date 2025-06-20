@@ -14,9 +14,9 @@ from wikipedia_news_downloader import (
     RETRY_MAX_ATTEMPTS,  # Import for use in tests
     clean_daily_markdown_content,
     generate_jekyll_content,
+    main,  # Import main for testing
     split_and_clean_monthly_markdown,
     worker,
-    main, # Import main for testing
 )
 
 # Raw markdown example from the issue description
@@ -167,9 +167,7 @@ class TestSplitAndCleanMarkdown:
 
         # Call the function under test
         # No try-except block here for ValueError, as the function should handle it
-        daily_events = split_and_clean_monthly_markdown(
-            markdown_with_malformed_date, month_dt, mock_logger
-        )
+        daily_events = split_and_clean_monthly_markdown(markdown_with_malformed_date, month_dt, mock_logger)
 
         # Assert that only valid segments are processed
         assert len(daily_events) == 2, "Should process 2 valid daily segments, skipping the malformed one."
@@ -536,7 +534,7 @@ class TestWorkerFunction:
         # Simulate getting the item multiple times for retries
         # PERF401: Use a list comprehension
         side_effects = [("online", month_dt, i) for i in range(RETRY_MAX_ATTEMPTS + 2)]
-        side_effects.append(queue.Empty)
+        side_effects.append(queue.Empty)  # type: ignore [arg-type]
         mock_queue.get.side_effect = side_effects
 
         error = requests.exceptions.RequestException("Some generic network error")
@@ -597,7 +595,7 @@ class TestWorkerFunction:
         mock_markitdown_converter.convert.assert_called_once_with(f"file://{html_file_path.resolve()}")
         mock_logger.exception.assert_any_call(
             f"Error during content conversion or processing for file://{html_file_path.resolve()} "
-            f"(local file for July_2024, mode: offline, attempt N/A)" # Removed : {error}
+            f"(local file for July_2024, mode: offline, attempt N/A)",  # Removed : {error}
         )
         mock_queue.put.assert_not_called()  # No retry for offline conversion error
         mock_queue.task_done.assert_called_once()
@@ -632,7 +630,7 @@ class TestWorkerFunction:
         assert mock_markitdown_converter.convert.call_count == 2
         mock_logger.exception.assert_any_call(
             f"Error during content conversion or processing for {expected_url} "
-            f"(online source for August_2024, mode: online, attempt 0)" # Removed : {error}
+            f"(online source for August_2024, mode: online, attempt 0)",  # Removed : {error}
         )
         mock_queue.put.assert_called_once_with(("online", month_dt, 1))
         assert mock_queue.task_done.call_count == 2
@@ -666,14 +664,13 @@ class TestWorkerFunction:
 
         mocker.patch("wikipedia_news_downloader.MarkItDown")  # Won't be used
 
-        # Crucially, local_html_input_dir is None, which should trigger the "cannot process offline mode" error path
-        # This happens before source_uri would be checked, but tests an early exit where source_uri remains None.
+        # Crucially, local_html_input_dir is None, which should trigger the "cannot process offline mode" error path.
+        # This happens before source_uri would be checked.
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
         mock_logger.error.assert_any_call("Cannot process offline mode: local_html_input_dir not provided to worker.")
-        # The more specific "Source URI not set" error shouldn't be hit in this case because the earlier check for local_html_input_dir catches it.
-        # However, if that initial check was removed, the source_uri check would be the fallback.
-        # For this test, the primary check is that the specific error about local_html_input_dir is logged.
+        # The more specific "Source URI not set" error shouldn't be hit in this case due to the early exit.
+        # The primary check is that the specific error about local_html_input_dir is logged.
         mock_queue.task_done.assert_called_once()
 
     def test_worker_handles_empty_markdown_after_conversion(  # E501 too long
@@ -751,35 +748,11 @@ class TestWorkerFunction:
         mock_markitdown_converter.convert.assert_called_once_with(f"file://{html_file_path.resolve()}")
 
         # Check logger.exception was called with the correct message parts
-        exception_logged = False
-        for call in mock_logger.exception.call_args_list:
-            log_message = call.args[0]
-            if (
-                "Error during content conversion or processing" in log_message
-                and f"file://{html_file_path.resolve()}" in log_message
-                and "local file for July_2024" in log_message
-                and "mode: offline" in log_message
-                and "Simulated conversion error" # Check if the original error is part of the log through exc_info
-            ):
-                 # To check for original error, we'd ideally look at call.exc_info but that's complex.
-                 # For now, we trust logger.exception captures it if called.
-                 # A more direct check would be `assert call.exc_info[1] is simulated_error`
-                 # if pytest-mock/MagicMock makes exc_info directly available on the call object.
-                 # However, the problem description implies checking the log message content.
-                 # The default formatting of logger.exception includes the string representation of the exception.
-                 # Let's assume the string representation of RuntimeError will be in the full log output,
-                 # which mock_logger.exception would have processed.
-                 # A simpler check for the test is that the intended message parts are present.
-                 # For this test, we will rely on the fact that logger.exception was called,
-                 # and the message contains key identifying information.
-                 # The actual exception object (simulated_error) is passed to logger.exception implicitly.
-                exception_logged = True # Simplified check based on problem description
-                break
-        # A more robust check for the exception message content from logger.exception
-        # This relies on the default formatting of logged exceptions.
+        # The F841 for exception_logged is fixed by removing the loop and variable.
+        # The assert_any_call below is the primary check for the log message.
         mock_logger.exception.assert_any_call(
             f"Error during content conversion or processing for file://{html_file_path.resolve()} "
-            f"(local file for July_2024, mode: offline, attempt N/A)"
+            f"(local file for July_2024, mode: offline, attempt N/A)",
         )
 
         mock_queue.put.assert_not_called()  # No retries for offline conversion errors
@@ -800,7 +773,7 @@ class TestWorkerFunction:
         simulated_error = RuntimeError("Simulated conversion error")
         mock_markitdown_converter.convert.side_effect = simulated_error
         mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
-        mock_time_sleep = mocker.patch("time.sleep") # Mock time.sleep
+        mock_time_sleep = mocker.patch("time.sleep")  # Mock time.sleep
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
@@ -811,10 +784,10 @@ class TestWorkerFunction:
         # Similar to the offline test, checking for key parts in the log message
         mock_logger.exception.assert_any_call(
             f"Error during content conversion or processing for {expected_url} "
-            f"(online source for August_2024, mode: online, attempt {initial_retries})"
+            f"(online source for August_2024, mode: online, attempt {initial_retries})",
         )
 
-        mock_time_sleep.assert_called_once() # Ensure sleep was called for retry
+        mock_time_sleep.assert_called_once()  # Ensure sleep was called for retry
         mock_queue.put.assert_called_once_with(("online", month_dt, initial_retries + 1))
         mock_queue.task_done.assert_called_once()
 
@@ -822,7 +795,7 @@ class TestWorkerFunction:
         self,
         mock_logger: MagicMock,
         mock_queue: MagicMock,
-        mock_markitdown_converter: MagicMock, # Provided by fixture, but we'll re-patch MarkItDown
+        mock_markitdown_converter: MagicMock,  # Provided by fixture, but we'll re-patch MarkItDown
         temp_output_dir: str,
         mocker: Any,
     ) -> None:
@@ -853,7 +826,7 @@ class TestWorkerFunction:
         # Check logger.exception was called
         mock_logger.exception.assert_any_call(
             f"Error during content conversion or processing for {expected_url} "
-            f"(online source for September_2024, mode: online, attempt {initial_retries})"
+            f"(online source for September_2024, mode: online, attempt {initial_retries})",
         )
 
         # Verify the original exception message is part of the log (implicitly via logger.exception)
@@ -907,7 +880,7 @@ class TestWorkerFunction:
         # Check logger.exception was called
         mock_logger.exception.assert_any_call(
             f"Error during content conversion or processing for {expected_url} "
-            f"(online source for October_2024, mode: online, attempt {initial_retries})"
+            f"(online source for October_2024, mode: online, attempt {initial_retries})",
         )
 
         mock_time_sleep.assert_called_once()
@@ -917,7 +890,7 @@ class TestWorkerFunction:
     # --- End Tests for worker function ---
 
     def test_published_false_empty_string_body(self, common_test_date: datetime) -> None:
-        markdown_body = ""  # type: ignore[var-annotated]
+        markdown_body = ""
         full_content = generate_jekyll_content(common_test_date, markdown_body, logger)
         assert "published: false" in full_content
 
@@ -938,10 +911,11 @@ class TestWorkerFunction:
 
 
 class TestMainFunctionLogging:
-    @patch('wikipedia_news_downloader.Path.mkdir')
-    @patch('threading.Thread')
-    @patch('wikipedia_news_downloader.setup_logging')
+    @patch("wikipedia_news_downloader.Path.mkdir")
+    @patch("threading.Thread")
+    @patch("wikipedia_news_downloader.setup_logging")
     def test_main_with_provided_logger(self, mock_setup_logging: MagicMock, mock_thread: MagicMock, mock_mkdir: MagicMock) -> None:
+        _ = mock_mkdir # Mark as intentionally unused, but keep patch active
         mock_custom_logger = MagicMock(spec=logging.Logger)
 
         dummy_file_path = MagicMock(spec=Path)
@@ -953,16 +927,18 @@ class TestMainFunctionLogging:
         dummy_file_path.parent = mock_parent_dir
 
         # Mock queue.Queue().qsize() to return 1 to indicate items to process
-        with patch('queue.Queue') as mock_queue_class:
+        with patch("queue.Queue") as mock_queue_class:
             mock_queue_instance = MagicMock()
-            mock_queue_instance.qsize.return_value = 1 # Indicates one item from local_html_files_list
+            mock_queue_instance.qsize.return_value = 1  # Indicates one item from local_html_files_list
             mock_queue_class.return_value = mock_queue_instance
 
-            main(output_dir_str="dummy_output",
-                 verbose=False,
-                 num_workers=1,
-                 local_html_files_list=[dummy_file_path],
-                 logger=mock_custom_logger)
+            main(
+                output_dir_str="dummy_output",
+                verbose=False,
+                num_workers=1,
+                local_html_files_list=[dummy_file_path],
+                logger=mock_custom_logger,
+            )
 
         mock_setup_logging.assert_not_called()
         # More specific check for the logger call related to starting processing
@@ -982,35 +958,32 @@ class TestMainFunctionLogging:
         mock_thread.assert_called_once()
         # Args for Thread: (target=worker, args=(processing_queue, current_output_dir, logger, effective_local_html_input_dir_str))
         # mock_thread.call_args[1]['args'] is the tuple of arguments passed to the worker function.
-        thread_args_for_worker = mock_thread.call_args[1]['args']
+        thread_args_for_worker = mock_thread.call_args[1]["args"]
         assert len(thread_args_for_worker) >= 4, "Not enough arguments passed to worker thread target"
-        assert thread_args_for_worker[2] is mock_custom_logger # logger is the 3rd arg for worker
+        assert thread_args_for_worker[2] is mock_custom_logger  # logger is the 3rd arg for worker
 
-    @patch('wikipedia_news_downloader.Path.mkdir')
-    @patch('threading.Thread')
-    @patch('wikipedia_news_downloader.setup_logging')
+    @patch("wikipedia_news_downloader.Path.mkdir")
+    @patch("threading.Thread")
+    @patch("wikipedia_news_downloader.setup_logging")
     def test_main_with_default_logger(self, mock_setup_logging: MagicMock, mock_thread: MagicMock, mock_mkdir: MagicMock) -> None:
+        _ = mock_mkdir # Mark as intentionally unused, but keep patch active
         mock_default_logger_instance = MagicMock(spec=logging.Logger)
         mock_setup_logging.return_value = mock_default_logger_instance
 
         dummy_file_path = MagicMock(spec=Path)
         dummy_file_path.is_file.return_value = True
         dummy_file_path.suffix = ".html"
-        dummy_file_path.stem = "february_2025" # Different stem to avoid potential test interactions if any
+        dummy_file_path.stem = "february_2025"  # Different stem to avoid potential test interactions if any
         dummy_file_path.name = "february_2025.html"
         mock_parent_dir = MagicMock(spec=Path)
         dummy_file_path.parent = mock_parent_dir
 
-        with patch('queue.Queue') as mock_queue_class:
+        with patch("queue.Queue") as mock_queue_class:
             mock_queue_instance = MagicMock()
             mock_queue_instance.qsize.return_value = 1
             mock_queue_class.return_value = mock_queue_instance
 
-            main(output_dir_str="dummy_output_default",
-                 verbose=False,
-                 num_workers=1,
-                 local_html_files_list=[dummy_file_path],
-                 logger=None)
+            main(output_dir_str="dummy_output_default", verbose=False, num_workers=1, local_html_files_list=[dummy_file_path], logger=None)
 
         mock_setup_logging.assert_called_once_with(False)
         expected_parent_dir_str = str(mock_parent_dir)
@@ -1024,6 +997,6 @@ class TestMainFunctionLogging:
         mock_default_logger_instance.info.assert_any_call(expected_log_message)
 
         mock_thread.assert_called_once()
-        thread_args_for_worker = mock_thread.call_args[1]['args']
+        thread_args_for_worker = mock_thread.call_args[1]["args"]
         assert len(thread_args_for_worker) >= 4
         assert thread_args_for_worker[2] is mock_default_logger_instance

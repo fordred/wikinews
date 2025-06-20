@@ -274,7 +274,8 @@ def worker(
         # Check if source_uri is set after the if-elif block
         if not source_uri:
             logger.error(
-                f"Source URI not set for {source_name_suffix} (mode: {mode}). This might be due to a file not found in offline mode or an unhandled condition. Skipping.",
+                f"Source URI not set for {source_name_suffix} (mode: {mode}). "
+                "This might be due to a file not found in offline mode or an unhandled condition. Skipping.",
             )
             processing_queue.task_done()
             continue
@@ -305,7 +306,8 @@ def worker(
                     save_news(event_date, full_jekyll_content, output_dir, logger)
                 else:
                     logger.warning(
-                        f"Skipping save for {event_date.strftime('%Y-%m-%d')} from {source_name_suffix}: Content marked unpublished or generation failed.",
+                        f"Skipping save for {event_date.strftime('%Y-%m-%d')} from {source_name_suffix}: "
+                        "Content marked unpublished or generation failed.",
                     )
 
         except requests.exceptions.RequestException as e:  # Specific to online mode fetching
@@ -327,7 +329,8 @@ def worker(
 
         except Exception:  # Catch other errors (MarkItDown conversion, content processing)
             logger.exception(
-                f"Error during content conversion or processing for {source_uri} ({source_name}, mode: {mode}, attempt {retries if mode == 'online' else 'N/A'})",
+                f"Error during content conversion or processing for {source_uri} "
+                f"({source_name}, mode: {mode}, attempt {retries if mode == 'online' else 'N/A'})",
             )
             if mode == "online":  # Decide if retry is appropriate for non-network errors in online mode
                 # For now, retry as per previous logic for generic exceptions in online mode
@@ -368,7 +371,13 @@ def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def main(output_dir_str: str, verbose: bool, num_workers: int | None, local_html_files_list: list[Path] | None, logger: logging.Logger | None = None) -> None:
+def main(
+    output_dir_str: str,
+    verbose: bool,
+    num_workers: int | None,
+    local_html_files_list: list[Path] | None,
+    logger: logging.Logger | None = None,
+) -> None:
     # Setup logging based on the verbose parameter
     if logger is None:
         logger = setup_logging(verbose)
@@ -382,27 +391,26 @@ def main(output_dir_str: str, verbose: bool, num_workers: int | None, local_html
     operation_mode = ""
     effective_local_html_input_dir_str: str | None = None
 
-    if local_html_files_list:  # Programmatic list of Path objects takes precedence
-        if local_html_files_list:  # Ensure not empty
-            # Assuming all files in the list are from the same parent directory for simplicity.
-            # This directory is passed to the worker for it to reconstruct paths.
-            # Guard against empty list for path determination, though `if local_html_files_list:` above helps
-            effective_local_html_input_dir_str = str(local_html_files_list[0].parent) if local_html_files_list else None
-            operation_mode = f"local HTML files provided programmatically (input dir: {effective_local_html_input_dir_str})"
-            for file_path_obj in local_html_files_list:
-                if file_path_obj.is_file() and file_path_obj.suffix == ".html":
-                    try:
-                        name_parts = file_path_obj.stem.lower().split("_")
-                        month_name = name_parts[0].capitalize()
-                        year = int(name_parts[1])
-                        month_number = MONTH_NAME_TO_NUMBER[month_name]
-                        month_datetime_obj = datetime(year, month_number, 1)
-                        processing_queue.put(("offline", month_datetime_obj, 0))
-                    except (IndexError, KeyError, ValueError) as e:
-                        logger.warning(f"Could not parse valid date from filename {file_path_obj.name}: {e}. Skipping.")
-                else:
-                    logger.warning(f"Skipping non-HTML file or directory from local_html_files input: {file_path_obj}")
-            items_to_process_count = processing_queue.qsize()
+    if local_html_files_list:  # Programmatic list of Path objects takes precedence and ensures not empty
+        # Assuming all files in the list are from the same parent directory for simplicity.
+        # This directory is passed to the worker for it to reconstruct paths.
+        # Guard against empty list for path determination.
+        effective_local_html_input_dir_str = str(local_html_files_list[0].parent)  # Outer if ensures list not empty.
+        operation_mode = f"local HTML files provided programmatically (input dir: {effective_local_html_input_dir_str})"
+        for file_path_obj in local_html_files_list:
+            if file_path_obj.is_file() and file_path_obj.suffix == ".html":
+                try:
+                    name_parts = file_path_obj.stem.lower().split("_")
+                    month_name = name_parts[0].capitalize()
+                    year = int(name_parts[1])
+                    month_number = MONTH_NAME_TO_NUMBER[month_name]
+                    month_datetime_obj = datetime(year, month_number, 1)
+                    processing_queue.put(("offline", month_datetime_obj, 0))
+                except (IndexError, KeyError, ValueError) as e:
+                    logger.warning(f"Could not parse valid date from filename {file_path_obj.name}: {e}. Skipping.")
+            else:
+                logger.warning(f"Skipping non-HTML file or directory from local_html_files input: {file_path_obj}")
+        items_to_process_count = processing_queue.qsize()
 
     # If local_html_files_list did not result in items (it's None or empty), operate in online mode.
     if items_to_process_count == 0 and not local_html_files_list:
@@ -428,11 +436,10 @@ def main(output_dir_str: str, verbose: bool, num_workers: int | None, local_html
 
     # Use num_workers parameter for determining number of threads
     resolved_num_workers = num_workers if num_workers is not None else min(8, items_to_process_count)
-    if items_to_process_count > 0 and resolved_num_workers == 0: # Ensure at least one worker if items exist
+    if items_to_process_count > 0 and resolved_num_workers == 0:  # Ensure at least one worker if items exist
         resolved_num_workers = 1
     elif items_to_process_count == 0:
         resolved_num_workers = 0
-
 
     logger.info(
         f"Starting processing in mode: {operation_mode}. "
@@ -442,7 +449,7 @@ def main(output_dir_str: str, verbose: bool, num_workers: int | None, local_html
     )
 
     threads: list[threading.Thread] = []
-    for _ in range(resolved_num_workers): # Use resolved_num_workers here
+    for _ in range(resolved_num_workers):  # Use resolved_num_workers here
         t = threading.Thread(target=worker, args=(processing_queue, current_output_dir, logger, effective_local_html_input_dir_str))
         t.start()
         threads.append(t)
@@ -457,14 +464,14 @@ def main(output_dir_str: str, verbose: bool, num_workers: int | None, local_html
 
 if __name__ == "__main__":
     args = parse_arguments()
-    logger = setup_logging(args.verbose) # Setup logger here for potential early exit messages
+    logger = setup_logging(args.verbose)  # Setup logger here for potential early exit messages
     html_files_to_pass = None
 
     if args.local_html_dir:
         local_dir_path = Path(args.local_html_dir)
         if not local_dir_path.is_dir():
             logger.error(f"Provided local HTML directory is not a valid directory: {args.local_html_dir}")
-            sys.exit(1) # Exit early
+            sys.exit(1)  # Exit early
         html_files_to_pass = list(local_dir_path.glob("*.html"))
         if not html_files_to_pass:
             logger.info(f"No *.html files found in {args.local_html_dir}. Proceeding without local HTML files from this directory.")
@@ -476,5 +483,5 @@ if __name__ == "__main__":
         verbose=args.verbose,
         num_workers=args.workers,
         local_html_files_list=html_files_to_pass,
-        logger=logger # Pass the logger instance here
+        logger=logger,  # Pass the logger instance here
     )

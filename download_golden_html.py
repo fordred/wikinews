@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import pathlib
 import sys
 
@@ -11,7 +12,7 @@ URLS = [
 OUTPUT_DIR = pathlib.Path("tests/golden_html_references/")
 
 
-def download_and_save_html(url: str, output_dir: pathlib.Path):
+def download_and_save_html(url: str, output_dir: pathlib.Path) -> None:
     """Downloads HTML content from a URL and saves it to a file,
        then converts the HTML to markdown and saves it.
 
@@ -37,7 +38,7 @@ def download_and_save_html(url: str, output_dir: pathlib.Path):
         md_filepath = output_dir / md_filename
 
         # Save HTML content
-        with open(html_filepath, "w", encoding="utf-8") as f:
+        with html_filepath.open("w", encoding="utf-8") as f:
             f.write(response.text)
         print(f"Successfully downloaded and saved HTML for {url} to {html_filepath}")
 
@@ -50,7 +51,7 @@ def download_and_save_html(url: str, output_dir: pathlib.Path):
             if result is None or not hasattr(result, "text_content") or not isinstance(result.text_content, str):
                 print(f"Error: MarkItDown().convert() did not return a valid 'text_content' string for {html_filepath}", file=sys.stderr)
             else:
-                with open(md_filepath, "w", encoding="utf-8") as f:
+                with md_filepath.open("w", encoding="utf-8") as f:
                     f.write(result.text_content)
                 print(f"Successfully converted HTML and saved reference markdown to {md_filepath}")
 
