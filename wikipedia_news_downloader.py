@@ -341,11 +341,10 @@ def worker(
             processing_queue.task_done()
 
 
-def main(local_html_files: list[Path] | None = None, output_dir: str | None = None) -> None:  # RUF013
-    # Set up argument parsing
+def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse command-line arguments."""
     parser = argparse.ArgumentParser(description="Download Wikipedia News")
-    # Add new argument for local HTML files, not exposed via CLI for now, but used programmatically.
-    parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose logging")  # Keep verbose flag
+    parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose logging")
     parser.add_argument(
         "--local-html-dir",
         type=Path,
@@ -366,41 +365,29 @@ def main(local_html_files: list[Path] | None = None, output_dir: str | None = No
         default=None,
         help="Maximum number of concurrent download workers.",
     )
+    return parser.parse_args(argv)
 
-    # Determine if being called programmatically with specific inputs vs. pure CLI
-    is_programmatic_input = local_html_files is not None or output_dir is not None
 
-    if is_programmatic_input:
-        # Use an empty list for parse_args to avoid CLI interference with pytest,
-        # relying on defaults for args not explicitly passed to main().
-        args = parser.parse_args([])
-    else:
-        args = parser.parse_args()  # Standard CLI argument parsing
+def main(local_html_files: list[Path] | None = None, output_dir: str | None = None) -> None:  # RUF013
+    cli_args = parse_arguments()
 
-    # Setup logging based on verbosity (either from programmatic default or CLI)
-    # If main were to have a verbose param: logger = setup_logging(verbose_param if is_programmatic_input else args.verbose)
-    logger = setup_logging(args.verbose if not is_programmatic_input else False)
+    # Setup logging based on verbosity from CLI args
+    logger = setup_logging(cli_args.verbose)
 
-    # Determine effective output directory
-    current_output_dir = output_dir if output_dir is not None else args.output_dir
+    # Determine effective output directory, prioritizing function argument
+    current_output_dir = output_dir if output_dir is not None else cli_args.output_dir
     Path(current_output_dir).mkdir(parents=True, exist_ok=True)
 
-    processing_queue: queue.Queue[StructuredQueueItem] = queue.Queue()  # Moved definition here
+    processing_queue: queue.Queue[StructuredQueueItem] = queue.Queue()
     items_to_process_count = 0
-    operation_mode = ""  # For logging clarity
-
-    # Determine effective local HTML input directory (only relevant for 'offline' mode if triggered via specific file list)
-    # This logic determines where the worker should look for HTML files if main() was called with local_html_files.
-    # If --local-html-dir is used, main() directly uses that to parse and queue.
-    # If online mode, this is not used by the worker.
+    operation_mode = ""
     effective_local_html_input_dir_str: str | None = None
-    if local_html_files:  # Programmatic list of Path objects
+
+    if local_html_files:  # Programmatic list of Path objects takes precedence
         if local_html_files:  # Ensure not empty
-            # Assuming all files in the list are from the same parent directory for simplicity.
-            # This directory is passed to the worker for it to reconstruct paths.
             effective_local_html_input_dir_str = str(local_html_files[0].parent)
             operation_mode = f"local HTML files provided programmatically (input dir: {effective_local_html_input_dir_str})"
-            for file_path_obj in local_html_files:  # Iterate through the provided list of Path objects
+            for file_path_obj in local_html_files:
                 if file_path_obj.is_file() and file_path_obj.suffix == ".html":
                     try:
                         name_parts = file_path_obj.stem.lower().split("_")
@@ -413,16 +400,21 @@ def main(local_html_files: list[Path] | None = None, output_dir: str | None = No
                         logger.warning(f"Could not parse valid date from filename {file_path_obj.name}: {e}. Skipping.")
                 else:
                     logger.warning(f"Skipping non-HTML file or directory from local_html_files input: {file_path_obj}")
-            items_to_process_count = processing_queue.qsize()  # Update count after processing
-    elif args.local_html_dir:  # CLI specifies a directory of local HTMLs
-        # For --local-html-dir, this directory itself is where files are located.
-        effective_local_html_input_dir_str = str(args.local_html_dir)
+            items_to_process_count = processing_queue.qsize()
+    elif cli_args.local_html_dir:  # Else, use CLI argument if provided
+        effective_local_html_input_dir_str = str(cli_args.local_html_dir)
         operation_mode = f"local HTML files from CLI directory: {effective_local_html_input_dir_str}"
-        cli_html_files = list(Path(args.local_html_dir).glob("*.html"))  # Already Path objects
-        if not cli_html_files:
-            logger.warning(f"No HTML files found in --local-html-dir: {args.local_html_dir}")
+        cli_html_files_path_obj = Path(cli_args.local_html_dir)
+        if not cli_html_files_path_obj.is_dir():
+            logger.error(f"--local-html-dir is not a valid directory: {cli_args.local_html_dir}")
             return
-        for file_path_obj in cli_html_files:  # Iterate through Path objects
+
+        cli_html_files = list(cli_html_files_path_obj.glob("*.html"))
+        if not cli_html_files:
+            logger.warning(f"No HTML files found in --local-html-dir: {cli_args.local_html_dir}")
+            # No return here, allow falling through to online mode if desired,
+            # or let items_to_process_count remain 0 if this was the only intended mode.
+        for file_path_obj in cli_html_files:
             try:
                 name_parts = file_path_obj.stem.lower().split("_")
                 month_name = name_parts[0].capitalize()
@@ -432,12 +424,17 @@ def main(local_html_files: list[Path] | None = None, output_dir: str | None = No
                 processing_queue.put(("offline", month_datetime_obj, 0))
             except (IndexError, KeyError, ValueError) as e:
                 logger.warning(f"Could not parse valid date from filename {file_path_obj.name} in --local-html-dir: {e}. Skipping.")
-        items_to_process_count = processing_queue.qsize()  # Update count
-    else:  # Online mode
+        items_to_process_count = processing_queue.qsize()
+
+    # If neither local_html_files (programmatic) nor cli_args.local_html_dir (CLI) resulted in items,
+    # and we intend online mode as a fallback or default, then populate for online mode.
+    # The current logic implies that if local modes are specified but yield no files, we don't automatically go online.
+    # If online is the default when no local files are processed, this needs to be explicit.
+    # For this refactoring, we assume if items_to_process_count is still 0, then it's online mode.
+    if items_to_process_count == 0 and not local_html_files and not cli_args.local_html_dir: # Only go online if no local mode was attempted
         operation_mode = "Wikipedia URL fetching mode"
-        # effective_local_html_input_dir_str remains None for online mode
         now = datetime.now()
-        start_date = datetime(2025, 1, 1)
+        start_date = datetime(2025, 1, 1) # Example start: Jan 2025, adjust as needed
         end_date = datetime(now.year, now.month, 1)
         dates_set: set[datetime] = set()
         current_date = start_date
@@ -447,25 +444,26 @@ def main(local_html_files: list[Path] | None = None, output_dir: str | None = No
                 current_date = datetime(current_date.year + 1, 1, 1)
             else:
                 current_date = datetime(current_date.year, current_date.month + 1, 1)
-        items_to_process_count = len(dates_set)  # Update count
-        for date_item in sorted(dates_set):  # C414
+        items_to_process_count = len(dates_set)
+        for date_item in sorted(dates_set):
             processing_queue.put(("online", date_item, 0))
 
-    if items_to_process_count == 0:  # Check after all modes of populating queue
-        logger.info(f"No items to process for mode: {operation_mode}.")  # Log final mode and count
+    if items_to_process_count == 0:
+        logger.info(f"No items to process for mode: {operation_mode}. Exiting.")
         return
 
     logger.info(
         f"Starting processing in mode: {operation_mode}. "
         f"Output directory: {current_output_dir}. "
         f"Input dir for offline (if applicable): {effective_local_html_input_dir_str}. "
-        f"Using up to {args.workers or min(8, items_to_process_count)} worker thread(s).",
+        f"Using up to {cli_args.workers or min(8, items_to_process_count)} worker thread(s).",
     )
 
-    num_workers = args.workers or min(8, items_to_process_count)
-    if items_to_process_count > 0 and num_workers == 0:  # E701
+    num_workers = cli_args.workers or min(8, items_to_process_count)
+    # Ensure num_workers is at least 1 if there are items, and 0 if no items.
+    if items_to_process_count > 0 and num_workers == 0:
         num_workers = 1
-    elif items_to_process_count == 0:  # E701
+    elif items_to_process_count == 0: # Should be caught by earlier return, but defensive
         num_workers = 0
 
     threads: list[threading.Thread] = []
