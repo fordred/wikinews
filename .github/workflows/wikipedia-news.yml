@@ -25,6 +25,7 @@ jobs:
       uses: astral-sh/setup-uv@v6
       with:
         version: "latest"
+        python-version: 3.13t
 
     - name: Save date
       id: save-date
