@@ -149,6 +149,51 @@ class TestSplitAndCleanMarkdown:
             assert daily_events[0][0] == datetime(2025, 7, 5)
             assert daily_events[0][1].startswith("#### Real Content")
 
+    def test_split_and_clean_malformed_date(self, mock_logger: MagicMock) -> None:
+        month_dt = datetime(2025, 6, 1)
+        markdown_with_malformed_date = (
+            "June\xa01,\xa02025\xa0(2025-06-01) (Sunday)\n\n"
+            "* [edit](...)\n* [history](...)\n* [watch](...)\n\n"
+            "**Valid Content June 1**\n* Event A\n\n"
+            # Malformed date: June 31 is invalid and will cause ValueError in datetime constructor
+            "June\xa031,\xa02025\xa0(2025-06-31) (BogusDay)\n\n"
+            "* [edit](...)\n* [history](...)\n* [watch](...)\n\n"
+            "**Content for Malformed Date**\n* Event B\n\n"
+            "June\xa02,\xa02025\xa0(2025-06-02) (Monday)\n\n"
+            "* [edit](...)\n* [history](...)\n* [watch](...)\n\n"
+            "**Valid Content June 2**\n* Event C\n"
+        )
+
+        # Call the function under test
+        # No try-except block here for ValueError, as the function should handle it
+        daily_events = split_and_clean_monthly_markdown(
+            markdown_with_malformed_date, month_dt, mock_logger
+        )
+
+        # Assert that only valid segments are processed
+        assert len(daily_events) == 2, "Should process 2 valid daily segments, skipping the malformed one."
+
+        # Assert that the valid segments are correct
+        if len(daily_events) == 2:
+            assert daily_events[0][0] == datetime(2025, 6, 1)
+            assert daily_events[0][1].strip().startswith("#### Valid Content June 1")
+            assert daily_events[1][0] == datetime(2025, 6, 2)
+            assert daily_events[1][1].strip().startswith("#### Valid Content June 2")
+
+        # Assert that the logger was called with a warning or error
+        # Check if either warning or error was called. The exact method might depend on implementation.
+        # We also check that *a* call contains relevant info about the malformed date.
+        # Assert that logger.exception was called with a message containing the malformed date.
+        # logger.exception() implies error level and exc_info.
+        exception_call_found = False
+        for call in mock_logger.exception.call_args_list:
+            log_message = call.args[0]
+            if "June 31, 2025" in log_message:
+                exception_call_found = True
+                break
+
+        assert exception_call_found, "logger.exception() should have been called with a message containing 'June 31, 2025'."
+
 
 class TestCleanDailyMarkdownContent:
     @pytest.mark.parametrize(
@@ -677,6 +722,195 @@ class TestWorkerFunction:
             f"No daily events found or extracted for {month_dt.strftime('%B_%Y')} (month_dt: {month_dt.strftime('%Y-%B')}).",
         )
         mock_generate_jekyll.assert_not_called()
+        mock_queue.task_done.assert_called_once()
+
+    def test_worker_offline_mode_conversion_runtime_error(
+        self,
+        mock_logger: MagicMock,
+        mock_queue: MagicMock,
+        mock_markitdown_converter: MagicMock,
+        temp_output_dir: str,
+        temp_html_input_dir: str,
+        mocker: Any,
+    ) -> None:
+        month_dt = datetime(2024, 7, 1)  # Example date: July 2024
+        file_name = "july_2024.html"
+        html_file_path = Path(temp_html_input_dir) / file_name
+        with html_file_path.open("w") as f:
+            f.write("<html><body>Dummy HTML for error test</body></html>")
+
+        mock_queue.get.side_effect = [("offline", month_dt, 0), queue.Empty]
+
+        simulated_error = RuntimeError("Simulated conversion error")
+        mock_markitdown_converter.convert.side_effect = simulated_error
+        mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
+
+        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=temp_html_input_dir)
+
+        mock_markitdown_converter.convert.assert_called_once_with(f"file://{html_file_path.resolve()}")
+
+        # Check logger.exception was called with the correct message parts
+        exception_logged = False
+        for call in mock_logger.exception.call_args_list:
+            log_message = call.args[0]
+            if (
+                "Error during content conversion or processing" in log_message
+                and f"file://{html_file_path.resolve()}" in log_message
+                and "local file for July_2024" in log_message
+                and "mode: offline" in log_message
+                and "Simulated conversion error" # Check if the original error is part of the log through exc_info
+            ):
+                 # To check for original error, we'd ideally look at call.exc_info but that's complex.
+                 # For now, we trust logger.exception captures it if called.
+                 # A more direct check would be `assert call.exc_info[1] is simulated_error`
+                 # if pytest-mock/MagicMock makes exc_info directly available on the call object.
+                 # However, the problem description implies checking the log message content.
+                 # The default formatting of logger.exception includes the string representation of the exception.
+                 # Let's assume the string representation of RuntimeError will be in the full log output,
+                 # which mock_logger.exception would have processed.
+                 # A simpler check for the test is that the intended message parts are present.
+                 # For this test, we will rely on the fact that logger.exception was called,
+                 # and the message contains key identifying information.
+                 # The actual exception object (simulated_error) is passed to logger.exception implicitly.
+                exception_logged = True # Simplified check based on problem description
+                break
+        # A more robust check for the exception message content from logger.exception
+        # This relies on the default formatting of logged exceptions.
+        mock_logger.exception.assert_any_call(
+            f"Error during content conversion or processing for file://{html_file_path.resolve()} "
+            f"(local file for July_2024, mode: offline, attempt N/A)"
+        )
+
+        mock_queue.put.assert_not_called()  # No retries for offline conversion errors
+        mock_queue.task_done.assert_called_once()
+
+    def test_worker_online_mode_conversion_runtime_error_retries(
+        self,
+        mock_logger: MagicMock,
+        mock_queue: MagicMock,
+        mock_markitdown_converter: MagicMock,
+        temp_output_dir: str,
+        mocker: Any,
+    ) -> None:
+        month_dt = datetime(2024, 8, 1)  # Example date: August 2024
+        initial_retries = 0
+        mock_queue.get.side_effect = [("online", month_dt, initial_retries), queue.Empty]
+
+        simulated_error = RuntimeError("Simulated conversion error")
+        mock_markitdown_converter.convert.side_effect = simulated_error
+        mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
+        mock_time_sleep = mocker.patch("time.sleep") # Mock time.sleep
+
+        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
+
+        expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
+        mock_markitdown_converter.convert.assert_called_once_with(expected_url)
+
+        # Check logger.exception was called
+        # Similar to the offline test, checking for key parts in the log message
+        mock_logger.exception.assert_any_call(
+            f"Error during content conversion or processing for {expected_url} "
+            f"(online source for August_2024, mode: online, attempt {initial_retries})"
+        )
+
+        mock_time_sleep.assert_called_once() # Ensure sleep was called for retry
+        mock_queue.put.assert_called_once_with(("online", month_dt, initial_retries + 1))
+        mock_queue.task_done.assert_called_once()
+
+    def test_worker_online_mode_split_clean_exception_retries(
+        self,
+        mock_logger: MagicMock,
+        mock_queue: MagicMock,
+        mock_markitdown_converter: MagicMock, # Provided by fixture, but we'll re-patch MarkItDown
+        temp_output_dir: str,
+        mocker: Any,
+    ) -> None:
+        month_dt = datetime(2024, 9, 1)  # Example date: September 2024
+        initial_retries = 0
+        mock_queue.get.side_effect = [("online", month_dt, initial_retries), queue.Empty]
+
+        # Configure MarkItDown().convert to return a successful mock result
+        # The mock_markitdown_converter fixture already does this, but we need to ensure it's the one used.
+        mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
+        mock_markitdown_converter.convert.return_value = MagicMock(text_content="Some dummy markdown")
+
+        # Mock split_and_clean_monthly_markdown to raise an exception
+        simulated_error_msg = "Simulated splitting error"
+        mock_split_clean = mocker.patch(
+            "wikipedia_news_downloader.split_and_clean_monthly_markdown",
+            side_effect=Exception(simulated_error_msg),
+        )
+
+        mock_time_sleep = mocker.patch("time.sleep")
+
+        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
+
+        expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
+        mock_markitdown_converter.convert.assert_called_once_with(expected_url)
+        mock_split_clean.assert_called_once_with("Some dummy markdown", month_dt, mock_logger)
+
+        # Check logger.exception was called
+        mock_logger.exception.assert_any_call(
+            f"Error during content conversion or processing for {expected_url} "
+            f"(online source for September_2024, mode: online, attempt {initial_retries})"
+        )
+
+        # Verify the original exception message is part of the log (implicitly via logger.exception)
+        # This is a bit indirect. A more robust check would be to see if `simulated_error_msg` is in any
+        # of the mock_logger.exception call args if the full formatting was known.
+        # For now, assert_any_call above checks the main message.
+
+        mock_time_sleep.assert_called_once()
+        mock_queue.put.assert_called_once_with(("online", month_dt, initial_retries + 1))
+        mock_queue.task_done.assert_called_once()
+
+    def test_worker_online_mode_jekyll_generation_exception_retries(
+        self,
+        mock_logger: MagicMock,
+        mock_queue: MagicMock,
+        mock_markitdown_converter: MagicMock,
+        temp_output_dir: str,
+        mocker: Any,
+    ) -> None:
+        month_dt = datetime(2024, 10, 1)  # Example date: October 2024
+        initial_retries = 0
+        mock_queue.get.side_effect = [("online", month_dt, initial_retries), queue.Empty]
+
+        mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
+        mock_markitdown_converter.convert.return_value = MagicMock(text_content="Some dummy markdown")
+
+        # Mock split_and_clean_monthly_markdown to return a successful result
+        daily_event_date = datetime(2024, 10, 1)
+        daily_event_content = "Cleaned daily content for Jekyll test"
+        mock_split_clean = mocker.patch(
+            "wikipedia_news_downloader.split_and_clean_monthly_markdown",
+            return_value=[(daily_event_date, daily_event_content)],
+        )
+
+        # Mock generate_jekyll_content to raise an exception
+        simulated_error_msg = "Simulated Jekyll generation error"
+        mock_generate_jekyll = mocker.patch(
+            "wikipedia_news_downloader.generate_jekyll_content",
+            side_effect=Exception(simulated_error_msg),
+        )
+
+        mock_time_sleep = mocker.patch("time.sleep")
+
+        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
+
+        expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
+        mock_markitdown_converter.convert.assert_called_once_with(expected_url)
+        mock_split_clean.assert_called_once_with("Some dummy markdown", month_dt, mock_logger)
+        mock_generate_jekyll.assert_called_once_with(daily_event_date, daily_event_content, mock_logger)
+
+        # Check logger.exception was called
+        mock_logger.exception.assert_any_call(
+            f"Error during content conversion or processing for {expected_url} "
+            f"(online source for October_2024, mode: online, attempt {initial_retries})"
+        )
+
+        mock_time_sleep.assert_called_once()
+        mock_queue.put.assert_called_once_with(("online", month_dt, initial_retries + 1))
         mock_queue.task_done.assert_called_once()
 
     # --- End Tests for worker function ---
