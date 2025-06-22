@@ -24,7 +24,7 @@ def test_markitdown_conversion_consistency(
     golden_reference_md_path_str: str,
     caplog: Any,
 ) -> None:
-    caplog.set_level(logging.INFO)  # Capture info logs if any part of MarkItDown uses logging
+    caplog.set_level(logging.DEBUG)  # Capture info logs if any part of MarkItDown uses logging
 
     golden_html_path = Path(golden_html_path_str)
     golden_reference_md_path = Path(golden_reference_md_path_str)
@@ -64,7 +64,7 @@ def test_markitdown_conversion_consistency(
 
 
 def test_markitdown_conversion_detects_mismatch(caplog: Any) -> None:
-    caplog.set_level(logging.INFO)  # Optional: if you want to log info during this test
+    caplog.set_level(logging.DEBUG)  # Optional: if you want to log info during this test
 
     # Use one of the existing golden file pairs
     golden_html_path_str = "tests/golden_html_references/january_2025.html"

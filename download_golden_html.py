@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# ruff: noqa: T201
 import pathlib
 import sys
 
@@ -37,16 +38,17 @@ def download_and_save_html(url: str, output_dir: pathlib.Path) -> None:
         html_filepath = output_dir / html_filename
         md_filepath = output_dir / md_filename
 
-        # Save HTML content
+        # Save the HTML content to a file
         with html_filepath.open("w", encoding="utf-8") as f:
             f.write(response.text)
-        print(f"Successfully downloaded and saved HTML for {url} to {html_filepath}")
+        print(f"Successfully downloaded HTML to {html_filepath}")
+        print(f"Reference markdown will be saved to {md_filepath}")
 
         # Convert HTML to Markdown and save
         try:
             md_converter = MarkItDown()
             # Pass the path to the downloaded HTML file as a string
-            result = md_converter.convert(str(html_filepath))
+            result = md_converter.convert(html_filepath)
 
             if result is None or not hasattr(result, "text_content") or not isinstance(result.text_content, str):
                 print(f"Error: MarkItDown().convert() did not return a valid 'text_content' string for {html_filepath}", file=sys.stderr)

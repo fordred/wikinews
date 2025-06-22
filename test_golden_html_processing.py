@@ -1,21 +1,20 @@
+import logging
 import tempfile
 from datetime import datetime
 from pathlib import Path
 
 import pytest
 
-from wikipedia_news_downloader import (
-    MONTH_NAME_TO_NUMBER,
-    setup_logging,
-)
-
 # Import the refactored main and other necessary components
 from wikipedia_news_downloader import (
+    MONTH_NAME_TO_NUMBER,
     main as wikipedia_main,
 )
 
-# Setup logger for the test module, can use the one from the downloader or define its own
-logger = setup_logging(verbose=True)
+# Pytest will configure the root logger, so we can just get a logger instance.
+# The log level can be controlled from the pytest command line.
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 def get_month_year_from_golden_html(html_file_path: Path) -> tuple[int, int]:
@@ -50,7 +49,7 @@ def test_html_processing_with_refactored_main() -> None:
         except Exception as e:
             pytest.fail(f"Could not parse month/year from golden HTML file {html_file.name}: {e}")
 
-    with tempfile.TemporaryDirectory() as temp_dir_name:
+    with tempfile.TemporaryDirectory(delete=False) as temp_dir_name:
         temp_output_dir = Path(temp_dir_name)
 
         logger.info(f"Running wikipedia_main with local HTML files: {golden_html_files}")
@@ -72,11 +71,11 @@ def test_html_processing_with_refactored_main() -> None:
                 verbose=False,  # Tests typically don't need verbose output from the script itself
                 num_workers=None,  # Use default worker logic (or 1 for deterministic testing if issues arise)
                 local_html_files_list=golden_html_files,
+                logger=logger,
             )
         except Exception as e:
             pytest.fail(f"Call to wikipedia_main failed during test execution: {e}")
 
-        errors = []
         # Compare generated files in temp_output_dir with reference files in docs/_posts/
         reference_markdown_files = list(reference_posts_root_dir.glob("*.md"))
 
@@ -102,7 +101,7 @@ def test_html_processing_with_refactored_main() -> None:
             if not generated_post_path.exists():
                 # Find which golden HTML was supposed to generate this
                 source_html_candidate = f"{event_date.strftime('%B').lower()}_{event_date.year}.html"
-                errors.append(
+                pytest.fail(
                     f"Missing generated file: {generated_post_path.name} in temp output. "
                     f"(Expected from: {source_html_candidate}, Reference: {ref_post_path})",
                 )
@@ -113,7 +112,7 @@ def test_html_processing_with_refactored_main() -> None:
 
             if generated_content != reference_content:
                 source_html_candidate = f"{event_date.strftime('%B').lower()}_{event_date.year}.html"
-                errors.append(
+                pytest.fail(
                     f"Content mismatch for {generated_post_path.name}.\n"
                     f"  Source HTML (expected): {source_html_candidate}\n"
                     f"  Reference MD: {ref_post_path}\n"
@@ -136,15 +135,10 @@ def test_html_processing_with_refactored_main() -> None:
             if (event_date.month, event_date.year) in covered_months_years:
                 corresponding_ref_path = reference_posts_root_dir / gen_file_path.name
                 if not corresponding_ref_path.exists():
-                    errors.append(
+                    pytest.fail(
                         f"Untested generated file: {gen_file_path.name} was created in temp output, "
                         f"but no corresponding reference file exists in {reference_posts_root_dir}.",
                     )
-
-        if errors:
-            error_summary = "\n\n".join(errors)
-            logger.error(f"Test failed with the following errors:\n{error_summary}")
-            pytest.fail(f"Golden HTML processing test failed with {len(errors)} error(s):\n{error_summary}")
 
 
 # Remove old test if it exists (or rename it to avoid running both)

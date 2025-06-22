@@ -25,6 +25,7 @@ raw_markdown_example = """
 
 # A basic logger for the function call, can be configured if more detail is needed
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 # Pytest handles log capture, so basicConfig is not needed here.
 
 
@@ -915,7 +916,7 @@ class TestMainFunctionLogging:
     @patch("threading.Thread")
     @patch("wikipedia_news_downloader.setup_logging")
     def test_main_with_provided_logger(self, mock_setup_logging: MagicMock, mock_thread: MagicMock, mock_mkdir: MagicMock) -> None:
-        _ = mock_mkdir # Mark as intentionally unused, but keep patch active
+        _ = mock_mkdir  # Mark as intentionally unused, but keep patch active
         mock_custom_logger = MagicMock(spec=logging.Logger)
 
         dummy_file_path = MagicMock(spec=Path)
@@ -966,7 +967,7 @@ class TestMainFunctionLogging:
     @patch("threading.Thread")
     @patch("wikipedia_news_downloader.setup_logging")
     def test_main_with_default_logger(self, mock_setup_logging: MagicMock, mock_thread: MagicMock, mock_mkdir: MagicMock) -> None:
-        _ = mock_mkdir # Mark as intentionally unused, but keep patch active
+        _ = mock_mkdir  # Mark as intentionally unused, but keep patch active
         mock_default_logger_instance = MagicMock(spec=logging.Logger)
         mock_setup_logging.return_value = mock_default_logger_instance
 
