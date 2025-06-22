@@ -27,7 +27,7 @@ jobs:
 
     - name: Test with pytest
       run: |
-        uv run --frozen pytest -ra --cov=wikipedia_news_downloader --cov-branch --cov-report term-missing --cov-report html:cov_html
+        uv run --frozen pytest -ra --cov=. --cov-branch --cov-report term-missing --cov-report html:cov_html
 
     - uses: actions/upload-artifact@v4
       with:
