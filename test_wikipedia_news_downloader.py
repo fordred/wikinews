@@ -31,12 +31,12 @@ logger.setLevel(logging.DEBUG)
 
 # --- Fixtures for worker tests ---
 @pytest.fixture
-def mock_logger(mocker: Any) -> MagicMock:
+def mock_logger(mocker: Any) -> Any:
     return mocker.MagicMock(spec=logging.Logger)
 
 
 @pytest.fixture
-def mock_queue(mocker: Any) -> MagicMock:
+def mock_queue(mocker: Any) -> Any:
     # Create a mock queue that can also raise queue.Empty
     q = mocker.MagicMock(spec=queue.Queue)
     # Configure get to raise queue.Empty after all pre-set items are retrieved
@@ -46,7 +46,7 @@ def mock_queue(mocker: Any) -> MagicMock:
 
 
 @pytest.fixture
-def mock_markitdown_converter(mocker: Any) -> MagicMock:
+def mock_markitdown_converter(mocker: Any) -> Any:
     mock_converter = mocker.MagicMock()
     # Default behavior for convert, can be overridden in tests
     mock_converter.convert.return_value = MagicMock(text_content="Mocked markdown content")
@@ -827,11 +827,6 @@ class TestWorkerFunction:
             f"Error during content conversion or processing for {expected_url} "
             f"(online source for September_2024, mode: online, attempt {initial_retries})",
         )
-
-        # Verify the original exception message is part of the log (implicitly via logger.exception)
-        # This is a bit indirect. A more robust check would be to see if `simulated_error_msg` is in any
-        # of the mock_logger.exception call args if the full formatting was known.
-        # For now, assert_any_call above checks the main message.
 
         mock_time_sleep.assert_called_once()
         mock_queue.put.assert_called_once_with(("online", month_dt, initial_retries + 1))
