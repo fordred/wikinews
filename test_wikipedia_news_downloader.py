@@ -401,7 +401,7 @@ class TestWorkerFunction:
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=temp_html_input_dir)
 
-        mock_markitdown_converter.convert.assert_called_once_with(str(html_file_path.resolve()))
+        mock_markitdown_converter.convert.assert_called_once_with(html_file_path)
         mock_save_news.assert_called_once()
         mock_queue.task_done.assert_called_once()
         mock_logger.info.assert_any_call(f"Processing in offline mode for {month_dt.strftime('%Y-%B')} (retries ignored: 0)")
@@ -593,10 +593,9 @@ class TestWorkerFunction:
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=temp_html_input_dir)
 
-        mock_markitdown_converter.convert.assert_called_once_with(str(html_file_path.resolve()))
+        mock_markitdown_converter.convert.assert_called_once_with(html_file_path)
         mock_logger.exception.assert_any_call(
-            f"Error during content conversion or processing for {str(html_file_path.resolve())} "
-            f"(local file for July_2024, mode: offline, attempt N/A)",
+            f"Error during content conversion or processing for {html_file_path} (local file for July_2024, mode: offline, attempt N/A)",
         )
         mock_queue.put.assert_not_called()  # No retry for offline conversion error
         mock_queue.task_done.assert_called_once()
@@ -746,14 +745,13 @@ class TestWorkerFunction:
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=temp_html_input_dir)
 
-        mock_markitdown_converter.convert.assert_called_once_with(str(html_file_path.resolve()))
+        mock_markitdown_converter.convert.assert_called_once_with(html_file_path)
 
         # Check logger.exception was called with the correct message parts
         # The F841 for exception_logged is fixed by removing the loop and variable.
         # The assert_any_call below is the primary check for the log message.
         mock_logger.exception.assert_any_call(
-            f"Error during content conversion or processing for {str(html_file_path.resolve())} "
-            f"(local file for July_2024, mode: offline, attempt N/A)",
+            f"Error during content conversion or processing for {html_file_path} (local file for July_2024, mode: offline, attempt N/A)",
         )
 
         mock_queue.put.assert_not_called()  # No retries for offline conversion errors
