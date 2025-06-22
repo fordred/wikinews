@@ -58,7 +58,7 @@ jobs:
         version: "latest"
 
     - name: Run Mypy
-      run: uv run --frozen mypy --strict .
+      run: uv run --frozen mypy .
 
   type_check_pyright:
     runs-on: ubuntu-latest

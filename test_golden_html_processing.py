@@ -43,7 +43,7 @@ def test_html_processing_with_refactored_main() -> None:
         pytest.skip("No golden HTML files found in tests/golden_html_references/. Skipping test.")
 
     # Create a set of (month, year) tuples from the golden HTML files to know what they cover
-    covered_months_years = set()
+    covered_months_years: set[tuple[int, int]] = set()
     for html_file in golden_html_files:
         try:
             month_num, year_num = get_month_year_from_golden_html(html_file)

@@ -50,7 +50,7 @@ def download_and_save_html(url: str, output_dir: pathlib.Path) -> None:
             # Pass the path to the downloaded HTML file as a string
             result = md_converter.convert(html_filepath)
 
-            if result is None or not hasattr(result, "text_content") or not isinstance(result.text_content, str):
+            if not hasattr(result, "text_content"):
                 print(f"Error: MarkItDown().convert() did not return a valid 'text_content' string for {html_filepath}", file=sys.stderr)
             else:
                 with md_filepath.open("w", encoding="utf-8") as f:
