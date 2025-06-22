@@ -271,15 +271,6 @@ def worker(
             processing_queue.task_done()
             continue
 
-        # Check if source_uri is set after the if-elif block
-        if not source_uri:
-            logger.error(
-                f"Source URI not set for {source_name_suffix} (mode: {mode}). "
-                "This might be due to a file not found in offline mode or an unhandled condition. Skipping.",
-            )
-            processing_queue.task_done()
-            continue
-
         try:
             # md_converter is already instantiated
             logger.debug(f"Attempting to convert content from {source_uri} for {source_name}")
