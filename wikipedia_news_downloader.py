@@ -228,7 +228,7 @@ def worker(
             break  # No more items to process
 
         monthly_raw_markdown = ""
-        source_uri = None  # Initialize source_uri
+        source_uri: Path | str | None = None  # Initialize source_uri, can be Path or str
         source_name = ""  # For logging (filename or month-year)
         source_name_suffix = month_dt.strftime("%B_%Y")  # e.g., "January_2025"
 
@@ -246,8 +246,8 @@ def worker(
             full_path_obj = Path(local_html_input_dir) / file_name
 
             if full_path_obj.exists():
-                source_uri = f"file://{full_path_obj.resolve()}"
-                logger.debug(f"Offline mode: Source URI set to {source_uri}")
+                source_uri = full_path_obj  # Store as Path object
+                logger.debug(f"Offline mode: Source URI set to path {source_uri}")
             else:
                 logger.error(f"Offline mode: Source HTML file not found at {full_path_obj}. Skipping.")
                 processing_queue.task_done()
@@ -263,8 +263,8 @@ def worker(
                 continue
 
             url = f"{BASE_WIKIPEDIA_URL}{source_name_suffix}"
-            source_uri = url  # Set source_uri to the URL for online mode
-            logger.debug(f"Online mode: Source URI set to {source_uri}")
+            source_uri = url  # Set source_uri to the URL string for online mode
+            logger.debug(f"Online mode: Source URI set to URL {source_uri}")
 
         else:  # Should not happen if queue is populated correctly
             logger.error(f"Unknown mode in queue item: {mode}. Item: {(mode, month_dt, retries)}. Skipping.")
@@ -282,8 +282,19 @@ def worker(
 
         try:
             # md_converter is already instantiated
-            logger.debug(f"Attempting to convert content from {source_uri} for {source_name}")
-            result = md_converter.convert(source_uri)
+            # Ensure source_uri_for_convert is a string for MarkItDown.convert()
+            source_uri_for_convert: str
+            if isinstance(source_uri, Path):
+                source_uri_for_convert = str(source_uri.resolve()) # Convert Path to absolute string path
+            elif isinstance(source_uri, str):
+                source_uri_for_convert = source_uri # It's already a URL string
+            else: # Should not happen if logic above is correct
+                logger.error(f"source_uri has unexpected type: {type(source_uri)}. Skipping conversion.")
+                processing_queue.task_done()
+                continue
+
+            logger.debug(f"Attempting to convert content from {source_uri_for_convert} (original source_uri: {source_uri}) for {source_name}")
+            result = md_converter.convert(source_uri_for_convert)
             monthly_raw_markdown = result.text_content
             logger.debug(f"Raw MarkItDown result length for {source_name}: {len(monthly_raw_markdown)}")
 
@@ -313,7 +324,8 @@ def worker(
         except requests.exceptions.RequestException as e:  # Specific to online mode fetching
             if mode == "online":
                 status_code = getattr(e.response, "status_code", None)
-                url_for_error = source_uri  # In online mode, source_uri is the url
+                # source_uri is already a string (URL) in online mode, so no change needed here for url_for_error
+                url_for_error = str(source_uri)
                 if status_code == 429:
                     logger.warning(f"HTTP 429 Too Many Requests for {url_for_error}. Re-queuing {source_name} (attempt {retries + 1}).")
                     processing_queue.put(("online", month_dt, retries + 1))
@@ -323,13 +335,19 @@ def worker(
                     logger.warning(f"Request error fetching {url_for_error} ({source_name}): {e}. Retrying (attempt {retries + 1}).")
                     time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
                     processing_queue.put(("online", month_dt, retries + 1))
-            else:  # Should not be a RequestException in offline mode if source_uri is file://
-                logger.exception(f"Unexpected requests.exceptions.RequestException for {source_uri} in {mode} mode")
+            else:  # Should not be a RequestException in offline mode if source_uri is Path
+                 # If source_uri is Path, convert to string for logging.
+                logged_source_uri = str(source_uri.resolve()) if isinstance(source_uri, Path) else source_uri
+                logger.exception(f"Unexpected requests.exceptions.RequestException for {logged_source_uri} in {mode} mode")
             # processing_queue.task_done() is handled by the finally block
 
         except Exception:  # Catch other errors (MarkItDown conversion, content processing)
+            logged_source_uri = source_uri
+            if isinstance(source_uri, Path):
+                logged_source_uri = str(source_uri.resolve())
+
             logger.exception(
-                f"Error during content conversion or processing for {source_uri} "
+                f"Error during content conversion or processing for {logged_source_uri} "
                 f"({source_name}, mode: {mode}, attempt {retries if mode == 'online' else 'N/A'})",
             )
             if mode == "online":  # Decide if retry is appropriate for non-network errors in online mode
