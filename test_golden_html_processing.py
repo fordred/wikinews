@@ -6,12 +6,8 @@ from pathlib import Path
 import pytest
 
 # Import the refactored main and other necessary components
-from wikipedia_news_downloader import (
-    MONTH_NAME_TO_NUMBER,
-)
-from wikipedia_news_downloader import (
-    main as wikipedia_main,
-)
+from wikipedia_news_downloader import WikiNewsDownloader # Import the class
+# main is no longer imported directly for calling with specific args in this test
 
 # Pytest will configure the root logger, so we can just get a logger instance.
 # The log level can be controlled from the pytest command line.
@@ -24,11 +20,12 @@ def get_month_year_from_golden_html(html_file_path: Path) -> tuple[int, int]:
     parts = html_file_path.stem.lower().split("_")
     month_name = parts[0].capitalize()
     year = int(parts[1])
-    month_number = MONTH_NAME_TO_NUMBER[month_name]
+    # Access MONTH_NAME_TO_NUMBER via the class
+    month_number = WikiNewsDownloader.MONTH_NAME_TO_NUMBER[month_name]
     return month_number, year
 
 
-def test_html_processing_with_refactored_main() -> None:
+def test_html_processing_with_refactored_main(monkeypatch: pytest.MonkeyPatch) -> None:
     """
     Tests HTML to Jekyll post conversion using the refactored main function
     from wikipedia_news_downloader.py.
@@ -57,26 +54,28 @@ def test_html_processing_with_refactored_main() -> None:
         logger.info(f"Running wikipedia_main with local HTML files: {golden_html_files}")
         logger.info(f"Outputting to temporary directory: {temp_output_dir}")
 
-        # Call the refactored main function with the list of local HTML paths
-        # The wikipedia_main function will use its own arg parsing for other params like verbosity
-        # We pass verbose=False here if we don't want its logger to override pytest's capture.
-        # However, our `main` doesn't take verbose directly, it uses args.verbose.
-        # For simplicity in this call, we rely on the default setup_logging or one from `args` if we mocked them.
-        # The key is `local_html_files` and `output_dir`.
         try:
-            # To control verbosity or other args if necessary, one might need to mock sys.argv
-            # or adjust main to accept more direct params. For now, using its CLI defaults for other args.
-            # The refactored `main` uses its own `setup_logging` based on its `args.verbose`.
-            # We pass the `local_html_files` list directly.
-            wikipedia_main(
-                output_dir_str=str(temp_output_dir),
-                verbose=False,  # Tests typically don't need verbose output from the script itself
-                num_workers=None,  # Use default worker logic (or 1 for deterministic testing if issues arise)
-                local_html_files_list=golden_html_files,
-                logger=logger,
+            # Instantiate WikiNewsDownloader
+            # The local_html_input_dir for __init__ can be derived from the parent of the first golden HTML file,
+            # or set to None if run handles it entirely based on local_html_files_list.
+            # The `run` method's logic for effective_local_html_input_dir_str will handle this.
+            # We provide the parent of the first golden file as the base input dir for consistency.
+            input_dir_for_init = str(golden_html_files[0].parent) if golden_html_files else None
+
+            downloader = WikiNewsDownloader(
+                output_dir=str(temp_output_dir),
+                verbose=False, # Test logger is used, this is for internal consistency if class uses it
+                num_workers=1, # Use 1 worker for deterministic testing
+                local_html_input_dir=input_dir_for_init,
+                logger=logger, # Use the test's logger instance
+                # base_url is not strictly needed for local HTML processing but good to provide default
+                base_url=WikiNewsDownloader.BASE_WIKIPEDIA_URL
             )
+            # Call the run method with the list of local HTML paths
+            downloader.run(local_html_files_list=golden_html_files)
+
         except Exception as e:
-            pytest.fail(f"Call to wikipedia_main failed during test execution: {e}")
+            pytest.fail(f"WikiNewsDownloader().run() failed during test execution: {e}")
 
         # Compare generated files in temp_output_dir with reference files in docs/_posts/
         reference_markdown_files = list(reference_posts_root_dir.glob("*.md"))
