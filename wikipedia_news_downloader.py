@@ -359,6 +359,16 @@ def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Maximum number of concurrent download workers.",
     )
+    parser.add_argument(
+        "--start-date",
+        type=lambda s: datetime.strptime(s, '%Y-%m-%d'),
+        help="Start date (YYYY-MM-DD)"
+    )
+    parser.add_argument(
+        "--end-date",
+        type=lambda s: datetime.strptime(s, '%Y-%m-%d'),
+        help="End date (YYYY-MM-DD)"
+    )
     return parser.parse_args(argv)
 
 
@@ -367,6 +377,8 @@ def main(
     verbose: bool,
     num_workers: int | None,
     local_html_files_list: list[Path] | None,
+    start_date_arg: datetime | None,
+    end_date_arg: datetime | None,
     logger: logging.Logger | None = None,
 ) -> None:
     # Setup logging based on the verbose parameter
@@ -407,18 +419,27 @@ def main(
     if items_to_process_count == 0 and not local_html_files_list:
         operation_mode = "Wikipedia URL fetching mode"
         now = datetime.now()
-        start_date = datetime(2025, 1, 1)
-        end_date = datetime(now.year, now.month, 1)
+
+        # Set start_date: use argument if provided, else default to January 1, 2024
+        start_date = start_date_arg if start_date_arg else datetime(2024, 1, 1)
+
+        # Set end_date: use argument if provided, else default to the first day of the current month
+        end_date = end_date_arg if end_date_arg else datetime(now.year, now.month, 1)
+
         dates_set: set[datetime] = set()
         current_date = start_date
         while current_date <= end_date:
-            dates_set.add(current_date)
+            # Ensure current_date is set to the first of its month for consistent comparison and storage
+            date_to_add = datetime(current_date.year, current_date.month, 1)
+            dates_set.add(date_to_add)
+
             if current_date.month == 12:
                 current_date = datetime(current_date.year + 1, 1, 1)
             else:
                 current_date = datetime(current_date.year, current_date.month + 1, 1)
+
         items_to_process_count = len(dates_set)
-        for date_item in sorted(dates_set):
+        for date_item in sorted(list(dates_set)): # Convert set to list before sorting
             processing_queue.put(("online", date_item, 0))
 
     if items_to_process_count == 0:
@@ -474,5 +495,7 @@ if __name__ == "__main__":
         verbose=args.verbose,
         num_workers=args.workers,
         local_html_files_list=html_files_to_pass,
+        start_date_arg=args.start_date,
+        end_date_arg=args.end_date,
         logger=logger,  # Pass the logger instance here
     )
