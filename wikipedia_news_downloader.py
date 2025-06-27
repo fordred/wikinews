@@ -11,6 +11,8 @@ from datetime import datetime
 from pathlib import Path
 
 import requests  # Import requests to catch its exceptions
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 from markitdown import MarkItDown
 
 # --- Constants ---
@@ -25,6 +27,27 @@ MIN_MARKDOWN_LENGTH_PUBLISH = 10  # Minimum length to consider content valid for
 # Precompiled regex patterns
 RELATIVE_WIKI_LINK_RE = re.compile(r"\(/wiki/")
 REDLINK_RE = re.compile(r'\[([^\]]+)\]\(/w/index\.php\?title=[^&\s]+&action=edit&redlink=1\s*"[^"]*"\)')
+
+
+def create_requests_session() -> requests.Session:
+    """Creates a requests session with connection pooling and retry logic."""
+    session = requests.Session()
+    retry_strategy = Retry(
+        total=RETRY_MAX_ATTEMPTS,
+        backoff_factor=1,  # Adjusted from RETRY_BASE_WAIT_SECONDS to fit Retry's backoff_factor logic
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["HEAD", "GET", "OPTIONS"]
+    )
+    adapter = HTTPAdapter(
+        pool_connections=10,  # Default is 10
+        pool_maxsize=10,    # Default is 10
+        max_retries=retry_strategy
+    )
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    return session
+
+
 CITATION_LINK_RE = re.compile(r"\[\[\d+\]\]\(#cite_note-\d+\)")
 TRAILING_SPACES_RE = re.compile(r"[ \t]+$", flags=re.MULTILINE)
 BOLD_HEADINGS_RE = re.compile(r"^\*\*(.*?)\*\*$", flags=re.MULTILINE)
@@ -211,7 +234,7 @@ def generate_jekyll_content(date: datetime, markdown_body: str, logger: logging.
     return "\n".join(front_matter_lines) + content_body
 
 
-StructuredQueueItem = tuple[str, datetime, int]  # (mode, month_datetime, retry_count)
+StructuredQueueItem = tuple[str, datetime]  # (mode, month_datetime)
 
 
 def worker(
@@ -220,10 +243,14 @@ def worker(
     logger: logging.Logger,
     local_html_input_dir: str | None = None,
 ) -> None:
-    md_converter = MarkItDown()  # Instantiated once per worker
+    # Create a session for each worker thread.
+    # If MarkItDown becomes thread-safe with a shared session, this can be moved outside.
+    requests_session = create_requests_session()
+    md_converter = MarkItDown(requests_session=requests_session)  # Pass session to MarkItDown
+
     while True:
         try:
-            mode, month_dt, retries = processing_queue.get(timeout=2)
+            mode, month_dt = processing_queue.get(timeout=2) # Retries removed
         except queue.Empty:
             break  # No more items to process
 
@@ -234,7 +261,7 @@ def worker(
 
         if mode == "offline":
             source_name = f"local file for {source_name_suffix}"  # Used for logging
-            logger.info(f"Processing in offline mode for {month_dt.strftime('%Y-%B')} (retries ignored: {retries})")
+            logger.info(f"Processing in offline mode for {month_dt.strftime('%Y-%B')}")
 
             if not local_html_input_dir:
                 logger.error("Cannot process offline mode: local_html_input_dir not provided to worker.")
@@ -255,19 +282,18 @@ def worker(
 
         elif mode == "online":
             source_name = f"online source for {source_name_suffix}"
-            logger.info(f"Processing in online mode for {month_dt.strftime('%Y-%B')} (attempt {retries + 1})")
+            # Retry count is now managed by the session's Retry object, so logging of attempt number is removed here.
+            logger.info(f"Processing in online mode for {month_dt.strftime('%Y-%B')}")
 
-            if retries > RETRY_MAX_ATTEMPTS:
-                logger.error(f"Exceeded max retries ({RETRY_MAX_ATTEMPTS}) for {source_name}")
-                processing_queue.task_done()
-                continue
+            # Max retries check is now handled by the session's Retry object.
+            # The old check 'if retries > RETRY_MAX_ATTEMPTS:' is removed.
 
             url = f"{BASE_WIKIPEDIA_URL}{source_name_suffix}"
             source_uri = url  # Set source_uri to the URL for online mode
             logger.debug(f"Online mode: Source URI set to {source_uri}")
 
         else:  # Should not happen if queue is populated correctly
-            logger.error(f"Unknown mode in queue item: {mode}. Item: {(mode, month_dt, retries)}. Skipping.")
+            logger.error(f"Unknown mode in queue item: {mode}. Item: {(mode, month_dt)}. Skipping.") # retries removed from log
             processing_queue.task_done()
             continue
 
@@ -305,15 +331,16 @@ def worker(
             if mode == "online":
                 status_code = getattr(e.response, "status_code", None)
                 url_for_error = source_uri  # In online mode, source_uri is the url
+                # The session's Retry object will handle retries including 429.
+                # We log it here for visibility but don't re-queue manually.
                 if status_code == 429:
-                    logger.warning(f"HTTP 429 Too Many Requests for {url_for_error}. Re-queuing {source_name} (attempt {retries + 1}).")
-                    processing_queue.put(("online", month_dt, retries + 1))
+                    logger.warning(f"HTTP 429 Too Many Requests for {url_for_error} ({source_name}). Relying on session retry.")
                 elif status_code == 404:
                     logger.warning(f"HTTP 404 Not Found for {url_for_error} ({source_name}). Skipping.")
                 else:
-                    logger.warning(f"Request error fetching {url_for_error} ({source_name}): {e}. Retrying (attempt {retries + 1}).")
-                    time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
-                    processing_queue.put(("online", month_dt, retries + 1))
+                    # For other request errors, log them. Retries are handled by the session.
+                    logger.warning(f"Request error fetching {url_for_error} ({source_name}): {e}. Relying on session retry.")
+                # Manual re-queuing and sleep are removed as the session's Retry handles this.
             else:  # Should not be a RequestException in offline mode if source_uri is Path
                 logger.exception(f"Unexpected requests.exceptions.RequestException for {source_uri} in {mode} mode")
             # processing_queue.task_done() is handled by the finally block
@@ -321,14 +348,12 @@ def worker(
         except Exception:  # Catch other errors (MarkItDown conversion, content processing)
             logger.exception(
                 f"Error during content conversion or processing for {source_uri} "
-                f"({source_name}, mode: {mode}, attempt {retries if mode == 'online' else 'N/A'})",
+                f"({source_name}, mode: {mode})",  # Removed retry attempt information
             )
-            if mode == "online":  # Decide if retry is appropriate for non-network errors in online mode
-                # For now, retry as per previous logic for generic exceptions in online mode
-                time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
-                processing_queue.put(("online", month_dt, retries + 1))
             # For offline mode, a general exception here usually means a conversion problem with the local file.
             # No retry logic for offline mode post-conversion attempt.
+            # For online mode, non-RequestException errors during conversion/processing are not automatically retried here.
+            # If specific non-network errors are found to be transient, more targeted retry logic could be added.
             # processing_queue.task_done() is handled by the finally block
 
         finally:  # Ensure task_done is always called once per item from the queue
@@ -396,7 +421,7 @@ def main(
                     year = int(name_parts[1])
                     month_number = MONTH_NAME_TO_NUMBER[month_name]
                     month_datetime_obj = datetime(year, month_number, 1)
-                    processing_queue.put(("offline", month_datetime_obj, 0))
+                    processing_queue.put(("offline", month_datetime_obj)) # Retry count removed
                 except (IndexError, KeyError, ValueError) as e:
                     logger.warning(f"Could not parse valid date from filename {file_path_obj.name}: {e}. Skipping.")
             else:
@@ -419,7 +444,7 @@ def main(
                 current_date = datetime(current_date.year, current_date.month + 1, 1)
         items_to_process_count = len(dates_set)
         for date_item in sorted(dates_set):
-            processing_queue.put(("online", date_item, 0))
+            processing_queue.put(("online", date_item)) # Retry count removed
 
     if items_to_process_count == 0:
         logger.info(f"No items to process for mode: {operation_mode}. Exiting.")
