@@ -13,6 +13,8 @@ from pathlib import Path
 import requests  # Import requests to catch its exceptions
 from markitdown import MarkItDown
 
+from wikipedia_news.data_structures import DailyEvent, ProcessingItem
+
 # --- Constants ---
 BASE_WIKIPEDIA_URL = "https://en.m.wikipedia.org/wiki/Portal:Current_events/"
 DEFAULT_OUTPUT_DIR = "./docs/_posts/"
@@ -105,7 +107,7 @@ DAY_DELIMITER_RE = re.compile(
 MONTHLY_MARKDOWN_RE = re.compile(r"\[◀\].*", flags=re.DOTALL)
 
 
-def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: datetime, logger: logging.Logger) -> list[tuple[datetime, str]]:
+def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: datetime, source_name: str, logger: logging.Logger) -> list[DailyEvent]:
     """Split markdown by day.
 
     Splits markdown from a monthly Wikipedia Current Events page into daily segments,
@@ -114,7 +116,7 @@ def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: date
     # Remove the trailing text that is not part of the daily events.
     monthly_markdown = MONTHLY_MARKDOWN_RE.sub("", monthly_markdown)
 
-    daily_events: list[tuple[datetime, str]] = []
+    daily_events_list: list[DailyEvent] = []
     # Find all starting positions of daily segments
     matches = list(DAY_DELIMITER_RE.finditer(monthly_markdown))
     logger.debug(f"Found {len(matches)} potential daily segments in markdown for {month_datetime.strftime('%Y-%B')}.")
@@ -150,7 +152,7 @@ def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: date
             cleaned_daily_md = clean_daily_markdown_content(daily_raw_content.strip())
 
             if cleaned_daily_md.strip():  # Ensure there's some content
-                daily_events.append((day_dt, cleaned_daily_md))
+                daily_events_list.append(DailyEvent(date=day_dt, content=cleaned_daily_md, source=source_name))
             else:
                 logger.debug(f"Segment {i + 1} for {day_dt.strftime('%Y-%m-%d')} is empty after cleaning. Skipping.")
 
@@ -161,13 +163,13 @@ def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: date
             logger.exception(f"Unexpected error processing segment {i + 1} for {month_datetime.strftime('%Y-%B')}")
             continue
 
-    logger.info(f"Successfully processed {len(daily_events)} daily segments from {month_datetime.strftime('%Y-%B')}.")
-    return daily_events
+    logger.info(f"Successfully processed {len(daily_events_list)} daily segments from {month_datetime.strftime('%Y-%B')}.")
+    return daily_events_list
 
 
-def save_news(date: datetime, full_content: str, output_dir: str, logger: logging.Logger) -> None:
+def save_news(daily_event: DailyEvent, full_content: str, output_dir: str, logger: logging.Logger) -> None:
     """Save markdown to specified directory."""
-    logger.info(f"Preparing to save news for {date}")
+    logger.info(f"Preparing to save news for {daily_event.date.strftime('%Y-%m-%d')}")
 
     # Create date-specific folder
     folder_path = "./docs/_posts/"
@@ -175,30 +177,30 @@ def save_news(date: datetime, full_content: str, output_dir: str, logger: loggin
     logger.debug(f"Created folder: {folder_path}")
 
     # Save markdown
-    markdown_path = Path(output_dir) / (date.strftime("%Y-%m-%d") + "-index.md")
+    markdown_path = Path(output_dir) / (daily_event.date.strftime("%Y-%m-%d") + "-index.md")
     with markdown_path.open("w", encoding="utf-8", newline="\n") as f:
         f.write(full_content)
     logger.info(f"Saved markdown to: {markdown_path}")
 
 
-def generate_jekyll_content(date: datetime, markdown_body: str, logger: logging.Logger) -> str:
+def generate_jekyll_content(daily_event: DailyEvent, logger: logging.Logger) -> str:
     """Jekyll front matter generator.
 
     Generates the full page content with Jekyll front matter.
     Returns the full content string, or None if markdown_body is invalid.
     """
     # Determine published status based on markdown content
-    is_published = len(markdown_body) >= MIN_MARKDOWN_LENGTH_PUBLISH
+    is_published = len(daily_event.content) >= MIN_MARKDOWN_LENGTH_PUBLISH
 
     if not is_published:
-        logger.warning(f"Markdown for {date.strftime('%Y-%m-%d')} is too short ({len(markdown_body)=}). Setting published: false.")
+        logger.warning(f"Markdown for {daily_event.date.strftime('%Y-%m-%d')} is too short ({len(daily_event.content)=}). Setting published: false.")
 
     # Build front matter
     front_matter_lines = [
         "---",
         "layout: post",
-        f"title: {date.strftime('%Y %B %d')}",
-        f"date: {date.strftime('%Y-%m-%d')}",
+        f"title: {daily_event.date.strftime('%Y %B %d')}",
+        f"date: {daily_event.date.strftime('%Y-%m-%d')}",
         f"published: {'true' if is_published else 'false'}",
         "---",
         "",  # Add blank lines after front matter
@@ -207,15 +209,12 @@ def generate_jekyll_content(date: datetime, markdown_body: str, logger: logging.
     ]
 
     # Combine front matter and content (use empty body if not published)
-    content_body = markdown_body if is_published else ""
+    content_body = daily_event.content if is_published else ""
     return "\n".join(front_matter_lines) + content_body
 
 
-StructuredQueueItem = tuple[str, datetime, int]  # (mode, month_datetime, retry_count)
-
-
 def worker(
-    processing_queue: queue.Queue[StructuredQueueItem],
+    processing_queue: queue.Queue[ProcessingItem],
     output_dir: str,
     logger: logging.Logger,
     local_html_input_dir: str | None = None,
@@ -223,26 +222,26 @@ def worker(
     md_converter = MarkItDown()  # Instantiated once per worker
     while True:
         try:
-            mode, month_dt, retries = processing_queue.get(timeout=2)
+            item = processing_queue.get(timeout=2)
         except queue.Empty:
             break  # No more items to process
 
         monthly_raw_markdown = ""
         source_uri: Path | str | None = None  # Initialize source_uri, can be Path or str
         source_name = ""  # For logging (filename or month-year)
-        source_name_suffix = month_dt.strftime("%B_%Y")  # e.g., "January_2025"
+        source_name_suffix = item.month_datetime.strftime("%B_%Y")  # e.g., "January_2025"
 
-        if mode == "offline":
+        if item.mode == "offline":
             source_name = f"local file for {source_name_suffix}"  # Used for logging
-            logger.info(f"Processing in offline mode for {month_dt.strftime('%Y-%B')} (retries ignored: {retries})")
+            logger.info(f"Processing in offline mode for {item.month_datetime.strftime('%Y-%B')} (retries ignored: {item.retry_count})")
 
             if not local_html_input_dir:
                 logger.error("Cannot process offline mode: local_html_input_dir not provided to worker.")
                 processing_queue.task_done()
                 continue
 
-            month_name_lower = month_dt.strftime("%B").lower()
-            file_name = f"{month_name_lower}_{month_dt.year}.html"
+            month_name_lower = item.month_datetime.strftime("%B").lower()
+            file_name = f"{month_name_lower}_{item.month_datetime.year}.html"
             full_path_obj = Path(local_html_input_dir) / file_name
 
             if full_path_obj.exists():
@@ -253,11 +252,11 @@ def worker(
                 processing_queue.task_done()
                 continue
 
-        elif mode == "online":
+        elif item.mode == "online":
             source_name = f"online source for {source_name_suffix}"
-            logger.info(f"Processing in online mode for {month_dt.strftime('%Y-%B')} (attempt {retries + 1})")
+            logger.info(f"Processing in online mode for {item.month_datetime.strftime('%Y-%B')} (attempt {item.retry_count + 1})")
 
-            if retries > RETRY_MAX_ATTEMPTS:
+            if item.retry_count > RETRY_MAX_ATTEMPTS:
                 logger.error(f"Exceeded max retries ({RETRY_MAX_ATTEMPTS}) for {source_name}")
                 processing_queue.task_done()
                 continue
@@ -267,7 +266,7 @@ def worker(
             logger.debug(f"Online mode: Source URI set to {source_uri}")
 
         else:  # Should not happen if queue is populated correctly
-            logger.error(f"Unknown mode in queue item: {mode}. Item: {(mode, month_dt, retries)}. Skipping.")
+            logger.error(f"Unknown mode in queue item: {item.mode}. Item: {item}. Skipping.")
             processing_queue.task_done()
             continue
 
@@ -280,53 +279,53 @@ def worker(
 
             # --- Common content processing (moved inside this try block) ---
             if not monthly_raw_markdown.strip():
-                logger.warning(f"No content extracted for {source_name_suffix} (mode: {mode}). Skipping further processing.")
+                logger.warning(f"No content extracted for {source_name_suffix} (mode: {item.mode}). Skipping further processing.")
                 continue
 
-            logger.info(f"Successfully fetched/read content for {source_name_suffix} (mode: {mode})")
+            logger.info(f"Successfully fetched/read content for {source_name_suffix} (mode: {item.mode})")
 
-            daily_events = split_and_clean_monthly_markdown(monthly_raw_markdown, month_dt, logger)
+            daily_events_list = split_and_clean_monthly_markdown(monthly_raw_markdown, item.month_datetime, source_name, logger)
 
-            if not daily_events:
-                logger.warning(f"No daily events found or extracted for {source_name_suffix} (month_dt: {month_dt.strftime('%Y-%B')}).")
+            if not daily_events_list:
+                logger.warning(f"No daily events found or extracted for {source_name_suffix} (month_dt: {item.month_datetime.strftime('%Y-%B')}).")
 
-            for event_date, daily_md_content in daily_events:
-                logger.info(f"Processing extracted day: {event_date.strftime('%Y-%m-%d')} from {source_name_suffix}")
-                full_jekyll_content = generate_jekyll_content(event_date, daily_md_content, logger)
+            for daily_event in daily_events_list:
+                logger.info(f"Processing extracted day: {daily_event.date.strftime('%Y-%m-%d')} from {daily_event.source}")
+                full_jekyll_content = generate_jekyll_content(daily_event, logger)
                 if full_jekyll_content and "published: true" in full_jekyll_content:
-                    save_news(event_date, full_jekyll_content, output_dir, logger)
+                    save_news(daily_event, full_jekyll_content, output_dir, logger)
                 else:
                     logger.warning(
-                        f"Skipping save for {event_date.strftime('%Y-%m-%d')} from {source_name_suffix}: "
+                        f"Skipping save for {daily_event.date.strftime('%Y-%m-%d')} from {daily_event.source}: "
                         "Content marked unpublished or generation failed.",
                     )
 
         except requests.exceptions.RequestException as e:  # Specific to online mode fetching
-            if mode == "online":
+            if item.mode == "online":
                 status_code = getattr(e.response, "status_code", None)
                 url_for_error = source_uri  # In online mode, source_uri is the url
                 if status_code == 429:
-                    logger.warning(f"HTTP 429 Too Many Requests for {url_for_error}. Re-queuing {source_name} (attempt {retries + 1}).")
-                    processing_queue.put(("online", month_dt, retries + 1))
+                    logger.warning(f"HTTP 429 Too Many Requests for {url_for_error}. Re-queuing {source_name} (attempt {item.retry_count + 1}).")
+                    processing_queue.put(ProcessingItem(item.mode, item.month_datetime, item.retry_count + 1))
                 elif status_code == 404:
                     logger.warning(f"HTTP 404 Not Found for {url_for_error} ({source_name}). Skipping.")
                 else:
-                    logger.warning(f"Request error fetching {url_for_error} ({source_name}): {e}. Retrying (attempt {retries + 1}).")
-                    time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
-                    processing_queue.put(("online", month_dt, retries + 1))
+                    logger.warning(f"Request error fetching {url_for_error} ({source_name}): {e}. Retrying (attempt {item.retry_count + 1}).")
+                    time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**item.retry_count))
+                    processing_queue.put(ProcessingItem(item.mode, item.month_datetime, item.retry_count + 1))
             else:  # Should not be a RequestException in offline mode if source_uri is Path
-                logger.exception(f"Unexpected requests.exceptions.RequestException for {source_uri} in {mode} mode")
+                logger.exception(f"Unexpected requests.exceptions.RequestException for {source_uri} in {item.mode} mode")
             # processing_queue.task_done() is handled by the finally block
 
         except Exception:  # Catch other errors (MarkItDown conversion, content processing)
             logger.exception(
                 f"Error during content conversion or processing for {source_uri} "
-                f"({source_name}, mode: {mode}, attempt {retries if mode == 'online' else 'N/A'})",
+                f"({source_name}, mode: {item.mode}, attempt {item.retry_count if item.mode == 'online' else 'N/A'})",
             )
-            if mode == "online":  # Decide if retry is appropriate for non-network errors in online mode
+            if item.mode == "online":  # Decide if retry is appropriate for non-network errors in online mode
                 # For now, retry as per previous logic for generic exceptions in online mode
-                time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**retries))
-                processing_queue.put(("online", month_dt, retries + 1))
+                time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**item.retry_count))
+                processing_queue.put(ProcessingItem(item.mode, item.month_datetime, item.retry_count + 1))
             # For offline mode, a general exception here usually means a conversion problem with the local file.
             # No retry logic for offline mode post-conversion attempt.
             # processing_queue.task_done() is handled by the finally block
@@ -377,7 +376,7 @@ def main(
     current_output_dir = output_dir_str
     Path(current_output_dir).mkdir(parents=True, exist_ok=True)
 
-    processing_queue: queue.Queue[StructuredQueueItem] = queue.Queue()
+    processing_queue: queue.Queue[ProcessingItem] = queue.Queue()
     items_to_process_count = 0
     operation_mode = ""
     effective_local_html_input_dir_str: str | None = None
@@ -396,7 +395,7 @@ def main(
                     year = int(name_parts[1])
                     month_number = MONTH_NAME_TO_NUMBER[month_name]
                     month_datetime_obj = datetime(year, month_number, 1)
-                    processing_queue.put(("offline", month_datetime_obj, 0))
+                    processing_queue.put(ProcessingItem(mode="offline", month_datetime=month_datetime_obj, retry_count=0))
                 except (IndexError, KeyError, ValueError) as e:
                     logger.warning(f"Could not parse valid date from filename {file_path_obj.name}: {e}. Skipping.")
             else:
@@ -419,7 +418,7 @@ def main(
                 current_date = datetime(current_date.year, current_date.month + 1, 1)
         items_to_process_count = len(dates_set)
         for date_item in sorted(dates_set):
-            processing_queue.put(("online", date_item, 0))
+            processing_queue.put(ProcessingItem(mode="online", month_datetime=date_item, retry_count=0))
 
     if items_to_process_count == 0:
         logger.info(f"No items to process for mode: {operation_mode}. Exiting.")
