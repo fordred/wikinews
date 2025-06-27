@@ -399,7 +399,8 @@ class TestWorkerFunction:
         mocker.patch("wikipedia_news_downloader.generate_jekyll_content", return_value="Jekyll content published: true")
         mock_save_news = mocker.patch("wikipedia_news_downloader.save_news")
 
-        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=temp_html_input_dir)
+        # Pass mock_markitdown_converter to worker (now 4th arg)
+        worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, temp_html_input_dir)
 
         mock_markitdown_converter.convert.assert_called_once_with(html_file_path)
         mock_save_news.assert_called_once()
@@ -421,7 +422,8 @@ class TestWorkerFunction:
         mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
         # Path.exists will default to False for a non-existent file if not mocked, which is what we want to test
 
-        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=temp_html_input_dir)
+        # Pass mock_markitdown_converter to worker (now 4th arg)
+        worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, temp_html_input_dir)
 
         expected_file_path = Path(temp_html_input_dir) / "february_2024.html"
         mock_logger.error.assert_any_call(f"Offline mode: Source HTML file not found at {expected_file_path}. Skipping.")
@@ -447,7 +449,8 @@ class TestWorkerFunction:
         mocker.patch("wikipedia_news_downloader.generate_jekyll_content", return_value="Jekyll content published: true")
         mock_save_news = mocker.patch("wikipedia_news_downloader.save_news")
 
-        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
+        # Pass mock_markitdown_converter to worker (now 4th arg, local_html_input_dir is None)
+        worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, None)
 
         expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
         mock_markitdown_converter.convert.assert_called_once_with(expected_url)
@@ -475,7 +478,8 @@ class TestWorkerFunction:
         mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
         mocker.patch("time.sleep")  # Mock time.sleep to avoid delays
 
-        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
+        # Pass mock_markitdown_converter to worker (now 4th arg, local_html_input_dir is None)
+        worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, None)
 
         expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
         mock_markitdown_converter.convert.assert_called_once_with(expected_url)
@@ -513,7 +517,8 @@ class TestWorkerFunction:
         mocker.patch("wikipedia_news_downloader.generate_jekyll_content", return_value="Jekyll content published: true")
         mocker.patch("wikipedia_news_downloader.save_news")
 
-        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
+        # Pass mock_markitdown_converter to worker (now 4th arg, local_html_input_dir is None)
+        worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, None)
 
         expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
         # Since MarkItDown.convert is mocked, session retry is bypassed. Convert is called once.
@@ -551,7 +556,8 @@ class TestWorkerFunction:
         # For now, assume Retry's internal delays are acceptable or will be handled if tests become too slow.
         mocker.patch("time.sleep")
 
-        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
+        # Pass mock_markitdown_converter to worker (now 4th arg, local_html_input_dir is None)
+        worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, None)
 
         expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
         # Since MarkItDown.convert is mocked, session retry is bypassed. Convert is called once.
@@ -596,7 +602,8 @@ class TestWorkerFunction:
 
         mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
 
-        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=temp_html_input_dir)
+        # Pass mock_markitdown_converter to worker (now 4th arg)
+        worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, temp_html_input_dir)
 
         mock_markitdown_converter.convert.assert_called_once_with(html_file_path)
         mock_logger.exception.assert_any_call(
@@ -626,7 +633,8 @@ class TestWorkerFunction:
         mock_generate_jekyll = mocker.patch("wikipedia_news_downloader.generate_jekyll_content")
         mock_save_news = mocker.patch("wikipedia_news_downloader.save_news")
 
-        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
+        # Pass mock_markitdown_converter as 4th arg, local_html_input_dir is 5th (None)
+        worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, None)
 
         expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
         mock_markitdown_converter.convert.assert_called_once_with(expected_url) # Called once
@@ -658,8 +666,9 @@ class TestWorkerFunction:
         mock_queue.get.side_effect = [("unknown_mode", month_dt), queue.Empty] # Retries removed
 
         mocker.patch("wikipedia_news_downloader.MarkItDown")  # Won't be used
-
-        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
+        # For this test, worker doesn't get far enough to use md_converter, so passing a simple MagicMock or None
+        # if the type hint allows. mock_markitdown_converter from fixture will do.
+        worker(mock_queue, temp_output_dir, mock_logger, None, mock_markitdown_converter)
 
         mock_logger.error.assert_any_call(f"Unknown mode in queue item: unknown_mode. Item: {('unknown_mode', month_dt)}. Skipping.")
         mock_queue.task_done.assert_called_once()
@@ -678,7 +687,8 @@ class TestWorkerFunction:
 
         # Crucially, local_html_input_dir is None, which should trigger the "cannot process offline mode" error path.
         # This happens before source_uri would be checked.
-        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
+        # md_converter (4th arg) is not used if local_html_input_dir (5th arg) is None for offline mode.
+        worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, None)
 
         mock_logger.error.assert_any_call("Cannot process offline mode: local_html_input_dir not provided to worker.")
         # The more specific "Source URI not set" error shouldn't be hit in this case due to the early exit.
@@ -700,7 +710,8 @@ class TestWorkerFunction:
         mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
         mock_split_clean = mocker.patch("wikipedia_news_downloader.split_and_clean_monthly_markdown")
 
-        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
+        # Pass mock_markitdown_converter to worker (now 4th arg, local_html_input_dir is None)
+        worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, None)
 
         expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
         mock_markitdown_converter.convert.assert_called_once_with(expected_url)
@@ -726,7 +737,8 @@ class TestWorkerFunction:
         mocker.patch("wikipedia_news_downloader.split_and_clean_monthly_markdown", return_value=[])  # No events
         mock_generate_jekyll = mocker.patch("wikipedia_news_downloader.generate_jekyll_content")
 
-        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
+        # Pass mock_markitdown_converter to worker (now 4th arg, local_html_input_dir is None)
+        worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, None)
 
         mock_logger.warning.assert_any_call(
             f"No daily events found or extracted for {month_dt.strftime('%B_%Y')} (month_dt: {month_dt.strftime('%Y-%B')}).",
@@ -755,7 +767,8 @@ class TestWorkerFunction:
         mock_markitdown_converter.convert.side_effect = simulated_error
         mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
 
-        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=temp_html_input_dir)
+        # Pass mock_markitdown_converter to worker (now 4th arg)
+        worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, temp_html_input_dir)
 
         mock_markitdown_converter.convert.assert_called_once_with(html_file_path)
 
@@ -790,8 +803,8 @@ class TestWorkerFunction:
         mock_generate_jekyll = mocker.patch("wikipedia_news_downloader.generate_jekyll_content")
         mock_save_news = mocker.patch("wikipedia_news_downloader.save_news")
 
-
-        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
+        # Pass mock_markitdown_converter to worker (now 4th arg, local_html_input_dir is None)
+        worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, None)
 
         expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
         mock_markitdown_converter.convert.assert_called_once_with(expected_url) # Called once
@@ -838,7 +851,8 @@ class TestWorkerFunction:
         mock_generate_jekyll = mocker.patch("wikipedia_news_downloader.generate_jekyll_content")
         mock_save_news = mocker.patch("wikipedia_news_downloader.save_news")
 
-        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
+        # Pass mock_markitdown_converter as 4th arg, local_html_input_dir is 5th (None)
+        worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, None)
 
         expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
         mock_markitdown_converter.convert.assert_called_once_with(expected_url)
@@ -891,8 +905,8 @@ class TestWorkerFunction:
         mock_time_sleep = mocker.patch("time.sleep")
         mock_save_news = mocker.patch("wikipedia_news_downloader.save_news")
 
-
-        worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
+        # Pass mock_markitdown_converter to worker (now 4th arg, local_html_input_dir is None)
+        worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, None)
 
         expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
         mock_markitdown_converter.convert.assert_called_once_with(expected_url)
