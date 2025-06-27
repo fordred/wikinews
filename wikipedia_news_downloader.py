@@ -241,12 +241,12 @@ def worker(
     processing_queue: queue.Queue[StructuredQueueItem],
     output_dir: str,
     logger: logging.Logger,
+    md_converter: MarkItDown,  # Moved before parameter with default
     local_html_input_dir: str | None = None,
 ) -> None:
-    # Create a session for each worker thread.
-    # If MarkItDown becomes thread-safe with a shared session, this can be moved outside.
-    requests_session = create_requests_session()
-    md_converter = MarkItDown(requests_session=requests_session)  # Pass session to MarkItDown
+    # These lines are removed as md_converter is now passed in:
+    # requests_session = create_requests_session()
+    # md_converter = MarkItDown(requests_session=requests_session)
 
     while True:
         try:
@@ -464,9 +464,23 @@ def main(
         f"Using up to {resolved_num_workers} worker thread(s).",
     )
 
+    # Create shared session and MarkItDown instance
+    # Assuming MarkItDown and its use of requests.Session is thread-safe
+    shared_requests_session = create_requests_session()
+    shared_md_converter = MarkItDown(requests_session=shared_requests_session)
+
     threads: list[threading.Thread] = []
     for _ in range(resolved_num_workers):  # Use resolved_num_workers here
-        t = threading.Thread(target=worker, args=(processing_queue, current_output_dir, logger, effective_local_html_input_dir_str))
+        t = threading.Thread(
+            target=worker,
+            args=(
+                processing_queue,
+                current_output_dir,
+                logger,
+                shared_md_converter,  # Moved before effective_local_html_input_dir_str
+                effective_local_html_input_dir_str,
+            ),
+        )
         t.start()
         threads.append(t)
 
