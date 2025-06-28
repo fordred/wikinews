@@ -8,11 +8,9 @@ from unittest.mock import MagicMock, patch  # For mocking MarkItDown conversion 
 import pytest
 import requests  # For requests.exceptions.RequestException
 
-from wikipedia_news.data_structures import DailyEvent, ProcessingItem
+from wikipedia_news.data_structures import Arguments, DailyEvent, ProcessingItem
 from wikipedia_news_downloader import (
-    BASE_WIKIPEDIA_URL,  # Import for use in tests
-    MIN_MARKDOWN_LENGTH_PUBLISH,
-    RETRY_MAX_ATTEMPTS,  # Import for use in tests
+    DEFAULT_CONFIG,  # Import for use in tests
     clean_daily_markdown_content,
     generate_jekyll_content,
     main,  # Import main for testing
@@ -325,7 +323,7 @@ def common_test_date() -> datetime:
 
 class TestGenerateJekyllContent:
     def test_correct_front_matter_and_published_true(self, common_test_date: datetime, mock_logger: MagicMock) -> None:
-        text_input = "This is a valid markdown body.\n" + ("a" * MIN_MARKDOWN_LENGTH_PUBLISH)
+        text_input = "This is a valid markdown body.\n" + ("a" * DEFAULT_CONFIG.min_markdown_length_publish)
         expected_title = "2023 October 26"
         expected_date_format = "2023-10-26"
         daily_event = DailyEvent(date=common_test_date, content=text_input, source="test_source")
@@ -339,23 +337,23 @@ class TestGenerateJekyllContent:
         assert full_content.endswith("\n\n\n" + text_input)  # 3 blank lines then body
 
     def test_published_true_sufficient_body_length(self, common_test_date: datetime, mock_logger: MagicMock) -> None:
-        # Exactly MIN_MARKDOWN_LENGTH_PUBLISH
-        markdown_body = "a" * MIN_MARKDOWN_LENGTH_PUBLISH
+        # Exactly DEFAULT_CONFIG.min_markdown_length_publish
+        markdown_body = "a" * DEFAULT_CONFIG.min_markdown_length_publish
         daily_event = DailyEvent(date=common_test_date, content=markdown_body, source="test_source")
         full_content = generate_jekyll_content(daily_event, mock_logger)
         assert "published: true" in full_content
         assert full_content.endswith(markdown_body)
 
-        # More than MIN_MARKDOWN_LENGTH_PUBLISH
-        markdown_body_long = "a" * (MIN_MARKDOWN_LENGTH_PUBLISH + 10)
+        # More than DEFAULT_CONFIG.min_markdown_length_publish
+        markdown_body_long = "a" * (DEFAULT_CONFIG.min_markdown_length_publish + 10)
         daily_event_long = DailyEvent(date=common_test_date, content=markdown_body_long, source="test_source")
         full_content_long = generate_jekyll_content(daily_event_long, mock_logger)
         assert "published: true" in full_content_long
         assert full_content_long.endswith(markdown_body_long)
 
     def test_published_false_insufficient_body_length(self, common_test_date: datetime, mock_logger: MagicMock) -> None:
-        # Less than MIN_MARKDOWN_LENGTH_PUBLISH
-        markdown_body = "a" * max(0, MIN_MARKDOWN_LENGTH_PUBLISH - 1)
+        # Less than DEFAULT_CONFIG.min_markdown_length_publish
+        markdown_body = "a" * max(0, DEFAULT_CONFIG.min_markdown_length_publish - 1)
         daily_event = DailyEvent(date=common_test_date, content=markdown_body, source="test_source")
         full_content = generate_jekyll_content(daily_event, mock_logger)
         assert "published: false" in full_content
@@ -458,7 +456,7 @@ class TestWorkerFunction:
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
-        expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
+        expected_url = f"{DEFAULT_CONFIG.base_wikipedia_url}{month_dt.strftime('%B_%Y')}"
         mock_markitdown_converter.convert.assert_called_once_with(expected_url)
         mock_split_and_clean.assert_called_once_with(
             "Mocked markdown content", month_dt, f"online source for {month_dt.strftime('%B_%Y')}", mock_logger
@@ -489,7 +487,7 @@ class TestWorkerFunction:
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
-        expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
+        expected_url = f"{DEFAULT_CONFIG.base_wikipedia_url}{month_dt.strftime('%B_%Y')}"
         mock_markitdown_converter.convert.assert_called_once_with(expected_url)
         mock_logger.warning.assert_any_call(f"HTTP 404 Not Found for {expected_url} (online source for April_2024). Skipping.")
         mock_queue.put.assert_not_called()  # Should not re-queue for 404
@@ -529,7 +527,7 @@ class TestWorkerFunction:
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
-        expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
+        expected_url = f"{DEFAULT_CONFIG.base_wikipedia_url}{month_dt.strftime('%B_%Y')}"
         assert mock_markitdown_converter.convert.call_count == 2
         mock_markitdown_converter.convert.assert_any_call(expected_url)
         mock_logger.warning.assert_any_call(
@@ -553,7 +551,7 @@ class TestWorkerFunction:
 
         # Simulate getting the item multiple times for retries
         side_effects = [
-            ProcessingItem(mode="online", month_datetime=month_dt, retry_count=i) for i in range(RETRY_MAX_ATTEMPTS + 2)
+            ProcessingItem(mode="online", month_datetime=month_dt, retry_count=i) for i in range(DEFAULT_CONFIG.retry_max_attempts + 2)
         ]
         side_effects.append(queue.Empty)
         mock_queue.get.side_effect = side_effects
@@ -566,24 +564,24 @@ class TestWorkerFunction:
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
-        expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
-        # Called once for initial, plus RETRY_MAX_ATTEMPTS times for retries before giving up
-        assert mock_markitdown_converter.convert.call_count == RETRY_MAX_ATTEMPTS + 1
+        expected_url = f"{DEFAULT_CONFIG.base_wikipedia_url}{month_dt.strftime('%B_%Y')}"
+        # Called once for initial, plus DEFAULT_CONFIG.retry_max_attempts times for retries before giving up
+        assert mock_markitdown_converter.convert.call_count == DEFAULT_CONFIG.retry_max_attempts + 1
 
         # Check that it logged warnings for retries
-        for i in range(RETRY_MAX_ATTEMPTS + 1):
+        for i in range(DEFAULT_CONFIG.retry_max_attempts + 1):
             mock_logger.warning.assert_any_call(
                 f"Request error fetching {expected_url} (online source for June_2024): {error}. Retrying (attempt {i + 1}).",
             )
 
         # Check that it logged error for exceeding max retries
-        mock_logger.error.assert_any_call(f"Exceeded max retries ({RETRY_MAX_ATTEMPTS}) for online source for June_2024")
+        mock_logger.error.assert_any_call(f"Exceeded max retries ({DEFAULT_CONFIG.retry_max_attempts}) for online source for June_2024")
 
         # Check that it tried to put items back on queue for retries
-        assert mock_queue.put.call_count == RETRY_MAX_ATTEMPTS + 1
+        assert mock_queue.put.call_count == DEFAULT_CONFIG.retry_max_attempts + 1
 
         # task_done should be called for each attempt that was processed from the queue
-        assert mock_queue.task_done.call_count == RETRY_MAX_ATTEMPTS + 2
+        assert mock_queue.task_done.call_count == DEFAULT_CONFIG.retry_max_attempts + 2
 
     def test_offline_mode_generic_exception_on_convert(  # E501 too long
         self,
@@ -646,7 +644,7 @@ class TestWorkerFunction:
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
-        expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
+        expected_url = f"{DEFAULT_CONFIG.base_wikipedia_url}{month_dt.strftime('%B_%Y')}"
         assert mock_markitdown_converter.convert.call_count == 2
         mock_logger.exception.assert_any_call(
             f"Error during content conversion or processing for {expected_url} "
@@ -712,7 +710,7 @@ class TestWorkerFunction:
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
-        expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
+        expected_url = f"{DEFAULT_CONFIG.base_wikipedia_url}{month_dt.strftime('%B_%Y')}"
         mock_markitdown_converter.convert.assert_called_once_with(expected_url)
         mock_logger.warning.assert_any_call(
             f"No content extracted for {month_dt.strftime('%B_%Y')} (mode: online). Skipping further processing.",
@@ -796,7 +794,7 @@ class TestWorkerFunction:
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
-        expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
+        expected_url = f"{DEFAULT_CONFIG.base_wikipedia_url}{month_dt.strftime('%B_%Y')}"
         mock_markitdown_converter.convert.assert_called_once_with(expected_url)
         mock_logger.exception.assert_any_call(
             f"Error during content conversion or processing for {expected_url} "
@@ -835,7 +833,7 @@ class TestWorkerFunction:
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
-        expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
+        expected_url = f"{DEFAULT_CONFIG.base_wikipedia_url}{month_dt.strftime('%B_%Y')}"
         mock_markitdown_converter.convert.assert_called_once_with(expected_url)
         mock_split_clean.assert_called_once_with(
             "Some dummy markdown", month_dt, f"online source for {month_dt.strftime('%B_%Y')}", mock_logger
@@ -885,7 +883,7 @@ class TestWorkerFunction:
 
         worker(mock_queue, temp_output_dir, mock_logger, local_html_input_dir=None)
 
-        expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
+        expected_url = f"{DEFAULT_CONFIG.base_wikipedia_url}{month_dt.strftime('%B_%Y')}"
         mock_markitdown_converter.convert.assert_called_once_with(expected_url)
         mock_split_clean.assert_called_once_with(
             "Some dummy markdown", month_dt, f"online source for {month_dt.strftime('%B_%Y')}", mock_logger
@@ -951,9 +949,7 @@ class TestMainFunctionLogging:
             mock_queue_class.return_value = mock_queue_instance
 
             main(
-                output_dir_str="dummy_output",
-                verbose=False,
-                num_workers=1,
+                args=Arguments(output_dir="dummy_output", verbose=False, workers=1, local_html_dir=None),
                 local_html_files_list=[dummy_file_path],
                 logger=mock_custom_logger,
             )
@@ -1001,7 +997,11 @@ class TestMainFunctionLogging:
             mock_queue_instance.qsize.return_value = 1
             mock_queue_class.return_value = mock_queue_instance
 
-            main(output_dir_str="dummy_output_default", verbose=False, num_workers=1, local_html_files_list=[dummy_file_path], logger=None)
+            main(
+                args=Arguments(output_dir="dummy_output_default", verbose=False, workers=1, local_html_dir=None),
+                local_html_files_list=[dummy_file_path],
+                logger=None,
+            )
 
         mock_setup_logging.assert_called_once_with(False)
         expected_parent_dir_str = str(mock_parent_dir)

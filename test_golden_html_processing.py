@@ -3,6 +3,8 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
+from wikipedia_news.data_structures import Arguments
+
 import pytest
 
 # Import the refactored main and other necessary components
@@ -68,10 +70,14 @@ def test_html_processing_with_refactored_main() -> None:
             # or adjust main to accept more direct params. For now, using its CLI defaults for other args.
             # The refactored `main` uses its own `setup_logging` based on its `args.verbose`.
             # We pass the `local_html_files` list directly.
+            args = Arguments(
+                output_dir=str(temp_output_dir),
+                verbose=False,
+                workers=None,
+                local_html_dir=None,  # Not used by main when local_html_files_list is provided
+            )
             wikipedia_main(
-                output_dir_str=str(temp_output_dir),
-                verbose=False,  # Tests typically don't need verbose output from the script itself
-                num_workers=None,  # Use default worker logic (or 1 for deterministic testing if issues arise)
+                args=args,
                 local_html_files_list=golden_html_files,
                 logger=logger,
             )

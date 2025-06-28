@@ -13,16 +13,17 @@ from pathlib import Path
 import requests  # Import requests to catch its exceptions
 from markitdown import MarkItDown
 
-from wikipedia_news.data_structures import DailyEvent, ProcessingItem
+from wikipedia_news.data_structures import Arguments, Config, DailyEvent, ProcessingItem
 
-# --- Constants ---
-BASE_WIKIPEDIA_URL = "https://en.m.wikipedia.org/wiki/Portal:Current_events/"
-DEFAULT_OUTPUT_DIR = "./docs/_posts/"
-LOG_FILE = "wikipedia_news_downloader.log"
-RETRY_MAX_ATTEMPTS = 5
-RETRY_BASE_WAIT_SECONDS = 20  # Start wait time for retries
-MIN_MARKDOWN_LENGTH_PUBLISH = 10  # Minimum length to consider content valid for publishing
-# --- End Constants ---
+# Initialize Config dataclass with default values
+DEFAULT_CONFIG = Config(
+    base_wikipedia_url="https://en.m.wikipedia.org/wiki/Portal:Current_events/",
+    default_output_dir="./docs/_posts/",
+    log_file="wikipedia_news_downloader.log",
+    retry_max_attempts=5,
+    retry_base_wait_seconds=20,
+    min_markdown_length_publish=10,
+)
 
 # Precompiled regex patterns
 RELATIVE_WIKI_LINK_RE = re.compile(r"\(/wiki/")
@@ -42,7 +43,7 @@ def setup_logging(verbose: bool = False) -> logging.Logger:
         format="%(asctime)s - %(levelname)s: %(message)s",
         handlers=[
             logging.StreamHandler(sys.stdout),
-            logging.FileHandler(LOG_FILE, mode="w"),
+            logging.FileHandler(DEFAULT_CONFIG.log_file, mode="w"),
         ],
     )
     return logging.getLogger(__name__)
@@ -190,7 +191,7 @@ def generate_jekyll_content(daily_event: DailyEvent, logger: logging.Logger) -> 
     Returns the full content string, or None if markdown_body is invalid.
     """
     # Determine published status based on markdown content
-    is_published = len(daily_event.content) >= MIN_MARKDOWN_LENGTH_PUBLISH
+    is_published = len(daily_event.content) >= DEFAULT_CONFIG.min_markdown_length_publish
 
     if not is_published:
         logger.warning(f"Markdown for {daily_event.date.strftime('%Y-%m-%d')} is too short ({len(daily_event.content)=}). Setting published: false.")
@@ -256,12 +257,12 @@ def worker(
             source_name = f"online source for {source_name_suffix}"
             logger.info(f"Processing in online mode for {item.month_datetime.strftime('%Y-%B')} (attempt {item.retry_count + 1})")
 
-            if item.retry_count > RETRY_MAX_ATTEMPTS:
-                logger.error(f"Exceeded max retries ({RETRY_MAX_ATTEMPTS}) for {source_name}")
+            if item.retry_count > DEFAULT_CONFIG.retry_max_attempts:
+                logger.error(f"Exceeded max retries ({DEFAULT_CONFIG.retry_max_attempts}) for {source_name}")
                 processing_queue.task_done()
                 continue
 
-            url = f"{BASE_WIKIPEDIA_URL}{source_name_suffix}"
+            url = f"{DEFAULT_CONFIG.base_wikipedia_url}{source_name_suffix}"
             source_uri = url  # Set source_uri to the URL for online mode
             logger.debug(f"Online mode: Source URI set to {source_uri}")
 
@@ -311,7 +312,7 @@ def worker(
                     logger.warning(f"HTTP 404 Not Found for {url_for_error} ({source_name}). Skipping.")
                 else:
                     logger.warning(f"Request error fetching {url_for_error} ({source_name}): {e}. Retrying (attempt {item.retry_count + 1}).")
-                    time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**item.retry_count))
+                    time.sleep(DEFAULT_CONFIG.retry_base_wait_seconds / 2 * (2**item.retry_count))
                     processing_queue.put(ProcessingItem(item.mode, item.month_datetime, item.retry_count + 1))
             else:  # Should not be a RequestException in offline mode if source_uri is Path
                 logger.exception(f"Unexpected requests.exceptions.RequestException for {source_uri} in {item.mode} mode")
@@ -324,7 +325,7 @@ def worker(
             )
             if item.mode == "online":  # Decide if retry is appropriate for non-network errors in online mode
                 # For now, retry as per previous logic for generic exceptions in online mode
-                time.sleep(RETRY_BASE_WAIT_SECONDS / 2 * (2**item.retry_count))
+                time.sleep(DEFAULT_CONFIG.retry_base_wait_seconds / 2 * (2**item.retry_count))
                 processing_queue.put(ProcessingItem(item.mode, item.month_datetime, item.retry_count + 1))
             # For offline mode, a general exception here usually means a conversion problem with the local file.
             # No retry logic for offline mode post-conversion attempt.
@@ -334,7 +335,7 @@ def worker(
             processing_queue.task_done()
 
 
-def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
+def parse_arguments(argv: list[str] | None = None) -> Arguments:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(description="Download Wikipedia News")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose logging")
@@ -348,8 +349,8 @@ def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
         "-o",
         "--output-dir",
         type=str,
-        default=DEFAULT_OUTPUT_DIR,
-        help=f"Directory to save markdown files (default: {DEFAULT_OUTPUT_DIR}).",
+        default=DEFAULT_CONFIG.default_output_dir,
+        help=f"Directory to save markdown files (default: {DEFAULT_CONFIG.default_output_dir}).",
     )
     parser.add_argument(
         "-w",
@@ -358,22 +359,26 @@ def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Maximum number of concurrent download workers.",
     )
-    return parser.parse_args(argv)
+    args = parser.parse_args(argv)
+    return Arguments(
+        verbose=args.verbose,
+        local_html_dir=str(args.local_html_dir) if args.local_html_dir else None,
+        output_dir=args.output_dir,
+        workers=args.workers,
+    )
 
 
 def main(
-    output_dir_str: str,
-    verbose: bool,
-    num_workers: int | None,
+    args: Arguments,
     local_html_files_list: list[Path] | None,
     logger: logging.Logger | None = None,
 ) -> None:
     # Setup logging based on the verbose parameter
     if logger is None:
-        logger = setup_logging(verbose)
+        logger = setup_logging(args.verbose)
 
     # Use output_dir_str directly
-    current_output_dir = output_dir_str
+    current_output_dir = args.output_dir
     Path(current_output_dir).mkdir(parents=True, exist_ok=True)
 
     processing_queue: queue.Queue[ProcessingItem] = queue.Queue()
@@ -425,7 +430,7 @@ def main(
         return
 
     # Use num_workers parameter for determining number of threads
-    resolved_num_workers = num_workers if num_workers is not None else min(8, items_to_process_count)
+    resolved_num_workers = args.workers if args.workers is not None else min(8, items_to_process_count)
     if items_to_process_count > 0 and resolved_num_workers == 0:  # Ensure at least one worker if items exist
         resolved_num_workers = 1
     elif items_to_process_count == 0:
@@ -453,25 +458,23 @@ def main(
 
 
 if __name__ == "__main__":
-    args = parse_arguments()
-    logger = setup_logging(args.verbose)  # Setup logger here for potential early exit messages
+    parsed_args = parse_arguments()
+    logger = setup_logging(parsed_args.verbose)  # Setup logger here for potential early exit messages
     html_files_to_pass = None
 
-    if args.local_html_dir:
-        local_dir_path = Path(args.local_html_dir)
+    if parsed_args.local_html_dir:
+        local_dir_path = Path(parsed_args.local_html_dir)
         if not local_dir_path.is_dir():
-            logger.error(f"Provided local HTML directory is not a valid directory: {args.local_html_dir}")
+            logger.error(f"Provided local HTML directory is not a valid directory: {parsed_args.local_html_dir}")
             sys.exit(1)  # Exit early
         html_files_to_pass = list(local_dir_path.glob("*.html"))
         if not html_files_to_pass:
-            logger.info(f"No *.html files found in {args.local_html_dir}. Proceeding without local HTML files from this directory.")
+            logger.info(f"No *.html files found in {parsed_args.local_html_dir}. Proceeding without local HTML files from this directory.")
         else:
-            logger.info(f"Found {len(html_files_to_pass)} HTML file(s) in {args.local_html_dir}.")
+            logger.info(f"Found {len(html_files_to_pass)} HTML file(s) in {parsed_args.local_html_dir}.")
 
     main(
-        output_dir_str=args.output_dir,
-        verbose=args.verbose,
-        num_workers=args.workers,
+        args=parsed_args,
         local_html_files_list=html_files_to_pass,
         logger=logger,  # Pass the logger instance here
     )
