@@ -2231,7 +2231,7 @@ Retrieved from "<https://en.wikipedia.org/w/index.php?title=Portal:Current_event
 
 ![Wikipedia](/static/images/mobile/copyright/wikipedia-wordmark-en.svg)
 
-* This page was last edited on 21 March 2025, at 14:47 (UTC). -
+* This page was last edited on 21 March 2025, at 14:47 (UTC).
 * Content is available under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.en) unless otherwise noted.
 
 * [Privacy policy](https://foundation.wikimedia.org/wiki/Special%3AMyLanguage/Policy%3APrivacy_policy)

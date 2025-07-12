@@ -1229,8 +1229,7 @@ February 22, 2025 (2025-02-22) (Saturday)
 * [Real Plaza Trujillo roof collapse](/wiki/Real_Plaza_Trujillo_roof_collapse "Real Plaza Trujillo roof collapse")
   + The death toll following the [structural collapse](/wiki/Structural_integrity_and_failure "Structural integrity and failure") of a metal roof of the [Real Plaza Trujillo](/wiki/Real_Plaza_Trujillo "Real Plaza Trujillo") in [Trujillo](/wiki/Trujillo%2C_Peru "Trujillo, Peru"), [Peru](/wiki/Peru "Peru"), rises to eight. The [La Libertad](/wiki/Department_of_La_Libertad "Department of La Libertad") government announces a period of mourning from February 22–23. [(*La Republica*)](https://larepublica.pe/sociedad/2025/02/21/colapsa-techo-de-real-plaza-en-trujillo-en-vivo-reporte-de-heridos-y-ultimas-noticias-segun-coer-1782711)
 * A bus carrying passengers to a wedding ceremony overturns in Ranhghati, [Rajasthan](/wiki/Rajasthan "Rajasthan"), [India](/wiki/India "India"), killing two people and injuring 30 others. [(*The Times of India*)](https://timesofindia.indiatimes.com/city/jaipur/two-dead-30-injured-as-bus-overturns/articleshow/118487309.cms)
-* A bus crashed into a petrol tanker in [Niger State](/wiki/Niger_State "Niger State"), killing 14 and injuring six.[[3]](#cite_note-3)
-* An SUV crashed into a truck near [Dhanbad](/wiki/Dhanbad "Dhanbad") while traveling to the 2025 [Prayag Maha Kumbh Mela](/w/index.php?title=Prayag_Maha_Kumbh_Mela&action=edit&redlink=1 "Prayag Maha Kumbh Mela (page does not exist)"), killing six and injuring two.[[4]](#cite_note-4)
+* A bus crashed into a petrol tanker in [Niger State](/wiki/Niger_State "Niger State"), killing 14 and injuring six. [(ARAB NEWS)](https://www.arabnews.com/node/2591303/world)
 
 **International relations**
 
@@ -1962,8 +1961,6 @@ Wikimedia Commons has media related to [February 2025](https://commons.wikimedia
 
 1. **[^](#cite_ref-1)** <https://www.bbc.co.uk/news/articles/c9d527zg38xo>
 2. **[^](#cite_ref-2)** <https://apnews.com/article/bus-accident-deaths-0b2dbdba71e232efbb7c70f4f117eeec>
-3. **[^](#cite_ref-3)** [https://en.wikipedia.org/wiki/List\_of\_traffic\_collisions\_(2000%E2%80%93present)#cite\_note-715](https://en.wikipedia.org/wiki/List_of_traffic_collisions_%282000%E2%80%93present%29#cite_note-715)
-4. **[^](#cite_ref-4)** [https://en.wikipedia.org/wiki/List\_of\_traffic\_collisions\_(2000%E2%80%93present)#cite\_note-716](https://en.wikipedia.org/wiki/List_of_traffic_collisions_%282000%E2%80%93present%29#cite_note-716)
 
 ![](https://en.m.wikipedia.org/wiki/Special:CentralAutoLogin/start?type=1x1&usesul3=1)
 
