@@ -658,6 +658,7 @@ class TestWorkerFunction:
         self,
         mock_logger: MagicMock,
         mock_queue: MagicMock,
+        mock_markitdown_converter: MagicMock,  # Added fixture injection
         temp_output_dir: str,
         mocker: Any,
     ) -> None:
@@ -665,9 +666,9 @@ class TestWorkerFunction:
         mock_queue.get.side_effect = [("unknown_mode", month_dt), queue.Empty] # Retries removed
 
         mocker.patch("wikipedia_news_downloader.MarkItDown")  # Won't be used
-        # For this test, worker doesn't get far enough to use md_converter, so passing a simple MagicMock or None
-        # if the type hint allows. mock_markitdown_converter from fixture will do.
-        worker(mock_queue, temp_output_dir, mock_logger, None, mock_markitdown_converter)
+        # For this test, worker doesn't get far enough to use md_converter.
+        # Pass the injected mock_markitdown_converter as the 4th arg, and None as the 5th.
+        worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, None)
 
         mock_logger.error.assert_any_call(f"Unknown mode in queue item: unknown_mode. Item: {('unknown_mode', month_dt)}. Skipping.")
         mock_queue.task_done.assert_called_once()
@@ -676,6 +677,7 @@ class TestWorkerFunction:
         self,
         mock_logger: MagicMock,
         mock_queue: MagicMock,
+        mock_markitdown_converter: MagicMock,  # Added fixture injection
         temp_output_dir: str,
         mocker: Any,
     ) -> None:
@@ -687,6 +689,7 @@ class TestWorkerFunction:
         # Crucially, local_html_input_dir is None, which should trigger the "cannot process offline mode" error path.
         # This happens before source_uri would be checked.
         # md_converter (4th arg) is not used if local_html_input_dir (5th arg) is None for offline mode.
+        # Pass the injected mock_markitdown_converter as the 4th arg.
         worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, None)
 
         mock_logger.error.assert_any_call("Cannot process offline mode: local_html_input_dir not provided to worker.")

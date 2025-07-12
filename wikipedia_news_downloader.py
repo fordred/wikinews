@@ -12,7 +12,7 @@ from pathlib import Path
 import requests  # Import requests to catch its exceptions
 from markitdown import MarkItDown
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+from urllib3.util.retry import Retry
 
 # --- Constants ---
 BASE_WIKIPEDIA_URL = "https://en.m.wikipedia.org/wiki/Portal:Current_events/"

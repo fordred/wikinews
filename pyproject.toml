@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11,<3.14"
 dependencies = [
     "markitdown",
+    "urllib3",
 ]
 
 [dependency-groups]
