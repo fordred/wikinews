@@ -51,7 +51,10 @@ def test_html_processing_with_refactored_main() -> None:
         except Exception as e:
             pytest.fail(f"Could not parse month/year from golden HTML file {html_file.name}: {e}")
 
-    with tempfile.TemporaryDirectory(delete=True) as temp_dir_name:
+    # For debugging, it can be useful to prevent the temporary directory from being deleted
+    # by passing `delete=False` to TemporaryDirectory (available in Python 3.12+).
+    # However, for automated tests, we want the cleanup to happen.
+    with tempfile.TemporaryDirectory() as temp_dir_name:
         temp_output_dir = Path(temp_dir_name)
 
         logger.info(f"Running wikipedia_main with local HTML files: {golden_html_files}")
