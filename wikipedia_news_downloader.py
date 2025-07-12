@@ -6,14 +6,13 @@ import queue
 import re
 import sys
 import threading
-import time  # Import time at the top level
 from datetime import datetime
 from pathlib import Path
 
 import requests  # Import requests to catch its exceptions
+from markitdown import MarkItDown
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
-from markitdown import MarkItDown
 
 # --- Constants ---
 BASE_WIKIPEDIA_URL = "https://en.m.wikipedia.org/wiki/Portal:Current_events/"
@@ -36,12 +35,12 @@ def create_requests_session() -> requests.Session:
         total=RETRY_MAX_ATTEMPTS,
         backoff_factor=1,  # Adjusted from RETRY_BASE_WAIT_SECONDS to fit Retry's backoff_factor logic
         status_forcelist=[429, 500, 502, 503, 504],
-        allowed_methods=["HEAD", "GET", "OPTIONS"]
+        allowed_methods=["HEAD", "GET", "OPTIONS"],
     )
     adapter = HTTPAdapter(
         pool_connections=10,  # Default is 10
-        pool_maxsize=10,    # Default is 10
-        max_retries=retry_strategy
+        pool_maxsize=10,  # Default is 10
+        max_retries=retry_strategy,
     )
     session.mount("http://", adapter)
     session.mount("https://", adapter)
@@ -244,13 +243,9 @@ def worker(
     md_converter: MarkItDown,  # Moved before parameter with default
     local_html_input_dir: str | None = None,
 ) -> None:
-    # These lines are removed as md_converter is now passed in:
-    # requests_session = create_requests_session()
-    # md_converter = MarkItDown(requests_session=requests_session)
-
     while True:
         try:
-            mode, month_dt = processing_queue.get(timeout=2) # Retries removed
+            mode, month_dt = processing_queue.get(timeout=2)  # Retries removed
         except queue.Empty:
             break  # No more items to process
 
@@ -293,7 +288,7 @@ def worker(
             logger.debug(f"Online mode: Source URI set to {source_uri}")
 
         else:  # Should not happen if queue is populated correctly
-            logger.error(f"Unknown mode in queue item: {mode}. Item: {(mode, month_dt)}. Skipping.") # retries removed from log
+            logger.error(f"Unknown mode in queue item: {mode}. Item: {(mode, month_dt)}. Skipping.")  # retries removed from log
             processing_queue.task_done()
             continue
 
@@ -421,7 +416,7 @@ def main(
                     year = int(name_parts[1])
                     month_number = MONTH_NAME_TO_NUMBER[month_name]
                     month_datetime_obj = datetime(year, month_number, 1)
-                    processing_queue.put(("offline", month_datetime_obj)) # Retry count removed
+                    processing_queue.put(("offline", month_datetime_obj))  # Retry count removed
                 except (IndexError, KeyError, ValueError) as e:
                     logger.warning(f"Could not parse valid date from filename {file_path_obj.name}: {e}. Skipping.")
             else:
@@ -444,7 +439,7 @@ def main(
                 current_date = datetime(current_date.year, current_date.month + 1, 1)
         items_to_process_count = len(dates_set)
         for date_item in sorted(dates_set):
-            processing_queue.put(("online", date_item)) # Retry count removed
+            processing_queue.put(("online", date_item))  # Retry count removed
 
     if items_to_process_count == 0:
         logger.info(f"No items to process for mode: {operation_mode}. Exiting.")

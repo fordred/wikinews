@@ -11,7 +11,6 @@ import requests  # For requests.exceptions.RequestException
 from wikipedia_news_downloader import (
     BASE_WIKIPEDIA_URL,  # Import for use in tests
     MIN_MARKDOWN_LENGTH_PUBLISH,
-    RETRY_MAX_ATTEMPTS,  # Import for use in tests
     clean_daily_markdown_content,
     generate_jekyll_content,
     main,  # Import main for testing
@@ -525,7 +524,7 @@ class TestWorkerFunction:
         mock_markitdown_converter.convert.assert_called_once_with(expected_url)
 
         mock_logger.warning.assert_any_call(
-            f"HTTP 429 Too Many Requests for {expected_url} (online source for May_2024). Relying on session retry."
+            f"HTTP 429 Too Many Requests for {expected_url} (online source for May_2024). Relying on session retry.",
         )
         # Ensure no successful processing happened
         mocker.patch("wikipedia_news_downloader.split_and_clean_monthly_markdown").assert_not_called()
@@ -565,7 +564,7 @@ class TestWorkerFunction:
 
         # Check that it logged the warning about the error and relying on session retry.
         mock_logger.warning.assert_any_call(
-            f"Request error fetching {expected_url} (online source for June_2024): {error}. Relying on session retry."
+            f"Request error fetching {expected_url} (online source for June_2024): {error}. Relying on session retry.",
         )
 
         # Ensure "Exceeded max retries" log from worker is NOT present (session handles actual retries)
@@ -643,7 +642,7 @@ class TestWorkerFunction:
         logged_exception_message = False
         for call in mock_logger.exception.call_args_list:
             if f"Error during content conversion or processing for {expected_url}" in call.args[0] and \
-               f"(online source for August_2024, mode: online)" in call.args[0]: # Retry attempt info removed
+               "(online source for August_2024, mode: online)" in call.args[0]: # Retry attempt info removed
                 logged_exception_message = True
                 break
         assert logged_exception_message, "Generic exception was not logged correctly."
@@ -813,7 +812,7 @@ class TestWorkerFunction:
         logged_exception_message = False
         for call in mock_logger.exception.call_args_list:
             if f"Error during content conversion or processing for {expected_url}" in call.args[0] and \
-               f"(online source for August_2024, mode: online)" in call.args[0]: # Retry attempt info removed
+               "(online source for August_2024, mode: online)" in call.args[0]: # Retry attempt info removed
                 logged_exception_message = True
                 break
         assert logged_exception_message, "RuntimeError during conversion was not logged correctly."
@@ -862,7 +861,7 @@ class TestWorkerFunction:
         logged_exception_message = False
         for call in mock_logger.exception.call_args_list:
             if f"Error during content conversion or processing for {expected_url}" in call.args[0] and \
-               f"(online source for September_2024, mode: online)" in call.args[0]: # Retry info removed
+               "(online source for September_2024, mode: online)" in call.args[0]: # Retry info removed
                 logged_exception_message = True
                 break
         assert logged_exception_message, "Exception during split/clean was not logged correctly."
@@ -917,7 +916,7 @@ class TestWorkerFunction:
         logged_exception_message = False
         for call in mock_logger.exception.call_args_list:
             if f"Error during content conversion or processing for {expected_url}" in call.args[0] and \
-               f"(online source for October_2024, mode: online)" in call.args[0]: # Retry info removed
+               "(online source for October_2024, mode: online)" in call.args[0]: # Retry info removed
                 logged_exception_message = True
                 break
         assert logged_exception_message, "Exception during Jekyll generation was not logged correctly."

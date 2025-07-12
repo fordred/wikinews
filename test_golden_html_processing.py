@@ -51,7 +51,7 @@ def test_html_processing_with_refactored_main() -> None:
         except Exception as e:
             pytest.fail(f"Could not parse month/year from golden HTML file {html_file.name}: {e}")
 
-    with tempfile.TemporaryDirectory() as temp_dir_name:
+    with tempfile.TemporaryDirectory(delete=True) as temp_dir_name:
         temp_output_dir = Path(temp_dir_name)
 
         logger.info(f"Running wikipedia_main with local HTML files: {golden_html_files}")
