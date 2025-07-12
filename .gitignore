@@ -21,3 +21,4 @@ wikipedia_news_downloader.log
 .vscode/
 __pycache__
 *.code-workspace
+.coverage
