@@ -117,6 +117,7 @@ wheels = [
 name = "coverage"
 version = "7.10.3"
 source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f4/2c/253cc41cd0f40b84c1c34c5363e0407d73d4a1cae005fed6db3b823175bd/coverage-7.10.3.tar.gz", hash = "sha256:812ba9250532e4a823b070b0420a36499859542335af3dca8f47fc6aa1a05619", size = 822936, upload-time = "2025-08-10T21:27:39.968Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/87/04/810e506d7a19889c244d35199cbf3239a2f952b55580aa42ca4287409424/coverage-7.10.3-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:f2ff2e2afdf0d51b9b8301e542d9c21a8d084fd23d4c8ea2b3a1b3c96f5f7397", size = 216075, upload-time = "2025-08-10T21:25:39.891Z" },
     { url = "https://files.pythonhosted.org/packages/2e/50/6b3fbab034717b4af3060bdaea6b13dfdc6b1fad44b5082e2a95cd378a9a/coverage-7.10.3-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:18ecc5d1b9a8c570f6c9b808fa9a2b16836b3dd5414a6d467ae942208b095f85", size = 216476, upload-time = "2025-08-10T21:25:41.137Z" },
@@ -162,6 +163,7 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/d2/5c/6375e9d905da22ddea41cd85c30994b8b6f6c02e44e4c5744b76d16b026f/coverage-7.10.3-cp313-cp313t-win32.whl", hash = "sha256:cc0ee4b2ccd42cab7ee6be46d8a67d230cb33a0a7cd47a58b587a7063b6c6b0e", size = 219396, upload-time = "2025-08-10T21:26:39.426Z" },
     { url = "https://files.pythonhosted.org/packages/33/3b/7da37fd14412b8c8b6e73c3e7458fef6b1b05a37f990a9776f88e7740c89/coverage-7.10.3-cp313-cp313t-win_amd64.whl", hash = "sha256:03db599f213341e2960430984e04cf35fb179724e052a3ee627a068653cf4a7c", size = 220458, upload-time = "2025-08-10T21:26:40.905Z" },
     { url = "https://files.pythonhosted.org/packages/28/cc/59a9a70f17edab513c844ee7a5c63cf1057041a84cc725b46a51c6f8301b/coverage-7.10.3-cp313-cp313t-win_arm64.whl", hash = "sha256:46eae7893ba65f53c71284585a262f083ef71594f05ec5c85baf79c402369098", size = 218722, upload-time = "2025-08-10T21:26:42.362Z" },
+    { url = "https://files.pythonhosted.org/packages/84/19/e67f4ae24e232c7f713337f3f4f7c9c58afd0c02866fb07c7b9255a19ed7/coverage-7.10.3-py3-none-any.whl", hash = "sha256:416a8d74dc0adfd33944ba2f405897bab87b7e9e84a391e09d241956bd953ce1", size = 207921, upload-time = "2025-08-10T21:27:38.254Z" },
 ]
 
 [package.optional-dependencies]
