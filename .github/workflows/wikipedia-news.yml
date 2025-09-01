@@ -11,8 +11,8 @@ concurrency:
 
 jobs:
   download-news:
-    # runs-on: ubuntu-latest
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    # runs-on: self-hosted
 
     permissions:
       # Give the default GITHUB_TOKEN write permission to commit and push the added or changed files to the repository.
