@@ -1,3 +1,5 @@
+[ ]
+
 * [Home](/wiki/Main_Page)
 * [Random](/wiki/Special%3ARandom)
 * [Nearby](/wiki/Special%3ANearby)
@@ -98,6 +100,7 @@ February 1, 2025 (2025-02-01) (Saturday)
 **Disasters and accidents**
 
 * A fire at a [retirement home](/wiki/Retirement_home "Retirement home") in [Bouffémont](/wiki/Bouff%C3%A9mont "Bouffémont"), [Val-d'Oise](/wiki/Val-d%27Oise "Val-d'Oise"), [France](/wiki/France "France"), kills three people and leaves nine others injured. [(AP)](https://apnews.com/article/france-retirement-home-fire-6bc21440ee9b7be5feff24ff9bb4b45e)
+* Two buses collided on the [Benin–Ore–Sagamu Expressway](/wiki/Benin%E2%80%93Ore%E2%80%93Sagamu_Expressway "Benin–Ore–Sagamu Expressway") in [Odigbo](/wiki/Odigbo "Odigbo"), [Nigeria](/wiki/Nigeria "Nigeria") before catching fire, killing 30 and injuring two.[(PM News)](https://pmnewsnigeria.com/2025/02/02/30-burnt-to-death-in-deadly-ondo-road-crash/)
 
 **Law and crime**
 
@@ -125,6 +128,7 @@ February 2, 2025 (2025-02-02) (Sunday)
 
 * [2025 Queensland floods](/wiki/2025_Queensland_floods "2025 Queensland floods")
   + Two people are killed and thousands are forced to [evacuate](/wiki/Emergency_evacuation "Emergency evacuation") their homes in over 1,000 millimetres (39 in) of [flooding](/wiki/Flooding "Flooding") in [North Queensland](/wiki/North_Queensland "North Queensland"), [Australia](/wiki/Australia "Australia"). [(BBC News)](https://www.bbc.com/news/articles/cn4z2py8448o)
+* A bus carrying pilgrims fell into a gorge near [Saputara](/wiki/Saputara "Saputara"), [Gujarat](/wiki/Gujarat "Gujarat"), [India](/wiki/India "India"), killing five and injuring 35.[(The Times of India)](https://timesofindia.indiatimes.com/india/5-pilgrims-killed-35-hurt-as-bus-falls-into-gujarat-gorge/articleshow/117872392.cms)
 
 **International relations**
 
@@ -926,7 +930,7 @@ February 17, 2025 (2025-02-17) (Monday)
   + Twenty-one people are injured, including three critically when a [Delta Airlines](/wiki/Delta_Airlines "Delta Airlines") [Bombardier CRJ900LR](/wiki/Bombardier_CRJ700_series#CRJ900LR "Bombardier CRJ700 series"), crashes after catching fire and flipping over at [Toronto Pearson Airport](/wiki/Toronto_Pearson_Airport "Toronto Pearson Airport") in [Mississauga](/wiki/Mississauga "Mississauga"), [Ontario](/wiki/Ontario "Ontario"), [Canada](/wiki/Canada "Canada"). [(NPR)](https://www.npr.org/2025/02/18/nx-s1-5301003/toronto-plane-crash-delta-update) [(CBS News)](https://www.cbsnews.com/chicago/news/delta-plane-crash-toronto-pearson-airport-minneapolis-st-paul-international-airport/) [(Al Jazeera)](https://www.aljazeera.com/news/2025/2/17/at-least-eight-injured-as-delta-plane-flips-upon-arrival-in-toronto-airport)
 * [February 2025 North American storm complex](/wiki/February_2025_North_American_storm_complex "February 2025 North American storm complex")
   + Eight adults and one child are killed in [flooding](/wiki/Flooding "Flooding") caused by heavy rains in the [eastern United States](/wiki/Eastern_United_States "Eastern United States"). [(DW)](https://www.dw.com/en/us-heavy-rains-and-flooding-kill-9/a-71635101)
-* [2025 Yocalla bus crash](/wiki/2025_Yocalla_bus_crash "2025 Yocalla bus crash")
+* [2025 Yocalla bus crash](/w/index.php?title=2025_Yocalla_bus_crash&action=edit&redlink=1 "2025 Yocalla bus crash (page does not exist)")
   + A [bus](/wiki/Bus "Bus") crashes and falls 800 m (2,600 ft) down a [cliff](/wiki/Cliff "Cliff") in [Yocalla Municipality](/wiki/Yocalla_Municipality "Yocalla Municipality"), [Bolivia](/wiki/Bolivia "Bolivia"), killing 31 people and injuring fourteen others. [(Reuters)](https://www.reuters.com/world/americas/bus-crash-bolivia-kills-over-30-people-2025-02-17/)
 
 **International relations**
@@ -1896,7 +1900,7 @@ See also – [List of ongoing proxy wars](/wiki/List_of_ongoing_proxy_wars "List
 ### ***[Science and technology](/wiki/2025_in_science "2025 in science")***
 
 * [Archaeology](/wiki/2025_in_archaeology "2025 in archaeology")
-* [Biotechnology](/w/index.php?title=2025_in_biotechnology&action=edit&redlink=1 "2025 in biotechnology (page does not exist)")
+* [Biotechnology](/wiki/2025_in_biotechnology "2025 in biotechnology")
 * [Computing](/wiki/2025_in_computing "2025 in computing")
 * [Palaeontology](/wiki/2025_in_paleontology "2025 in paleontology")
 * [Quantum computing and communication](/wiki/2025_in_quantum_computing_and_communication "2025 in quantum computing and communication")
@@ -1935,11 +1939,11 @@ See also – [List of ongoing proxy wars](/wiki/List_of_ongoing_proxy_wars "List
 
 **2025** at Wikipedia's [sister projects](/wiki/Wikipedia%3AWikimedia_sister_projects "Wikipedia:Wikimedia sister projects")
 
-* ![](//upload.wikimedia.org/wikipedia/en/thumb/4/4a/Commons-logo.svg/20px-Commons-logo.svg.png) [Media](https://commons.wikimedia.org/wiki/Category%3A2025 "c:Category:2025") from Commons
-* ![](//upload.wikimedia.org/wikipedia/commons/thumb/2/24/Wikinews-logo.svg/40px-Wikinews-logo.svg.png) [News](https://en.wikinews.org/wiki/Special%3ASearch/Category%3A2025 "n:Special:Search/Category:2025") from Wikinews
-* ![](//upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Wikiquote-logo.svg/40px-Wikiquote-logo.svg.png) [Quotations](https://en.wikiquote.org/wiki/Category%3A2025 "q:Category:2025") from Wikiquote
-* ![](//upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Wikisource-logo.svg/40px-Wikisource-logo.svg.png) [Texts](https://en.wikisource.org/wiki/Category%3A2025_works "s:Category:2025 works") from Wikisource
-* ![](//upload.wikimedia.org/wikipedia/commons/thumb/d/df/Wikispecies-logo.svg/40px-Wikispecies-logo.svg.png) [Taxa](https://species.wikimedia.org/wiki/Category%3ANew_species_2025 "species:Category:New species 2025") from Wikispecies
+* [![](//upload.wikimedia.org/wikipedia/en/thumb/4/4a/Commons-logo.svg/20px-Commons-logo.svg.png)](/wiki/File%3ACommons-logo.svg)[Media](https://commons.wikimedia.org/wiki/Category%3A2025 "c:Category:2025") from Commons
+* [![](//upload.wikimedia.org/wikipedia/commons/thumb/2/24/Wikinews-logo.svg/40px-Wikinews-logo.svg.png)](/wiki/File%3AWikinews-logo.svg)[News](https://en.wikinews.org/wiki/Special%3ASearch/Category%3A2025 "n:Special:Search/Category:2025") from Wikinews
+* [![](//upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Wikiquote-logo.svg/40px-Wikiquote-logo.svg.png)](/wiki/File%3AWikiquote-logo.svg)[Quotations](https://en.wikiquote.org/wiki/Category%3A2025 "q:Category:2025") from Wikiquote
+* [![](//upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Wikisource-logo.svg/40px-Wikisource-logo.svg.png)](/wiki/File%3AWikisource-logo.svg)[Texts](https://en.wikisource.org/wiki/Category%3A2025_works "s:Category:2025 works") from Wikisource
+* [![](//upload.wikimedia.org/wikipedia/commons/thumb/d/df/Wikispecies-logo.svg/40px-Wikispecies-logo.svg.png)](/wiki/File%3AWikispecies-logo.svg)[Taxa](https://species.wikimedia.org/wiki/Category%3ANew_species_2025 "species:Category:New species 2025") from Wikispecies
 * ![](//upload.wikimedia.org/wikipedia/commons/thumb/7/75/Wikimedia_Community_Logo.svg/40px-Wikimedia_Community_Logo.svg.png) [Discussions](https://meta.wikimedia.org/wiki/Special%3ASearch/Category%3A2025 "m:Special:Search/Category:2025") from Meta-Wiki
 
 [...more](/wiki/Category%3A2025 "Category:2025")
@@ -1952,7 +1956,7 @@ Wikimedia Commons has media related to [February 2025](https://commons.wikimedia
 
 | * [v](/wiki/Template%3AEvents_by_month_links "Template:Events by month links") * [t](/wiki/Template_talk%3AEvents_by_month_links "Template talk:Events by month links") * [e](/wiki/Special%3AEditPage/Template%3AEvents_by_month_links "Special:EditPage/Template:Events by month links")  Current events by month | |
 | --- | --- |
-| [2025](/wiki/2025 "2025") | * [Jan](/wiki/Portal%3ACurrent_events/January_2025 "Portal:Current events/January 2025") * Feb * [Mar](/wiki/Portal%3ACurrent_events/March_2025 "Portal:Current events/March 2025") * [Apr](/wiki/Portal%3ACurrent_events/April_2025 "Portal:Current events/April 2025") * [May](/wiki/Portal%3ACurrent_events/May_2025 "Portal:Current events/May 2025") * [Jun](/wiki/Portal%3ACurrent_events/June_2025 "Portal:Current events/June 2025") * [Jul](/wiki/Portal%3ACurrent_events/July_2025 "Portal:Current events/July 2025") |
+| [2025](/wiki/2025 "2025") | * [Jan](/wiki/Portal%3ACurrent_events/January_2025 "Portal:Current events/January 2025") * Feb * [Mar](/wiki/Portal%3ACurrent_events/March_2025 "Portal:Current events/March 2025") * [Apr](/wiki/Portal%3ACurrent_events/April_2025 "Portal:Current events/April 2025") * [May](/wiki/Portal%3ACurrent_events/May_2025 "Portal:Current events/May 2025") * [Jun](/wiki/Portal%3ACurrent_events/June_2025 "Portal:Current events/June 2025") * [Jul](/wiki/Portal%3ACurrent_events/July_2025 "Portal:Current events/July 2025") * [Aug](/wiki/Portal%3ACurrent_events/August_2025 "Portal:Current events/August 2025") |
 | [2024](/wiki/2024 "2024") | * [Jan](/wiki/Portal%3ACurrent_events/January_2024 "Portal:Current events/January 2024") * [Feb](/wiki/Portal%3ACurrent_events/February_2024 "Portal:Current events/February 2024") * [Mar](/wiki/Portal%3ACurrent_events/March_2024 "Portal:Current events/March 2024") * [Apr](/wiki/Portal%3ACurrent_events/April_2024 "Portal:Current events/April 2024") * [May](/wiki/Portal%3ACurrent_events/May_2024 "Portal:Current events/May 2024") * [Jun](/wiki/Portal%3ACurrent_events/June_2024 "Portal:Current events/June 2024") * [Jul](/wiki/Portal%3ACurrent_events/July_2024 "Portal:Current events/July 2024") * [Aug](/wiki/Portal%3ACurrent_events/August_2024 "Portal:Current events/August 2024") * [Sep](/wiki/Portal%3ACurrent_events/September_2024 "Portal:Current events/September 2024") * [Oct](/wiki/Portal%3ACurrent_events/October_2024 "Portal:Current events/October 2024") * [Nov](/wiki/Portal%3ACurrent_events/November_2024 "Portal:Current events/November 2024") * [Dec](/wiki/Portal%3ACurrent_events/December_2024 "Portal:Current events/December 2024") |
 | [2023](/wiki/2023 "2023") | * [Jan](/wiki/Portal%3ACurrent_events/January_2023 "Portal:Current events/January 2023") * [Feb](/wiki/Portal%3ACurrent_events/February_2023 "Portal:Current events/February 2023") * [Mar](/wiki/Portal%3ACurrent_events/March_2023 "Portal:Current events/March 2023") * [Apr](/wiki/Portal%3ACurrent_events/April_2023 "Portal:Current events/April 2023") * [May](/wiki/Portal%3ACurrent_events/May_2023 "Portal:Current events/May 2023") * [Jun](/wiki/Portal%3ACurrent_events/June_2023 "Portal:Current events/June 2023") * [Jul](/wiki/Portal%3ACurrent_events/July_2023 "Portal:Current events/July 2023") * [Aug](/wiki/Portal%3ACurrent_events/August_2023 "Portal:Current events/August 2023") * [Sep](/wiki/Portal%3ACurrent_events/September_2023 "Portal:Current events/September 2023") * [Oct](/wiki/Portal%3ACurrent_events/October_2023 "Portal:Current events/October 2023") * [Nov](/wiki/Portal%3ACurrent_events/November_2023 "Portal:Current events/November 2023") * [Dec](/wiki/Portal%3ACurrent_events/December_2023 "Portal:Current events/December 2023") |
 | [2022](/wiki/2022 "2022") | * [Jan](/wiki/Portal%3ACurrent_events/January_2022 "Portal:Current events/January 2022") * [Feb](/wiki/Portal%3ACurrent_events/February_2022 "Portal:Current events/February 2022") * [Mar](/wiki/Portal%3ACurrent_events/March_2022 "Portal:Current events/March 2022") * [Apr](/wiki/Portal%3ACurrent_events/April_2022 "Portal:Current events/April 2022") * [May](/wiki/Portal%3ACurrent_events/May_2022 "Portal:Current events/May 2022") * [Jun](/wiki/Portal%3ACurrent_events/June_2022 "Portal:Current events/June 2022") * [Jul](/wiki/Portal%3ACurrent_events/July_2022 "Portal:Current events/July 2022") * [Aug](/wiki/Portal%3ACurrent_events/August_2022 "Portal:Current events/August 2022") * [Sep](/wiki/Portal%3ACurrent_events/September_2022 "Portal:Current events/September 2022") * [Oct](/wiki/Portal%3ACurrent_events/October_2022 "Portal:Current events/October 2022") * [Nov](/wiki/Portal%3ACurrent_events/November_2022 "Portal:Current events/November 2022") * [Dec](/wiki/Portal%3ACurrent_events/December_2022 "Portal:Current events/December 2022") |

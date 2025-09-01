@@ -24,7 +24,13 @@ def download_and_save_html(url: str, output_dir: pathlib.Path) -> None:
     html_filepath = None  # Initialize to ensure it's defined for error messages
     md_filepath = None  # Initialize
     try:
-        response = requests.get(url, timeout=10)
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
+            )
+        }
+        response = requests.get(url, timeout=10, headers=headers)
         response.raise_for_status()
 
         # Simplified filename extraction for HTML
