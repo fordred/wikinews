@@ -31,6 +31,14 @@ REDLINK_RE = re.compile(r'\[([^\]]+)\]\(/w/index\.php\?title=[^&\s]+&action=edit
 def create_requests_session() -> requests.Session:
     """Creates a requests session with connection pooling and retry logic."""
     session = requests.Session()
+    session.headers.update(
+        {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
+            )
+        }
+    )
     retry_strategy = Retry(
         total=RETRY_MAX_ATTEMPTS,
         backoff_factor=1,  # Adjusted from RETRY_BASE_WAIT_SECONDS to fit Retry's backoff_factor logic

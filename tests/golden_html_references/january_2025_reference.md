@@ -1,3 +1,5 @@
+[ ]
+
 * [Home](/wiki/Main_Page)
 * [Random](/wiki/Special%3ARandom)
 * [Nearby](/wiki/Special%3ANearby)
@@ -86,6 +88,7 @@ January 1, 2025 (2025-01-01) (Wednesday)
 * [European migrant crisis](/wiki/European_migrant_crisis "European migrant crisis")
   + Twenty-seven migrants from [sub-Saharan Africa](/wiki/Sub-Saharan_Africa "Sub-Saharan Africa") are killed, and 83 others are rescued after two boats capsize off the [Kerkennah Islands](/wiki/Kerkennah_Islands "Kerkennah Islands") near [Tunisia](/wiki/Tunisia "Tunisia"), with searches ongoing for additional missing passengers. [(France 24)](https://www.france24.com/en/live-news/20250102-27-sub-saharan-african-migrants-die-off-tunisia-in-shipwrecks)
 * Three people are killed and over twenty others are injured in a fireworks explosion at a house in [Honolulu](/wiki/Honolulu "Honolulu"), [Hawaii](/wiki/Hawaii "Hawaii"), United States. [(CTV News)](https://www.ctvnews.ca/world/rescuers-find-gruesome-scene-at-a-honolulu-home-after-a-fireworks-blast-kills-3-injures-over-20-1.7162295)
+* A tour bus crashed into a tree in [Surat Thani province](/wiki/Surat_Thani_province "Surat Thani province"), [Thailand](/wiki/Thailand "Thailand"), killing five and 30.[(The Straits Times)](https://www.straitstimes.com/asia/se-asia/tour-bus-crash-in-thailands-surat-thani-leaves-5-dead-30-injured)
 
 **International relations**
 
@@ -94,8 +97,7 @@ January 1, 2025 (2025-01-01) (Wednesday)
 
 **Law and crime**
 
-* [2024–2025 German New Year's Eve pyrotechnics incidents](/wiki/2024%E2%80%932025_German_New_Year%27s_Eve_pyrotechnics_incidents "2024–2025 German New Year's Eve pyrotechnics incidents")
-  + Five people are killed, several others are injured, and at least 330 people are arrested due to mishandling of [pyrotechnics](/wiki/Pyrotechnics "Pyrotechnics") during [New Year's celebrations](/wiki/New_Year%27s_Eve "New Year's Eve") in [Germany](/wiki/Germany "Germany"). [(RNZ)](https://www.rnz.co.nz/news/world/538011/five-dead-in-germany-from-new-year-s-fireworks-accidents) [(1News)](https://www.1news.co.nz/2025/01/02/german-government-condemns-violence-that-killed-five-on-nye/)
+* + Five people are killed, several others are injured, and at least 330 people are arrested due to mishandling of [pyrotechnics](/wiki/Pyrotechnics "Pyrotechnics") during [New Year's celebrations](/wiki/New_Year%27s_Eve "New Year's Eve") in [Germany](/wiki/Germany "Germany"). [(RNZ)](https://www.rnz.co.nz/news/world/538011/five-dead-in-germany-from-new-year-s-fireworks-accidents) [(1News)](https://www.1news.co.nz/2025/01/02/german-government-condemns-violence-that-killed-five-on-nye/)
 * [2025 Cetinje shootings](/wiki/2025_Cetinje_shootings "2025 Cetinje shootings")
   + Twelve people are killed and four others are injured in a [shooting spree](/wiki/Spree_killer "Spree killer") in [Cetinje](/wiki/Cetinje "Cetinje"), [Montenegro](/wiki/Montenegro "Montenegro"). The perpetrator kills himself. [(AP)](https://apnews.com/article/montenegro-shooting-gunman-suicide-cetinje-7ab4ac905c4d08bca357251823dd4ee6) [(Al Jazeera)](https://www.aljazeera.com/news/2025/1/2/at-least-10-killed-in-mass-shooting-in-montenegro-suspect-kills-himself)
 * [Al Jazeera controversies and criticism](/wiki/Al_Jazeera_controversies_and_criticism "Al Jazeera controversies and criticism")
@@ -283,6 +285,7 @@ January 4, 2025 (2025-01-04) (Saturday)
   + [Kentucky Governor](/wiki/Governor_of_Kentucky "Governor of Kentucky") [Andy Beshear](/wiki/Andy_Beshear "Andy Beshear") declares a [state of emergency](/wiki/State_of_emergency "State of emergency") for [Kentucky](/wiki/Kentucky "Kentucky"), [United States](/wiki/United_States "United States"), amidst the upcoming winter storm. [(WNKY)](https://www.wnky.com/release-gov-beshear-declares-state-of-emergency-ahead-of-winter-storm-system/)
 * At least eight people are killed and 15 others are injured in a fire at a market in [Zhangjiakou](/wiki/Zhangjiakou "Zhangjiakou"), [Hebei](/wiki/Hebei "Hebei"), [China](/wiki/China "China"). [(Al Jazeera)](https://www.aljazeera.com/news/2025/1/4/fire-at-market-in-hebei-china-kills-and-wounds-several-people)
 * The [Taiwanese Coast Guard](/wiki/Coast_Guard_Administration_%28Taiwan%29 "Coast Guard Administration (Taiwan)") intercepts the [Cameroon](/wiki/Cameroon "Cameroon")-registered [container ship](/wiki/Container_ship "Container ship") *Shunxin39* after it was suspected of damaging an undersea cable north of [Taiwan](/wiki/Taiwan "Taiwan") yesterday. [(Taiwan News)](https://www.taiwannews.com.tw/)
+* A fishing boat ran aground near [Gageodo](/wiki/Gageodo "Gageodo"), [South Korea](/wiki/South_Korea "South Korea") after colliding with coastal rocks. Three people were killed, 19 were rescued. [(NOS)](https://nos.nl/artikel/2550531)
 
 **Law and crime**
 
@@ -621,7 +624,7 @@ January 10, 2025 (2025-01-10) (Friday)
     - Amid ongoing wildfires, authorities in [Los Angeles County](/wiki/Los_Angeles_County "Los Angeles County"), [California](/wiki/California "California"), [United States](/wiki/United_States "United States"), impose a curfew and announce the deployment of the [California National Guard](/wiki/California_National_Guard "California National Guard") in order to protect homes in evacuated areas from [looting](/wiki/Looting "Looting"). [(KNBC-TV)](https://www.nbclosangeles.com/news/california-wildfires/curfew-la-county-wildfires/3600157/)
     - The [United States Department of Health and Human Services](/wiki/United_States_Department_of_Health_and_Human_Services "United States Department of Health and Human Services") issues a [public health emergency](/wiki/Public_health_emergency_%28United_States%29 "Public health emergency (United States)") for California in response to injuries and [mental health](/wiki/Mental_health "Mental health") impacts caused by the ongoing wildfires. [(CNN)](https://www.cnn.com/weather/live-news/los-angeles-wildfires-palisades-eaton-california-01-10-25-hnk/index.html)
 * Three of the twelve miners that were reported missing yesterday in an explosion at a coal mine in Singidi, [Balochistan](/wiki/Balochistan%2C_Pakistan "Balochistan, Pakistan"), [Pakistan](/wiki/Pakistan "Pakistan"), are found dead by rescue workers. [(CTV News)](https://www.ctvnews.ca/world/bodies-found-after-gas-explosion-causes-coal-mine-to-collapse-in-southwest-pakistan-1.7171084)
-* Three women are killed and five children are injured in a [stampede](/wiki/Crowd_collapses_and_crushes#crowd_%22stampedes%22 "Crowd collapses and crushes") at the [Umayyad Mosque](/wiki/Umayyad_Mosque "Umayyad Mosque") in [Damascus](/wiki/Damascus "Damascus"), [Syria](/wiki/Syria "Syria"). [(Reuters)](https://www.reuters.com/world/middle-east/stampede-kills-three-women-injures-five-children-umayyad-mosque-damascus-2025-01-10/)
+* Three women are killed and five children are injured in a [stampede](/wiki/Crowd_collapses_and_crushes#crowd_"stampedes" "Crowd collapses and crushes") at the [Umayyad Mosque](/wiki/Umayyad_Mosque "Umayyad Mosque") in [Damascus](/wiki/Damascus "Damascus"), [Syria](/wiki/Syria "Syria"). [(Reuters)](https://www.reuters.com/world/middle-east/stampede-kills-three-women-injures-five-children-umayyad-mosque-damascus-2025-01-10/)
 * Three people on the ground are killed and three others are injured when a [Cessna 172](/wiki/Cessna_172 "Cessna 172") aircraft crashes into a road near [Malindi](/wiki/Malindi "Malindi"), [Kenya](/wiki/Kenya "Kenya"). [(AP)](https://apnews.com/article/kenya-plane-crash-malindi-3c41baec5aa126b1d25d93313566f14d)
 
 **Health and environment**
@@ -753,7 +756,9 @@ January 12, 2025 (2025-01-12) (Sunday)
     - [California Governor](/wiki/Governor_of_California "Governor of California") [Gavin Newsom](/wiki/Gavin_Newsom "Gavin Newsom") states that the ongoing [wildfires](/wiki/Wildfire "Wildfire") impacting [Los Angeles County](/wiki/Los_Angeles_County%2C_California "Los Angeles County, California") could become the worst [natural disaster](/wiki/Natural_disaster "Natural disaster") in [American](/wiki/United_States "United States") history "in terms of the scale and scope", amid current estimated damages of more than [US$](/wiki/United_States_dollar "United States dollar")135 billion. [(*The Independent*)](https://www.independent.co.uk/news/world/americas/fires-los-angeles-california-palisades-map-victim-latest-updates-b2677814.html) [(NBC News)](https://www.nbcnews.com/meet-the-press/video/gov-newsom-says-l-a-wildfires-could-be-worst-natural-disaster-in-u-s-history-full-interview-229078085843)
     - The death toll from the wildfires increases to 24. [(BBC News)](https://www.bbc.com/news/articles/ckgy0pyvglpo)
     - Officials say that the [Kenneth Fire](/wiki/January_2025_Southern_California_wildfires#Kenneth_Fire "January 2025 Southern California wildfires") has been contained. [(KCAL-TV)](https://www.cbsnews.com/losangeles/news/kenneth-fire-evacuations-in-west-hills-area/)
+* A bus crashed on a highway in [Al-Loud](/w/index.php?title=Al-Loud&action=edit&redlink=1 "Al-Loud (page does not exist)"), [Libya](/wiki/Libya "Libya"), killing 23 and injuring five. [(Xinhua News Agency)](https://english.news.cn/20250113/ab96976fd65b4bf4b25ab9da5f04f002/c.html)
 * Ten people are killed and several others are injured after large floods engulf the city of [Ipatinga](/wiki/Ipatinga "Ipatinga") in [Minas Gerais](/wiki/Minas_Gerais "Minas Gerais"), [Brazil](/wiki/Brazil "Brazil"). [(BBC)](https://www.bbc.com/news/articles/cvglwd34l81o.amp)
+* A bus fell down a 100-meter gorge in [Pauri Garhwal district](/wiki/Pauri_Garhwal_district "Pauri Garhwal district"), [Uttarakhand](/wiki/Uttarakhand "Uttarakhand"), [India](/wiki/India "India"), killing six and injuring 22. [(The Tribune)](https://www.tribuneindia.com/news/india/5-die-17-injured-as-bus-falls-into-gorge-in-uttarakhands-pauri/)
 * Three people are killed and two others are injured in an [avalanche](/wiki/Avalanche "Avalanche") in [Trasquera](/wiki/Trasquera "Trasquera"), [Province of Verbano-Cusio-Ossola](/wiki/Province_of_Verbano-Cusio-Ossola "Province of Verbano-Cusio-Ossola"), [Italy](/wiki/Italy "Italy"). [(Rai News)](https://www.rainews.it/articoli/2025/01/valanga-travolge-scialpinisti-in-piemonte-3-morti-e-2-feriti-trasquera-verbano-cusio-ossola-0186dba0-f920-4286-95de-4f72db97dbd4.html)
 * At least 17 miners are trapped in a gold mine in [La Libertad Department](/wiki/Department_of_La_Libertad "Department of La Libertad"), [Peru](/wiki/Peru "Peru"), after a group of illegal miners attacked the mine. [(Xinhua)](https://english.news.cn/20250114/c17952037b594df4bdc2e8f0b23c8099/c.html)
 
@@ -843,6 +848,10 @@ January 14, 2025 (2025-01-14) (Tuesday)
   + [North Korea](/wiki/Korean_People%27s_Army "Korean People's Army") launches multiple [short-range ballistic missiles](/wiki/Short-range_ballistic_missile "Short-range ballistic missile") into the [Sea of Japan](/wiki/Sea_of_Japan "Sea of Japan"). [(Reuters)](https://www.reuters.com/world/asia-pacific/north-korea-fires-missile-off-east-coast-says-south-korea-military-2025-01-14/)
 * [Red Sea crisis](/wiki/Red_Sea_crisis "Red Sea crisis")
   + [Yemen](/wiki/Yemen "Yemen")'s [Houthi](/wiki/Houthi "Houthi") forces fire a missile at [Israel](/wiki/Israel "Israel"), triggering [sirens](/wiki/Civil_defense_siren "Civil defense siren") in several areas, including [Tel Aviv](/wiki/Tel_Aviv "Tel Aviv") and some Israeli settlements in the occupied [West Bank](/wiki/West_Bank "West Bank"). According to the [Israeli military](/wiki/Israeli_Defense_Forces "Israeli Defense Forces"), the missile was "likely intercepted" with no injuries reported. [(Xinhua)](https://english.news.cn/20250114/7d596dc7d5e6418683867e53dbecb391/c.html)
+
+**Disasters and accidents**
+
+* At least 43 vehicles figured in a pileup caused by icy conditions along the [Seoul](/wiki/Seoul "Seoul")-[Munsan](/wiki/Munsan "Munsan") Expressway near [Goyang](/wiki/Goyang "Goyang"), injuring nine. [(Yonhap News Agency)](https://en.yna.co.kr/view/AEN20250114002500315)
 
 **Health and environment**
 
@@ -1022,6 +1031,10 @@ January 17, 2025 (2025-01-17) (Friday)
 
 * [British](/wiki/United_Kingdom "United Kingdom") [oil and gas](/wiki/Petroleum_industry "Petroleum industry") company [BP](/wiki/BP "BP") announces that it will [lay off](/wiki/Layoff "Layoff") 4,700 employees and 3,000 contractors globally to reduce costs. [(AP)](https://apnews.com/article/bp-job-cuts-oil-b96729fc515a1495ca2fae320f62fefc)
 
+**Disasters and accidents**
+
+* A minivan rammed into a stationary bus near [Narayangaon](/wiki/Narayangaon "Narayangaon"), [India](/wiki/India "India"), killing nine. [(INDIA TODAY)](https://www.indiatoday.in/india/story/maharashtra-road-accident-on-pune-nashik-highway-dead-injured-2666217)
+
 **Health and environment**
 
 * The [Zimbabwean](/wiki/Zimbabwe "Zimbabwe") [Ministry of Health](/wiki/Ministry_of_Health_and_Child_Care_%28Zimbabwe%29 "Ministry of Health and Child Care (Zimbabwe)") reports that a new [cholera](/wiki/Cholera "Cholera") outbreak that started in December 2024 has reached eight [districts](/wiki/Districts_of_Zimbabwe "Districts of Zimbabwe") and infected nearly 300 people, causing one death. [(DW)](https://www.dw.com/en/zimbabwe-cholera-outbreak-in-al-least-eight-districts/a-71333093)
@@ -1121,6 +1134,7 @@ January 19, 2025 (2025-01-19) (Sunday)
 * [2025 California wildfires](/wiki/2025_California_wildfires "2025 California wildfires")
   + [January 2025 Southern California wildfires](/wiki/January_2025_Southern_California_wildfires "January 2025 Southern California wildfires")
     - [Cal Fire](/wiki/California_Department_of_Forestry_and_Fire_Protection "California Department of Forestry and Fire Protection") reports that the [Palisades Fire](/wiki/Palisades_Fire "Palisades Fire") is more than 50% contained, while the [Eaton Fire](/wiki/Eaton_Fire "Eaton Fire") is more than 80% contained. [(*Forbes*)](https://www.forbes.com/sites/antoniopequenoiv/2025/01/19/california-wildfire-updates-palisades-fire-finally-over-50-contained/)
+* A bus crashed into a concrete centre barrier in [Eastern Cape](/wiki/Eastern_Cape "Eastern Cape"), killing five and injuring six. [(news365)](https://news365.co.za/head-on-collision-25/)
 
 **Law and crime**
 
@@ -1298,6 +1312,7 @@ January 22, 2025 (2025-01-22) (Wednesday)
 * [January 20–22, 2025 Gulf Coast blizzard](/wiki/January_20%E2%80%9322%2C_2025_Gulf_Coast_blizzard "January 20–22, 2025 Gulf Coast blizzard")
   + The death toll of a historic [winter storm](/wiki/Winter_storm "Winter storm") event on the [Gulf Coast of the United States](/wiki/Gulf_Coast_of_the_United_States "Gulf Coast of the United States") rises to nine people. 8 in (20 cm) of [snowfall](/wiki/Snowfall "Snowfall") is measured at [Louis Armstrong New Orleans International Airport](/wiki/Louis_Armstrong_New_Orleans_International_Airport "Louis Armstrong New Orleans International Airport") in [Louisiana](/wiki/Louisiana "Louisiana"). The statewide snowfall record in [Florida](/wiki/Florida "Florida") is broken as over 5.5 in (14 cm) falls in [Molino](/wiki/Molino%2C_Florida "Molino, Florida"). [(CNN)](https://www.cnn.com/2025/01/21/weather/winter-storm-south-tuesday-hnk/index.html)
 * At least thirteen people are killed in a railway accident in [Jalgaon](/wiki/Jalgaon "Jalgaon"), [Maharashtra](/wiki/Maharashtra "Maharashtra"), [India](/wiki/India "India"). The victims had initially fled from their train following an alleged [fire alarm](/wiki/Fire_alarm "Fire alarm") and were subsequently struck and killed by a passing train on the adjacent tracks. [(BBC)](https://www.bbc.com/news/articles/cly9zrpvjm0o)
+* A truck overturned and fell into a ravine along [National Highway 63](/wiki/National_Highway_63_%28India%29 "National Highway 63 (India)") in [Yellapur](/wiki/Yellapur "Yellapur"), killing 10 and injuring 15. [(The Indian Express)](https://indianexpress.com/article/india/eight-killed-ten-injured-when-truck-fell-into-valley-9792483/)
 
 **International relations**
 
@@ -1328,6 +1343,7 @@ January 23, 2025 (2025-01-23) (Thursday)
 **Disasters and accidents**
 
 * Four people are killed and five more injured in a [stampede](/wiki/Stampede "Stampede") at [Cambodian](/wiki/Cambodia "Cambodia") businessman [Sok Kong](/wiki/Sok_Kong "Sok Kong")'s home in [Phnom Penh](/wiki/Phnom_Penh "Phnom Penh") as he was giving away food and money amid [Lunar New Year](/wiki/Lunar_New_Year "Lunar New Year") celebrations. [(AP)](https://apnews.com/article/cambodia-crowd-crush-killed-sok-kong-facdf0652f008fa1695283aae9f49078)
+* Nineteen vehicles figured in a pileup along the [Yekaterinburg](/wiki/Yekaterinburg "Yekaterinburg")-[Almaty](/wiki/Almaty "Almaty") highway near [Aksu-Ayuly](/wiki/Aksu-Ayuly "Aksu-Ayuly"), [Kazakhstan](/wiki/Kazakhstan "Kazakhstan"), [Karaganda Region](/wiki/Karaganda_Region "Karaganda Region"), injuring six. [(Kazinform)](https://en.inform.kz/news/several-injured-in-massive-19-car-pile-up-in-karaganda-region-8ed368/)
 
 **Law and crime**
 
@@ -1503,6 +1519,11 @@ January 26, 2025 (2025-01-26) (Sunday)
 **Business and economy**
 
 * The [Syrian](/wiki/Syria "Syria") newspaper *[Enab Baladi](/wiki/Enab_Baladi "Enab Baladi")* announces it will return to Syria after a decade in exile following the beginning of the [Syrian civil war](/wiki/Syrian_civil_war "Syrian civil war"). [(*The New Arab*)](https://www.newarab.com/news/syrian-paper-announces-damascus-return-after-decade-exile)
+
+**Disasters and accidents**
+
+* A bus overturned in [Potosi Department](/wiki/Potosi_Department "Potosi Department"), [Bolivia](/wiki/Bolivia "Bolivia"), killing 19 and injuring nine. [(Barron's)](https://www.barrons.com/news/bus-crash-in-southern-bolivia-leaves-19-dead-police-ffc252c7)
+* A bus traveling from [Vientiane](/wiki/Vientiane "Vientiane") to [Pakse](/wiki/Pakse "Pakse") [Laos](/wiki/Laos "Laos"), crashed into a tree after the driver fell asleep, killing five and injuring 13. [(The Times of Israel)](https://www.timesofisrael.com/13-israeli-tourists-injured-some-seriously-in-bus-crash-in-laos/)
 
 **International relations**
 
@@ -1871,7 +1892,7 @@ Wikimedia portal
 ### Politics
 
 * [Georgian constitutional crisis](/wiki/2024%E2%80%932025_Georgian_constitutional_crisis "2024–2025 Georgian constitutional crisis")
-* [Mexico–United States border crisis](/wiki/Mexico%E2%80%93United_States_border_crisis#Biden_administration_(2021%E2%80%932025) "Mexico–United States border crisis")
+* [Mexico–United States border crisis](/wiki/Mexico%E2%80%93United_States_border_crisis#Biden_administration_(2021–2025) "Mexico–United States border crisis")
 * [Somali constitutional crisis](/wiki/Constitutional_crisis_in_Somalia "Constitutional crisis in Somalia")
 * [South Korean presidential impeachment](/wiki/Impeachment_of_Yoon_Suk_Yeol "Impeachment of Yoon Suk Yeol")
 * [Venezuelan political crisis](/wiki/2024_Venezuelan_political_crisis "2024 Venezuelan political crisis")
@@ -2153,7 +2174,7 @@ See also – [List of ongoing proxy wars](/wiki/List_of_ongoing_proxy_wars "List
 ### ***[Science and technology](/wiki/2025_in_science "2025 in science")***
 
 * [Archaeology](/wiki/2025_in_archaeology "2025 in archaeology")
-* [Biotechnology](/w/index.php?title=2025_in_biotechnology&action=edit&redlink=1 "2025 in biotechnology (page does not exist)")
+* [Biotechnology](/wiki/2025_in_biotechnology "2025 in biotechnology")
 * [Computing](/wiki/2025_in_computing "2025 in computing")
 * [Palaeontology](/wiki/2025_in_paleontology "2025 in paleontology")
 * [Quantum computing and communication](/wiki/2025_in_quantum_computing_and_communication "2025 in quantum computing and communication")
@@ -2192,11 +2213,11 @@ See also – [List of ongoing proxy wars](/wiki/List_of_ongoing_proxy_wars "List
 
 **2025** at Wikipedia's [sister projects](/wiki/Wikipedia%3AWikimedia_sister_projects "Wikipedia:Wikimedia sister projects")
 
-* ![](//upload.wikimedia.org/wikipedia/en/thumb/4/4a/Commons-logo.svg/20px-Commons-logo.svg.png) [Media](https://commons.wikimedia.org/wiki/Category%3A2025 "c:Category:2025") from Commons
-* ![](//upload.wikimedia.org/wikipedia/commons/thumb/2/24/Wikinews-logo.svg/40px-Wikinews-logo.svg.png) [News](https://en.wikinews.org/wiki/Special%3ASearch/Category%3A2025 "n:Special:Search/Category:2025") from Wikinews
-* ![](//upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Wikiquote-logo.svg/40px-Wikiquote-logo.svg.png) [Quotations](https://en.wikiquote.org/wiki/Category%3A2025 "q:Category:2025") from Wikiquote
-* ![](//upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Wikisource-logo.svg/40px-Wikisource-logo.svg.png) [Texts](https://en.wikisource.org/wiki/Category%3A2025_works "s:Category:2025 works") from Wikisource
-* ![](//upload.wikimedia.org/wikipedia/commons/thumb/d/df/Wikispecies-logo.svg/40px-Wikispecies-logo.svg.png) [Taxa](https://species.wikimedia.org/wiki/Category%3ANew_species_2025 "species:Category:New species 2025") from Wikispecies
+* [![](//upload.wikimedia.org/wikipedia/en/thumb/4/4a/Commons-logo.svg/20px-Commons-logo.svg.png)](/wiki/File%3ACommons-logo.svg)[Media](https://commons.wikimedia.org/wiki/Category%3A2025 "c:Category:2025") from Commons
+* [![](//upload.wikimedia.org/wikipedia/commons/thumb/2/24/Wikinews-logo.svg/40px-Wikinews-logo.svg.png)](/wiki/File%3AWikinews-logo.svg)[News](https://en.wikinews.org/wiki/Special%3ASearch/Category%3A2025 "n:Special:Search/Category:2025") from Wikinews
+* [![](//upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Wikiquote-logo.svg/40px-Wikiquote-logo.svg.png)](/wiki/File%3AWikiquote-logo.svg)[Quotations](https://en.wikiquote.org/wiki/Category%3A2025 "q:Category:2025") from Wikiquote
+* [![](//upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Wikisource-logo.svg/40px-Wikisource-logo.svg.png)](/wiki/File%3AWikisource-logo.svg)[Texts](https://en.wikisource.org/wiki/Category%3A2025_works "s:Category:2025 works") from Wikisource
+* [![](//upload.wikimedia.org/wikipedia/commons/thumb/d/df/Wikispecies-logo.svg/40px-Wikispecies-logo.svg.png)](/wiki/File%3AWikispecies-logo.svg)[Taxa](https://species.wikimedia.org/wiki/Category%3ANew_species_2025 "species:Category:New species 2025") from Wikispecies
 * ![](//upload.wikimedia.org/wikipedia/commons/thumb/7/75/Wikimedia_Community_Logo.svg/40px-Wikimedia_Community_Logo.svg.png) [Discussions](https://meta.wikimedia.org/wiki/Special%3ASearch/Category%3A2025 "m:Special:Search/Category:2025") from Meta-Wiki
 
 [...more](/wiki/Category%3A2025 "Category:2025")
@@ -2209,7 +2230,7 @@ Wikimedia Commons has media related to [January 2025](https://commons.wikimedia.
 
 | * [v](/wiki/Template%3AEvents_by_month_links "Template:Events by month links") * [t](/wiki/Template_talk%3AEvents_by_month_links "Template talk:Events by month links") * [e](/wiki/Special%3AEditPage/Template%3AEvents_by_month_links "Special:EditPage/Template:Events by month links")  Current events by month | |
 | --- | --- |
-| [2025](/wiki/2025 "2025") | * Jan * [Feb](/wiki/Portal%3ACurrent_events/February_2025 "Portal:Current events/February 2025") * [Mar](/wiki/Portal%3ACurrent_events/March_2025 "Portal:Current events/March 2025") * [Apr](/wiki/Portal%3ACurrent_events/April_2025 "Portal:Current events/April 2025") * [May](/wiki/Portal%3ACurrent_events/May_2025 "Portal:Current events/May 2025") * [Jun](/wiki/Portal%3ACurrent_events/June_2025 "Portal:Current events/June 2025") * [Jul](/wiki/Portal%3ACurrent_events/July_2025 "Portal:Current events/July 2025") |
+| [2025](/wiki/2025 "2025") | * Jan * [Feb](/wiki/Portal%3ACurrent_events/February_2025 "Portal:Current events/February 2025") * [Mar](/wiki/Portal%3ACurrent_events/March_2025 "Portal:Current events/March 2025") * [Apr](/wiki/Portal%3ACurrent_events/April_2025 "Portal:Current events/April 2025") * [May](/wiki/Portal%3ACurrent_events/May_2025 "Portal:Current events/May 2025") * [Jun](/wiki/Portal%3ACurrent_events/June_2025 "Portal:Current events/June 2025") * [Jul](/wiki/Portal%3ACurrent_events/July_2025 "Portal:Current events/July 2025") * [Aug](/wiki/Portal%3ACurrent_events/August_2025 "Portal:Current events/August 2025") |
 | [2024](/wiki/2024 "2024") | * [Jan](/wiki/Portal%3ACurrent_events/January_2024 "Portal:Current events/January 2024") * [Feb](/wiki/Portal%3ACurrent_events/February_2024 "Portal:Current events/February 2024") * [Mar](/wiki/Portal%3ACurrent_events/March_2024 "Portal:Current events/March 2024") * [Apr](/wiki/Portal%3ACurrent_events/April_2024 "Portal:Current events/April 2024") * [May](/wiki/Portal%3ACurrent_events/May_2024 "Portal:Current events/May 2024") * [Jun](/wiki/Portal%3ACurrent_events/June_2024 "Portal:Current events/June 2024") * [Jul](/wiki/Portal%3ACurrent_events/July_2024 "Portal:Current events/July 2024") * [Aug](/wiki/Portal%3ACurrent_events/August_2024 "Portal:Current events/August 2024") * [Sep](/wiki/Portal%3ACurrent_events/September_2024 "Portal:Current events/September 2024") * [Oct](/wiki/Portal%3ACurrent_events/October_2024 "Portal:Current events/October 2024") * [Nov](/wiki/Portal%3ACurrent_events/November_2024 "Portal:Current events/November 2024") * [Dec](/wiki/Portal%3ACurrent_events/December_2024 "Portal:Current events/December 2024") |
 | [2023](/wiki/2023 "2023") | * [Jan](/wiki/Portal%3ACurrent_events/January_2023 "Portal:Current events/January 2023") * [Feb](/wiki/Portal%3ACurrent_events/February_2023 "Portal:Current events/February 2023") * [Mar](/wiki/Portal%3ACurrent_events/March_2023 "Portal:Current events/March 2023") * [Apr](/wiki/Portal%3ACurrent_events/April_2023 "Portal:Current events/April 2023") * [May](/wiki/Portal%3ACurrent_events/May_2023 "Portal:Current events/May 2023") * [Jun](/wiki/Portal%3ACurrent_events/June_2023 "Portal:Current events/June 2023") * [Jul](/wiki/Portal%3ACurrent_events/July_2023 "Portal:Current events/July 2023") * [Aug](/wiki/Portal%3ACurrent_events/August_2023 "Portal:Current events/August 2023") * [Sep](/wiki/Portal%3ACurrent_events/September_2023 "Portal:Current events/September 2023") * [Oct](/wiki/Portal%3ACurrent_events/October_2023 "Portal:Current events/October 2023") * [Nov](/wiki/Portal%3ACurrent_events/November_2023 "Portal:Current events/November 2023") * [Dec](/wiki/Portal%3ACurrent_events/December_2023 "Portal:Current events/December 2023") |
 | [2022](/wiki/2022 "2022") | * [Jan](/wiki/Portal%3ACurrent_events/January_2022 "Portal:Current events/January 2022") * [Feb](/wiki/Portal%3ACurrent_events/February_2022 "Portal:Current events/February 2022") * [Mar](/wiki/Portal%3ACurrent_events/March_2022 "Portal:Current events/March 2022") * [Apr](/wiki/Portal%3ACurrent_events/April_2022 "Portal:Current events/April 2022") * [May](/wiki/Portal%3ACurrent_events/May_2022 "Portal:Current events/May 2022") * [Jun](/wiki/Portal%3ACurrent_events/June_2022 "Portal:Current events/June 2022") * [Jul](/wiki/Portal%3ACurrent_events/July_2022 "Portal:Current events/July 2022") * [Aug](/wiki/Portal%3ACurrent_events/August_2022 "Portal:Current events/August 2022") * [Sep](/wiki/Portal%3ACurrent_events/September_2022 "Portal:Current events/September 2022") * [Oct](/wiki/Portal%3ACurrent_events/October_2022 "Portal:Current events/October 2022") * [Nov](/wiki/Portal%3ACurrent_events/November_2022 "Portal:Current events/November 2022") * [Dec](/wiki/Portal%3ACurrent_events/December_2022 "Portal:Current events/December 2022") |
