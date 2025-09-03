@@ -8,6 +8,7 @@ import pytest
 # Import the refactored main and other necessary components
 from wikipedia_news_downloader import (
     MONTH_NAME_TO_NUMBER,
+    parse_jekyll_post,
 )
 from wikipedia_news_downloader import (
     main as wikipedia_main,
@@ -112,19 +113,23 @@ def test_html_processing_with_refactored_main() -> None:
                 )
                 continue
 
-            generated_content = generated_post_path.read_text(encoding="utf-8").strip()
-            reference_content = ref_post_path.read_text(encoding="utf-8").strip()
+            generated_content_full = generated_post_path.read_text(encoding="utf-8")
+            reference_content_full = ref_post_path.read_text(encoding="utf-8")
 
-            if generated_content != reference_content:
+            generated_fm, generated_body = parse_jekyll_post(generated_content_full)
+            reference_fm, reference_body = parse_jekyll_post(reference_content_full)
+
+            # Remove last_modified_at from generated front matter for comparison
+            if "last_modified_at" in generated_fm:
+                del generated_fm["last_modified_at"]
+
+            if generated_fm != reference_fm or generated_body.strip() != reference_body.strip():
                 source_html_candidate = f"{event_date.strftime('%B').lower()}_{event_date.year}.html"
                 pytest.fail(
                     f"Content mismatch for {generated_post_path.name}.\n"
                     f"  Source HTML (expected): {source_html_candidate}\n"
                     f"  Reference MD: {ref_post_path}\n"
                     f"  Generated MD: {generated_post_path}\n",
-                    # Consider adding a diff here if it's not too verbose, or a marker
-                    # For now, full content is not included in assertion to avoid huge outputs
-                    # Pytest diffing for strings might handle this well if we directly assert.
                 )
 
         # Also check for any files generated in temp_dir that are NOT in reference_posts_root_dir

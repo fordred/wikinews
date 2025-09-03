@@ -14,6 +14,8 @@ from wikipedia_news_downloader import (
     clean_daily_markdown_content,
     generate_jekyll_content,
     main,  # Import main for testing
+    parse_jekyll_post,
+    save_news,
     split_and_clean_monthly_markdown,
     worker,
 )
@@ -875,7 +877,7 @@ class TestWorkerFunction:
         mock_save_news.assert_not_called() # Should not be reached
         mock_queue.task_done.assert_called_once()
 
-    def test_worker_online_mode_jekyll_generation_exception_retries(
+    def test_worker_calls_save_news_after_successful_processing(
         self,
         mock_logger: MagicMock,
         mock_queue: MagicMock,
@@ -883,51 +885,25 @@ class TestWorkerFunction:
         temp_output_dir: str,
         mocker: Any,
     ) -> None:
-        month_dt = datetime(2024, 10, 1)  # Example date: October 2024
-        mock_queue.get.side_effect = [("online", month_dt), queue.Empty] # Item fetched once
+        """Tests that the worker calls save_news with correct args after processing."""
+        month_dt = datetime(2024, 10, 1)
+        mock_queue.get.side_effect = [("online", month_dt), queue.Empty]
 
         mocker.patch("wikipedia_news_downloader.MarkItDown", return_value=mock_markitdown_converter)
         mock_markitdown_converter.convert.return_value = MagicMock(text_content="Some dummy markdown")
 
-        # Mock split_and_clean_monthly_markdown to return a successful result
         daily_event_date = datetime(2024, 10, 1)
-        daily_event_content = "Cleaned daily content for Jekyll test"
-        mock_split_clean = mocker.patch(
+        daily_event_content = "Cleaned daily content for save_news test"
+        mocker.patch(
             "wikipedia_news_downloader.split_and_clean_monthly_markdown",
             return_value=[(daily_event_date, daily_event_content)],
         )
 
-        # Mock generate_jekyll_content to raise an exception
-        simulated_error_msg = "Simulated Jekyll generation error"
-        mock_generate_jekyll = mocker.patch(
-            "wikipedia_news_downloader.generate_jekyll_content",
-            side_effect=Exception(simulated_error_msg),
-        )
-
-        mock_time_sleep = mocker.patch("time.sleep")
         mock_save_news = mocker.patch("wikipedia_news_downloader.save_news")
 
-        # Pass mock_markitdown_converter to worker (now 4th arg, local_html_input_dir is None)
         worker(mock_queue, temp_output_dir, mock_logger, mock_markitdown_converter, None)
 
-        expected_url = f"{BASE_WIKIPEDIA_URL}{month_dt.strftime('%B_%Y')}"
-        mock_markitdown_converter.convert.assert_called_once_with(expected_url)
-        mock_split_clean.assert_called_once_with("Some dummy markdown", month_dt, mock_logger)
-        mock_generate_jekyll.assert_called_once_with(daily_event_date, daily_event_content, mock_logger)
-
-        # Check logger.exception was called
-        logged_exception_message = False
-        for call in mock_logger.exception.call_args_list:
-            if f"Error during content conversion or processing for {expected_url}" in call.args[0] and \
-               "(online source for October_2024, mode: online)" in call.args[0]: # Retry info removed
-                logged_exception_message = True
-                break
-        assert logged_exception_message, "Exception during Jekyll generation was not logged correctly."
-
-        mock_time_sleep.assert_not_called()
-        mock_queue.put.assert_not_called()
-        mock_save_news.assert_not_called() # Should not be reached
-        mock_queue.task_done.assert_called_once()
+        mock_save_news.assert_called_once_with(daily_event_date, daily_event_content, temp_output_dir, mock_logger)
 
     # --- End Tests for worker function ---
 
@@ -1042,3 +1018,88 @@ class TestMainFunctionLogging:
         thread_args_for_worker = mock_thread.call_args[1]["args"]
         assert len(thread_args_for_worker) >= 4
         assert thread_args_for_worker[2] is mock_default_logger_instance
+
+
+class TestSaveNews:
+    def test_save_new_post(self, temp_output_dir: str, common_test_date: datetime, mock_logger: MagicMock) -> None:
+        """Test that a new post gets a last_modified_at tag."""
+        markdown_body = "This is the body of a new post."
+
+        with patch("wikipedia_news_downloader.datetime") as mock_dt:
+            mock_dt.now.return_value = datetime(2025, 9, 2, 12, 0, 0)
+
+            save_news(common_test_date, markdown_body, temp_output_dir, mock_logger)
+
+        post_path = Path(temp_output_dir) / (common_test_date.strftime("%Y-%m-%d") + "-index.md")
+        assert post_path.exists()
+
+        content = post_path.read_text()
+        front_matter, body = parse_jekyll_post(content)
+
+        assert "last_modified_at" in front_matter
+        assert front_matter["last_modified_at"] == "2025-09-02 12:00"
+        assert body.strip() == markdown_body.strip()
+
+    def test_save_post_with_changed_content(self, temp_output_dir: str, common_test_date: datetime, mock_logger: MagicMock) -> None:
+        """Test that a changed post gets an updated last_modified_at tag."""
+        post_path = Path(temp_output_dir) / (common_test_date.strftime("%Y-%m-%d") + "-index.md")
+
+        # Create an initial post
+        initial_body = "Initial content."
+        initial_lmod = "2025-09-01 10:00"
+        initial_content = f"---\nlayout: post\ntitle: Test\ndate: {common_test_date.strftime('%Y-%m-%d')}\nlast_modified_at: {initial_lmod}\npublished: true\n---\n\n{initial_body}"
+        post_path.write_text(initial_content)
+
+        new_markdown_body = "This is the updated body of the post."
+
+        with patch("wikipedia_news_downloader.datetime") as mock_dt:
+            mock_dt.now.return_value = datetime(2025, 9, 2, 13, 0, 0)
+
+            save_news(common_test_date, new_markdown_body, temp_output_dir, mock_logger)
+
+        assert post_path.exists()
+
+        content = post_path.read_text()
+        front_matter, body = parse_jekyll_post(content)
+
+        assert "last_modified_at" in front_matter
+        assert front_matter["last_modified_at"] == "2025-09-02 13:00"
+        assert body.strip() == new_markdown_body.strip()
+
+    def test_save_post_with_unchanged_content_and_existing_tag(
+        self, temp_output_dir: str, common_test_date: datetime, mock_logger: MagicMock
+    ) -> None:
+        """Test that an unchanged post with a tag preserves the tag."""
+        post_path = Path(temp_output_dir) / (common_test_date.strftime("%Y-%m-%d") + "-index.md")
+
+        initial_body = "Content that will not change."
+        initial_lmod = "2025-09-01 11:00"
+        initial_content = f"---\nlayout: post\ntitle: Test\ndate: {common_test_date.strftime('%Y-%m-%d')}\nlast_modified_at: {initial_lmod}\npublished: true\n---\n\n{initial_body}"
+        post_path.write_text(initial_content)
+
+        save_news(common_test_date, initial_body, temp_output_dir, mock_logger)
+
+        content = post_path.read_text()
+        front_matter, body = parse_jekyll_post(content)
+
+        assert "last_modified_at" in front_matter
+        assert front_matter["last_modified_at"] == initial_lmod
+        assert body.strip() == initial_body.strip()
+
+    def test_save_post_with_unchanged_content_and_no_tag(
+        self, temp_output_dir: str, common_test_date: datetime, mock_logger: MagicMock
+    ) -> None:
+        """Test that an unchanged post without a tag does not get one."""
+        post_path = Path(temp_output_dir) / (common_test_date.strftime("%Y-%m-%d") + "-index.md")
+
+        initial_body = "Content that will not change."
+        initial_content = f"---\nlayout: post\ntitle: Test\ndate: {common_test_date.strftime('%Y-%m-%d')}\npublished: true\n---\n\n{initial_body}"
+        post_path.write_text(initial_content)
+
+        save_news(common_test_date, initial_body, temp_output_dir, mock_logger)
+
+        content = post_path.read_text()
+        front_matter, body = parse_jekyll_post(content)
+
+        assert "last_modified_at" not in front_matter
+        assert body.strip() == initial_body.strip()

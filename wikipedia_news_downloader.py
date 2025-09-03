@@ -195,23 +195,77 @@ def split_and_clean_monthly_markdown(monthly_markdown: str, month_datetime: date
     return daily_events
 
 
-def save_news(date: datetime, full_content: str, output_dir: str, logger: logging.Logger) -> None:
-    """Save markdown to specified directory."""
-    logger.info(f"Preparing to save news for {date}")
+def parse_jekyll_post(file_content: str) -> tuple[dict[str, str], str]:
+    """
+    Parses a Jekyll post file content to separate front matter from the body.
+    Returns a tuple containing a dictionary of the front matter and the post body as a string.
+    """
+    # Regex to match front matter and content
+    match = re.match(r"---\s*\n(.*?)\n---\s*\n(.*)", file_content, re.S)
+    if not match:
+        return {}, file_content  # No front matter found
 
-    # Create date-specific folder
-    folder_path = "./docs/_posts/"
-    Path(output_dir).mkdir(parents=True, exist_ok=True)
-    logger.debug(f"Created folder: {folder_path}")
+    front_matter_str, content = match.groups()
+    front_matter = {}
+    for line in front_matter_str.split("\n"):
+        if ":" in line:
+            key, value = line.split(":", 1)
+            front_matter[key.strip()] = value.strip()
 
-    # Save markdown
+    return front_matter, content
+
+
+def save_news(date: datetime, markdown_body: str, output_dir: str, logger: logging.Logger) -> None:
+    """Save markdown to specified directory, handling last modified date."""
+    logger.info(f"Preparing to save news for {date.strftime('%Y-%m-%d')}")
+
     markdown_path = Path(output_dir) / (date.strftime("%Y-%m-%d") + "-index.md")
+    last_modified_at: str | None = None  # Initialize to None
+
+    is_publishable = len(markdown_body.strip()) >= MIN_MARKDOWN_LENGTH_PUBLISH
+
+    # Skip creating new, unpublishable files.
+    if not is_publishable and not markdown_path.exists():
+        logger.warning(
+            f"Markdown for {date.strftime('%Y-%m-%d')} is too short and file does not exist. "
+            "Skipping save to avoid creating an empty post."
+        )
+        return
+
+    if markdown_path.exists():
+        logger.debug(f"File exists, reading for comparison: {markdown_path}")
+        try:
+            existing_content = markdown_path.read_text(encoding="utf-8")
+            existing_front_matter, existing_body = parse_jekyll_post(existing_content)
+
+            if existing_body.strip() == markdown_body.strip():
+                logger.info(f"Content for {date.strftime('%Y-%m-%d')} is unchanged.")
+                last_modified_at = existing_front_matter.get("last_modified_at")
+            else:
+                logger.info(f"Content for {date.strftime('%Y-%m-%d')} has changed. Updating last_modified_at.")
+                last_modified_at = datetime.now().strftime("%Y-%m-%d %H:%M")
+        except Exception as e:
+            logger.error(f"Could not read or parse existing file {markdown_path}: {e}. Overwriting.")
+            last_modified_at = datetime.now().strftime("%Y-%m-%d %H:%M")
+    else:
+        logger.info(f"New post for {date.strftime('%Y-%m-%d')}. Setting last_modified_at.")
+        last_modified_at = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    full_content = generate_jekyll_content(date, markdown_body, logger, last_modified_at)
+
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+
     with markdown_path.open("w", encoding="utf-8", newline="\n") as f:
         f.write(full_content)
     logger.info(f"Saved markdown to: {markdown_path}")
 
 
-def generate_jekyll_content(date: datetime, markdown_body: str, logger: logging.Logger) -> str:
+def generate_jekyll_content(
+    date: datetime,
+    markdown_body: str,
+    logger: logging.Logger,
+    last_modified_at: str | None = None,
+) -> str:
     """Jekyll front matter generator.
 
     Generates the full page content with Jekyll front matter.
@@ -229,12 +283,19 @@ def generate_jekyll_content(date: datetime, markdown_body: str, logger: logging.
         "layout: post",
         f"title: {date.strftime('%Y %B %d')}",
         f"date: {date.strftime('%Y-%m-%d')}",
-        f"published: {'true' if is_published else 'false'}",
-        "---",
-        "",  # Add blank lines after front matter
-        "",
-        "",
     ]
+    if last_modified_at:
+        front_matter_lines.append(f"last_modified_at: {last_modified_at}")
+
+    front_matter_lines.extend(
+        [
+            f"published: {'true' if is_published else 'false'}",
+            "---",
+            "",
+            "",
+            "",
+        ]
+    )
 
     # Combine front matter and content (use empty body if not published)
     content_body = markdown_body if is_published else ""
@@ -321,14 +382,8 @@ def worker(
 
             for event_date, daily_md_content in daily_events:
                 logger.info(f"Processing extracted day: {event_date.strftime('%Y-%m-%d')} from {source_name_suffix}")
-                full_jekyll_content = generate_jekyll_content(event_date, daily_md_content, logger)
-                if full_jekyll_content and "published: true" in full_jekyll_content:
-                    save_news(event_date, full_jekyll_content, output_dir, logger)
-                else:
-                    logger.warning(
-                        f"Skipping save for {event_date.strftime('%Y-%m-%d')} from {source_name_suffix}: "
-                        "Content marked unpublished or generation failed.",
-                    )
+                # The decision to publish and the generation of the full Jekyll content are now handled within save_news.
+                save_news(event_date, daily_md_content, output_dir, logger)
 
         except requests.exceptions.RequestException as e:  # Specific to online mode fetching
             if mode == "online":
