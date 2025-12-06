@@ -310,6 +310,7 @@ wheels = [
 name = "librt"
 version = "0.7.1"
 source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a2/2a/35004d8afde010281da1b62056e30d3f88c62d5f5364bed9780d1b075be3/librt-0.7.1.tar.gz", hash = "sha256:f57724d7cb7224d478a70acd5939b309f1496ad0c70df0505ac9f13c8f7aa525", size = 93871, upload-time = "2025-12-06T11:30:55.39Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ff/e8/d4240735f4a5cceccc407b7512e4468563dcda2758613907bfa41ab30f36/librt-0.7.1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:65c2f35fffff81bfb8f8c8656bb3776848739c94e960ceab8efe0fd58ba7dac6", size = 54709, upload-time = "2025-12-06T11:29:39.624Z" },
     { url = "https://files.pythonhosted.org/packages/29/49/ceddde22d43229ffcdde892e3f30e47a613c983c99d1e6bb317b8e7c7ed0/librt-0.7.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:df9ccf00cfd1d1a7fce2a7b83e7d3e23091c464389d1cc78045ced27d9958eed", size = 56656, upload-time = "2025-12-06T11:29:40.866Z" },
