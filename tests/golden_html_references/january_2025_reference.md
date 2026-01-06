@@ -1,33 +1,120 @@
+[Jump to content](#bodyContent)
+
 [ ]
 
-* [Home](/wiki/Main_Page)
-* [Random](/wiki/Special%3ARandom)
-* [Nearby](/wiki/Special%3ANearby)
+Main menu
 
-* [Log in](/w/index.php?title=Special:UserLogin&returnto=Portal%3ACurrent+events%2FJanuary+2025)
+Main menu
 
-* [Settings](/w/index.php?title=Special:MobileOptions&returnto=Portal%3ACurrent+events%2FJanuary+2025)
+move to sidebar
+hide
 
-[Donate Now
-If Wikipedia is useful to you, please give today.
+Navigation
 
-![](https://en.wikipedia.org/static/images/donate/donate.gif)](https://donate.wikimedia.org/?wmf_source=donate&wmf_medium=sidebar&wmf_campaign=en.wikipedia.org&uselang=en&wmf_key=minerva)
+* [Main page](/wiki/Main_Page "Visit the main page [z]")
+* [Contents](/wiki/Wikipedia%3AContents "Guides to browsing Wikipedia")
+* [Current events](/wiki/Portal%3ACurrent_events "Articles related to current events")
+* [Random article](/wiki/Special%3ARandom "Visit a randomly selected article [x]")
+* [About Wikipedia](/wiki/Wikipedia%3AAbout "Learn about Wikipedia and how it works")
+* [Contact us](//en.wikipedia.org/wiki/Wikipedia%3AContact_us "How to contact Wikipedia")
 
-* [About Wikipedia](/wiki/Wikipedia%3AAbout)
-* [Disclaimers](/wiki/Wikipedia%3AGeneral_disclaimer)
+Contribute
 
-[![Wikipedia](/static/images/mobile/copyright/wikipedia-wordmark-en.svg)](/wiki/Main_Page)
+* [Help](/wiki/Help%3AContents "Guidance on how to use and edit Wikipedia")
+* [Learn to edit](/wiki/Help%3AIntroduction "Learn how to edit Wikipedia")
+* [Community portal](/wiki/Wikipedia%3ACommunity_portal "The hub for editors")
+* [Recent changes](/wiki/Special%3ARecentChanges "A list of recent changes to Wikipedia [r]")
+* [Upload file](/wiki/Wikipedia%3AFile_upload_wizard "Add images or other media for use on Wikipedia")
+* [Special pages](/wiki/Special%3ASpecialPages)
+
+[![](/static/images/icons/wikipedia.png)
+
+![Wikipedia](/static/images/mobile/copyright/wikipedia-wordmark-en.svg)
+![The Free Encyclopedia](/static/images/mobile/copyright/wikipedia-tagline-en.svg)](/wiki/Main_Page)
+
+[Search](/wiki/Special%3ASearch "Search Wikipedia [f]")
 
 Search
 
+[ ]
+
+Appearance
+
+* [Donate](https://donate.wikimedia.org/?wmf_source=donate&wmf_medium=sidebar&wmf_campaign=en.wikipedia.org&uselang=en)
+* [Create account](/w/index.php?title=Special:CreateAccount&returnto=Portal%3ACurrent+events%2FJanuary+2025 "You are encouraged to create an account and log in; however, it is not mandatory")
+* [Log in](/w/index.php?title=Special:UserLogin&returnto=Portal%3ACurrent+events%2FJanuary+2025 "You're encouraged to log in; however, it's not mandatory. [o]")
+
+[ ]
+
+Personal tools
+
+* [Donate](https://donate.wikimedia.org/?wmf_source=donate&wmf_medium=sidebar&wmf_campaign=en.wikipedia.org&uselang=en)
+* [Create account](/w/index.php?title=Special:CreateAccount&returnto=Portal%3ACurrent+events%2FJanuary+2025 "You are encouraged to create an account and log in; however, it is not mandatory")
+* [Log in](/w/index.php?title=Special:UserLogin&returnto=Portal%3ACurrent+events%2FJanuary+2025 "You're encouraged to log in; however, it's not mandatory. [o]")
+
 # Portal:Current events/January 2025
 
-* [Portal](/wiki/Portal%3ACurrent_events/January_2025)
-* [Talk](/wiki/Portal_talk%3ACurrent_events/January_2025)
+[ ]
 
-* [Language](#p-lang "Language")
-* [Watch](/w/index.php?title=Special:UserLogin&returnto=Portal%3ACurrent+events%2FJanuary+2025)
-* [Edit](/w/index.php?title=Portal:Current_events/January_2025&action=edit)
+4 languages
+
+* [العربية](https://ar.wikipedia.org/wiki/%D8%A8%D9%88%D8%A7%D8%A8%D8%A9%3A%D8%A3%D8%AD%D8%AF%D8%A7%D8%AB_%D8%AC%D8%A7%D8%B1%D9%8A%D8%A9/%D9%8A%D9%86%D8%A7%D9%8A%D8%B1_2025 "بوابة:أحداث جارية/يناير 2025 – Arabic")
+* [বাংলা](https://bn.wikipedia.org/wiki/%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A7%81%E0%A6%AF%E0%A6%BC%E0%A6%BE%E0%A6%B0%E0%A6%BF_%E0%A7%A8%E0%A7%A6%E0%A7%A8%E0%A7%AB-%E0%A6%8F%E0%A6%B0_%E0%A6%98%E0%A6%9F%E0%A6%A8%E0%A6%BE%E0%A6%AC%E0%A6%B2%E0%A6%BF "জানুয়ারি ২০২৫-এর ঘটনাবলি – Bangla")
+* [ไทย](https://th.wikipedia.org/wiki/%E0%B8%A1%E0%B8%81%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%A1_%E0%B8%9E.%E0%B8%A8._2568 "มกราคม พ.ศ. 2568 – Thai")
+* [اردو](https://ur.wikipedia.org/wiki/%D8%A8%D8%A7%D8%A8%3A%D8%AD%D8%A7%D9%84%DB%8C%DB%81_%D9%88%D8%A7%D9%82%D8%B9%D8%A7%D8%AA/%D8%AC%D9%86%D9%88%D8%B1%DB%8C_2025 "باب:حالیہ واقعات/جنوری 2025 – Urdu")
+
+[Edit links](https://www.wikidata.org/wiki/Special%3AEntityPage/Q131604374#sitelinks-wikipedia "Edit interlanguage links")
+
+* [Portal](/wiki/Portal%3ACurrent_events/January_2025 "View the subject page [c]")
+* [Talk](/wiki/Portal_talk%3ACurrent_events/January_2025 "Discuss improvements to the content page [t]")
+
+[ ]
+English
+
+* [Read](/wiki/Portal%3ACurrent_events/January_2025)
+* [Edit](/w/index.php?title=Portal:Current_events/January_2025&action=edit "Edit this page [e]")
+* [View history](/w/index.php?title=Portal:Current_events/January_2025&action=history "Past revisions of this page [h]")
+
+[ ]
+Tools
+
+Tools
+
+move to sidebar
+hide
+
+Actions
+
+* [Read](/wiki/Portal%3ACurrent_events/January_2025)
+* [Edit](/w/index.php?title=Portal:Current_events/January_2025&action=edit "Edit this page [e]")
+* [View history](/w/index.php?title=Portal:Current_events/January_2025&action=history)
+
+General
+
+* [What links here](/wiki/Special%3AWhatLinksHere/Portal%3ACurrent_events/January_2025 "List of all English Wikipedia pages containing links to this page [j]")
+* [Related changes](/wiki/Special%3ARecentChangesLinked/Portal%3ACurrent_events/January_2025 "Recent changes in pages linked from this page [k]")
+* [Upload file](//en.wikipedia.org/wiki/Wikipedia%3AFile_Upload_Wizard "Upload files [u]")
+* [Permanent link](/w/index.php?title=Portal:Current_events/January_2025&oldid=1330530208 "Permanent link to this revision of this page")
+* [Page information](/w/index.php?title=Portal:Current_events/January_2025&action=info "More information about this page")
+* [Get shortened URL](/w/index.php?title=Special:UrlShortener&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FPortal%3ACurrent_events%2FJanuary_2025)
+* [Download QR code](/w/index.php?title=Special:QrCode&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FPortal%3ACurrent_events%2FJanuary_2025)
+
+Print/export
+
+* [Download as PDF](/w/index.php?title=Special:DownloadAsPdf&page=Portal%3ACurrent_events%2FJanuary_2025&action=show-download-screen "Download this page as a PDF file")
+* [Printable version](/w/index.php?title=Portal:Current_events/January_2025&printable=yes "Printable version of this page [p]")
+
+In other projects
+
+* [Wikinews](https://en.wikinews.org/wiki/Wikinews%3A2025/January)
+* [Wikidata item](https://www.wikidata.org/wiki/Special%3AEntityPage/Q131604374 "Structured data on this page hosted by Wikidata [g]")
+
+Appearance
+
+move to sidebar
+hide
+
+From Wikipedia, the free encyclopedia
 
 < [Portal:Current events](/wiki/Portal%3ACurrent_events "Portal:Current events")
 
@@ -45,11 +132,11 @@ Search
 :   [November](/wiki/Portal%3ACurrent_events/November_2025 "Portal:Current events/November 2025")
 :   [December](/wiki/Portal%3ACurrent_events/December_2025 "Portal:Current events/December 2025")
 
-**[January](/wiki/January "January")** **[2025](/wiki/2025 "2025")** was the first month of the current common year. The month, which began on a [Wednesday](/wiki/Wednesday "Wednesday"), ended on a [Friday](/wiki/Friday "Friday") after 31 days.
+**[January](/wiki/January "January")** **[2025](/wiki/2025 "2025")** was the first month of that common year. The month, which began on a [Wednesday](/wiki/Wednesday "Wednesday"), ended on a [Friday](/wiki/Friday "Friday") after 31 days.
 
 ## [Portal:Current events](/wiki/Portal%3ACurrent_events "Portal:Current events")
 
-[edit](/w/index.php?title=Portal:Current_events/January_2025&action=edit&section=1 "Edit section: Portal:Current events")
+[[edit](/w/index.php?title=Portal:Current_events/January_2025&action=edit&section=1 "Edit section: Portal:Current events")]
 
 *This is an [archived version](/wiki/Portal%3ACurrent_events/How_to_archive_the_portal "Portal:Current events/How to archive the portal") of Wikipedia's [Current events Portal](/wiki/Portal%3ACurrent_events "Portal:Current events") from January 2025.*
 
@@ -68,11 +155,6 @@ January 1, 2025 (2025-01-01) (Wednesday)
   + A man kills 14 people and injures 35 others, including two police officers, in a [vehicle-ramming](/wiki/Vehicle-ramming_attack "Vehicle-ramming attack") and [shooting attack](/wiki/Mass_shooting "Mass shooting") on [Bourbon Street](/wiki/Bourbon_Street "Bourbon Street") in [New Orleans](/wiki/New_Orleans "New Orleans"), [Louisiana](/wiki/Louisiana "Louisiana"), [United States](/wiki/United_States "United States"), before being shot dead. The [FBI](/wiki/FBI "FBI") says that it found an [Islamic State](/wiki/Islamic_State "Islamic State") flag in the suspect's vehicle. [(Reuters)](https://www.reuters.com/world/us/multiple-fatalities-truck-crashes-into-new-orleans-crowd-cbs-news-says-2025-01-01/)
 * [Somali Civil War](/wiki/Somali_Civil_War_%282009%E2%80%93present%29 "Somali Civil War (2009–present)")
   + The [African Union Support and Stabilisation Mission](/wiki/African_Union_Support_and_Stabilization_Mission_in_Somalia "African Union Support and Stabilization Mission in Somalia"), endorsed by the [United Nations Security Council](/wiki/United_Nations_Security_Council "United Nations Security Council") on December 27, replaces the [African Union Transition Mission](/wiki/African_Union_Transition_Mission_in_Somalia "African Union Transition Mission in Somalia") as the [African Union](/wiki/African_Union "African Union")'s [peacekeeping](/wiki/Peacekeeping "Peacekeeping") mission in [Somalia](/wiki/Somalia "Somalia"). [(Voice of Nigeria)](https://von.gov.ng/un-approves-new-au-force-in-somalia/) [(UN Press)](https://press.un.org/en/2024/sc15955.doc.htm)
-
-**Arts and culture**
-
-* [Public Domain Day](/wiki/Public_Domain_Day "Public Domain Day"), [2025 in public domain](/wiki/2025_in_public_domain "2025 in public domain")
-  + The novel *[A Farewell to Arms](/wiki/A_Farewell_to_Arms "A Farewell to Arms")* and the cartoon characters [Popeye](/wiki/Popeye "Popeye") and [Tintin](/wiki/Tintin_%28character%29 "Tintin (character)") enter the [public domain](/wiki/Public_domain "Public domain") in the [United States](/wiki/United_States "United States"). [(*Rolling Stone*)](https://www.rollingstone.com/culture/culture-news/popeye-skeleton-dance-singin-in-the-rain-maltese-falcon-public-domain-1235218802/)
 
 **Business and economy**
 
@@ -152,6 +234,7 @@ January 2, 2025 (2025-01-02) (Thursday)
 
 **Disasters and accidents**
 
+* Seven people are killed and 31 injured after a truck crashed in [Gombe State](/wiki/Gombe_State "Gombe State"), [Nigeria](/wiki/Nigeria "Nigeria"). [(Daily Post)](https://dailypost.ng/2025/01/03/seven-dead-31-injured-in-gombe-auto-crash-frsc/)
 * A small plane crashes through the roof of a commercial warehouse in [Fullerton](/wiki/Fullerton%2C_California "Fullerton, California"), [California](/wiki/California "California"), [United States](/wiki/United_States "United States"), causing a fire, killing two people and injuring at least 18 others. [(KABC-TV)](https://abc7.com/post/small-plane-crashes-fullerton-resulting-4-alarm-fire-police-say/15742833/) [(AP)](https://apnews.com/article/california-plane-crash-fullerton-08ec23f1c117be7bc07fc9b8f4064f91)
 * Two officers were injured in an explosion of an unknown object at a police fence in [Berlin-Wittenau](/wiki/Berlin-Wittenau "Berlin-Wittenau"); the reasons for this are still unclear. [(*tagesschau*)](https://www.tagesschau.de/inland/regional/berlin/polizisten-explosion-verletzungen-berlin-100.html)
 
@@ -386,8 +469,9 @@ January 6, 2025 (2025-01-06) (Monday)
 
 **Disasters and accidents**
 
+* [2025 Assam mine incident](/wiki/2025_Assam_mine_incident "2025 Assam mine incident")
+  + Several miners are trapped in a [coal mine](/wiki/Coal_mine "Coal mine") in [Dima Hasao](/wiki/Dima_Hasao_district "Dima Hasao district"), [Assam](/wiki/Assam "Assam"), India, with rescue efforts underway involving the [State Disaster Response Force](/wiki/State_Disaster_Response_Force_%28Assam%29 "State Disaster Response Force (Assam)"), the [National Disaster Response Force](/wiki/National_Disaster_Response_Force "National Disaster Response Force"), and the [Indian Army](/wiki/Indian_Army "Indian Army"). Local authorities state that flooding may have caused the incident. [(Reuters)](https://www.reuters.com/world/india/several-miners-trapped-coal-mine-indias-assam-2025-01-06/)
 * 18 people are killed in a multi-vehicle collision on [Van Reenen's Pass](/wiki/Van_Reenen%27s_Pass "Van Reenen's Pass") in [KwaZulu-Natal](/wiki/KwaZulu-Natal "KwaZulu-Natal"), [South Africa](/wiki/South_Africa "South Africa"). [(ENCA)](https://www.enca.com/news/18-killed-multi-vehicle-crash-van-reenens-pass)
-* Several miners are trapped in a [coal mine](/wiki/Coal_mine "Coal mine") in [Dima Hasao](/wiki/Dima_Hasao_district "Dima Hasao district"), [Assam](/wiki/Assam "Assam"), India, with rescue efforts underway involving the [State Disaster Response Force](/wiki/State_Disaster_Response_Force_%28Assam%29 "State Disaster Response Force (Assam)"), the [National Disaster Response Force](/wiki/National_Disaster_Response_Force "National Disaster Response Force"), and the [Indian Army](/wiki/Indian_Army "Indian Army"). Local authorities state that flooding may have caused the incident. [(Reuters)](https://www.reuters.com/world/india/several-miners-trapped-coal-mine-indias-assam-2025-01-06/)
 
 **Health and environment**
 
@@ -795,7 +879,7 @@ January 13, 2025 (2025-01-13) (Monday)
       * Twenty-six [Islamic State](/wiki/Islamic_State_%E2%80%93_Somalia_Province "Islamic State – Somalia Province") militants are allegedly killed, including a female combatant and two soldiers, and several others are injured when [Puntland forces](/wiki/Puntland_Security_Force "Puntland Security Force") capture eight Islamic State bases during [ongoing offensive military operations](/wiki/Islamic_State_insurgency_in_Puntland#Clashes "Islamic State insurgency in Puntland") in [Bari](/wiki/Bari%2C_Somalia "Bari, Somalia"), [Puntland](/wiki/Puntland "Puntland"), [Somalia](/wiki/Somalia "Somalia"). [(Idil News)](https://www.idilnews.com/puntland-forces-kill-26-isis-militants-in-major-offensive-in-bari-region/) [(AFP)](https://www.barrons.com/news/several-is-fighters-killed-in-somalia-s-puntland-state-9950d700)
 * [Gaza war](/wiki/Gaza_war "Gaza war")
   + [Gaza war hostage crisis](/wiki/Gaza_war_hostage_crisis "Gaza war hostage crisis"), [Calls for a ceasefire during the Gaza war](/wiki/Calls_for_a_ceasefire_during_the_Gaza_war "Calls for a ceasefire during the Gaza war")
-    - According to two [Israeli](/wiki/Israel "Israel") officials, [Hamas](/wiki/Hamas "Hamas") is expected to release 33 hostages during the first phase of an [emerging ceasefire agreement](/wiki/2025_Gaza_war_ceasefire "2025 Gaza war ceasefire") being finalized by negotiators in [Doha](/wiki/Doha "Doha"), [Qatar](/wiki/Qatar "Qatar"). [(CNN)](https://www.cnn.com/2025/01/13/middleeast/hamas-33-hostages-israel-ceasefire-talks-intl-latam)
+    - According to two [Israeli](/wiki/Israel "Israel") officials, [Hamas](/wiki/Hamas "Hamas") is expected to release 33 hostages during the first phase of an [emerging ceasefire agreement](/wiki/January_2025_Gaza_war_ceasefire "January 2025 Gaza war ceasefire") being finalized by negotiators in [Doha](/wiki/Doha "Doha"), [Qatar](/wiki/Qatar "Qatar"). [(CNN)](https://www.cnn.com/2025/01/13/middleeast/hamas-33-hostages-israel-ceasefire-talks-intl-latam)
 * [Israeli invasion of Lebanon](/wiki/Israeli_invasion_of_Lebanon_%282024%E2%80%93present%29 "Israeli invasion of Lebanon (2024–present)")
   + [2024 Israel–Lebanon ceasefire agreement](/wiki/2024_Israel%E2%80%93Lebanon_ceasefire_agreement "2024 Israel–Lebanon ceasefire agreement")
     - The [Israel Defense Forces](/wiki/Israel_Defense_Forces "Israel Defense Forces") strike several [Hezbollah](/wiki/Hezbollah "Hezbollah") sites in [Lebanon](/wiki/Lebanon "Lebanon"), alleging that the targets violated the terms of the ceasefire agreement. [(*The Times of Israel*)](https://www.timesofisrael.com/idf-says-it-hit-hezbollah-sites-after-ceasefire-monitors-failed-to-address-threats/)
@@ -838,7 +922,7 @@ January 14, 2025 (2025-01-14) (Tuesday)
 
 * [Gaza war](/wiki/Gaza_war "Gaza war")
   + [Gaza war hostage crisis](/wiki/Gaza_war_hostage_crisis "Gaza war hostage crisis"), [Calls for a ceasefire during the Gaza war](/wiki/Calls_for_a_ceasefire_during_the_Gaza_war "Calls for a ceasefire during the Gaza war")
-    - [Hamas](/wiki/Hamas "Hamas") officials say that they have accepted a [draft agreement for a potential ceasefire](/wiki/2025_Gaza_war_ceasefire "2025 Gaza war ceasefire") as well as the release of [hostages](/wiki/Gaza_war_hostage_crisis "Gaza war hostage crisis"). Mediators in the [United States](/wiki/United_States "United States") and [Qatar](/wiki/Qatar "Qatar") also state that this is the closest that both sides have been to a ceasefire agreement so far. [(AP)](https://apnews.com/article/israel-palestinians-hamas-war-news-01-14-2025-a1495c0f4f13102903ce31a862c49baa)
+    - [Hamas](/wiki/Hamas "Hamas") officials say that they have accepted a [draft agreement for a potential ceasefire](/wiki/January_2025_Gaza_war_ceasefire "January 2025 Gaza war ceasefire") as well as the release of [hostages](/wiki/Gaza_war_hostage_crisis "Gaza war hostage crisis"). Mediators in the [United States](/wiki/United_States "United States") and [Qatar](/wiki/Qatar "Qatar") also state that this is the closest that both sides have been to a ceasefire agreement so far. [(AP)](https://apnews.com/article/israel-palestinians-hamas-war-news-01-14-2025-a1495c0f4f13102903ce31a862c49baa)
   + [Israeli incursions in the West Bank](/wiki/Israeli_incursions_in_the_West_Bank_%282023%E2%80%93present%29 "Israeli incursions in the West Bank (2023–present)")
     - Four [Al-Qassam Brigades](/wiki/Al-Qassam_Brigades "Al-Qassam Brigades") militants and two civilians are killed during an Israeli [airstrike](/wiki/Airstrike "Airstrike") in [Jenin](/wiki/Jenin "Jenin"), in the occupied [West Bank](/wiki/West_Bank "West Bank"). [(Al Jazeera)](https://www.aljazeera.com/news/liveblog/2025/1/15/live-israel-launches-fierce-strikes-on-gaza-as-ceasefire-deal-moves-closer?update=3442835)
 * [Russian invasion of Ukraine](/wiki/Russian_invasion_of_Ukraine "Russian invasion of Ukraine")
@@ -895,7 +979,7 @@ January 15, 2025 (2025-01-15) (Wednesday)
   + [Kivu conflict](/wiki/Kivu_conflict "Kivu conflict")
     - [Allied Democratic Forces](/wiki/Allied_Democratic_Forces "Allied Democratic Forces") militants kill ten people in an attack on a village in [North Kivu](/wiki/North_Kivu "North Kivu"), [Democratic Republic of the Congo](/wiki/Democratic_Republic_of_the_Congo "Democratic Republic of the Congo"). [(AP)](https://apnews.com/article/congo-islamic-rebel-attack-adf-kivu-makoko-faae44fe327d54ca619acd7c3fb30104)
 * [Gaza war](/wiki/Gaza_war "Gaza war")
-  + [2025 Gaza war ceasefire](/wiki/2025_Gaza_war_ceasefire "2025 Gaza war ceasefire")
+  + [2025 Gaza war ceasefire](/wiki/January_2025_Gaza_war_ceasefire "January 2025 Gaza war ceasefire")
     - [Israel](/wiki/Israel "Israel") and [Hamas](/wiki/Hamas "Hamas") reach a diplomatic agreement mediated by [Egypt](/wiki/Egypt "Egypt"), [Qatar](/wiki/Qatar "Qatar"), and the [U.S.](/wiki/U.S. "U.S.") to initiate a [ceasefire](/wiki/Ceasefire "Ceasefire") and an end to military operations in the [Gaza Strip](/wiki/Gaza_Strip "Gaza Strip"), as well as to facilitate the exchange of [hostages](/wiki/Gaza_war_hostage_crisis "Gaza war hostage crisis") and [prisoners](/wiki/Palestinians_in_Israeli_custody "Palestinians in Israeli custody"), marking the first major cessation of hostilities since [November 2023](/wiki/2023_Gaza_war_ceasefire "2023 Gaza war ceasefire"). [(CNN)](https://www.cnn.com/world/live-news/israel-hamas-gaza-ceasefire-hostages-01-15-24/index.html)
 * [Syrian civil war](/wiki/Syrian_civil_war "Syrian civil war")
   + [Israeli invasion of Syria](/wiki/Israeli_invasion_of_Syria_%282024%E2%80%93present%29 "Israeli invasion of Syria (2024–present)")
@@ -954,8 +1038,8 @@ January 16, 2025 (2025-01-16) (Thursday)
 
 * [Gaza war](/wiki/Gaza_war "Gaza war")
   + [Israeli bombing of the Gaza Strip](/wiki/Israeli_bombing_of_the_Gaza_Strip "Israeli bombing of the Gaza Strip")
-    - [Israeli](/wiki/Israeli_Air_Force "Israeli Air Force") [airstrikes](/wiki/Airstrike "Airstrike") kill at least 82 people across the [Gaza Strip](/wiki/Gaza_Strip "Gaza Strip"), including 30 in [Gaza City](/wiki/Gaza_City "Gaza City"), hours after the announcement of a [ceasefire agreement](/wiki/2025_Gaza_war_ceasefire "2025 Gaza war ceasefire"). [(Al Jazeera)](https://www.aljazeera.com/news/2025/1/16/israeli-attacks-kill-30-palestinians-in-gaza-after-ceasefire-deal-announced)
-  + [2025 Gaza war ceasefire](/wiki/2025_Gaza_war_ceasefire "2025 Gaza war ceasefire")
+    - [Israeli](/wiki/Israeli_Air_Force "Israeli Air Force") [airstrikes](/wiki/Airstrike "Airstrike") kill at least 82 people across the [Gaza Strip](/wiki/Gaza_Strip "Gaza Strip"), including 30 in [Gaza City](/wiki/Gaza_City "Gaza City"), hours after the announcement of a [ceasefire agreement](/wiki/January_2025_Gaza_war_ceasefire "January 2025 Gaza war ceasefire"). [(Al Jazeera)](https://www.aljazeera.com/news/2025/1/16/israeli-attacks-kill-30-palestinians-in-gaza-after-ceasefire-deal-announced)
+  + [2025 Gaza war ceasefire](/wiki/January_2025_Gaza_war_ceasefire "January 2025 Gaza war ceasefire")
     - The [Israeli](/wiki/Israel "Israel") and [Hamas](/wiki/Hamas "Hamas") negotiating teams sign the hostage release and ceasefire deal in [Doha](/wiki/Doha "Doha"), [Qatar](/wiki/Qatar "Qatar"). [(*The Times of Israel*)](https://www.timesofisrael.com/liveblog_entry/israel-and-hamas-sign-hostage-ceasefire-deal-after-mediators-iron-out-final-kinks/)
 * [Somali Civil War](/wiki/Somali_Civil_War_%282009%E2%80%93present%29 "Somali Civil War (2009–present)"), [War against the Islamic State](/wiki/War_against_the_Islamic_State "War against the Islamic State")
   + [Islamic State insurgency in Puntland](/wiki/Islamic_State_insurgency_in_Puntland "Islamic State insurgency in Puntland")
@@ -973,6 +1057,7 @@ January 16, 2025 (2025-01-16) (Thursday)
     - It is reported that the [Eaton Fire](/wiki/Eaton_Fire "Eaton Fire"), which has burned over 14,000 acres and has killed 17 people, is 65% contained. [(CBS News)](https://www.cbsnews.com/losangeles/news/eaton-fire-containment-altadena-strong-winds/)
 * [Stilfontein mine deaths](/wiki/Stilfontein_mine_deaths "Stilfontein mine deaths")
   + The bodies of nine [illegal miners](/wiki/Illegal_mining "Illegal mining") trapped inside a [gold mine](/wiki/Gold_mine "Gold mine") in [Stilfontein](/wiki/Stilfontein "Stilfontein"), [South Africa](/wiki/South_Africa "South Africa"), are recovered by [police](/wiki/South_African_Police_Service "South African Police Service"). [(CTV News)](https://www.ctvnews.ca/world/article/standoff-in-south-africa-ends-with-87-miners-dead-and-anger-over-polices-smoke-them-out-tactics/)
+* A boat carrying migrants capsizes near [Dakhla, Western Sahara](/wiki/Dakhla%2C_Western_Sahara "Dakhla, Western Sahara") on its way to Spain's [Canary Islands](/wiki/Canary_Islands "Canary Islands"), killing at least 50 people including 44 Pakistanis. [(AP News)](https://apnews.com/article/pakistan-migrant-boat-capsize-morocco-29d58ccf4ffdcde2860bbbce948c7ff0)
 * Two [deminers](/wiki/Demining "Demining") are killed in an explosion while attempting to remove a [Cambodian Civil War](/wiki/Cambodian_Civil_War "Cambodian Civil War")-era [anti-tank mine](/wiki/Anti-tank_mine "Anti-tank mine") from a rice field in [Oddar Meanchey province](/wiki/Oddar_Meanchey_province "Oddar Meanchey province"), [Cambodia](/wiki/Cambodia "Cambodia"). [(AP)](https://apnews.com/article/landmine-cambodia-killed-cmac-khmer-rouge-c4468881e8805a3106c56f8a2e664d34)
 
 **International relations**
@@ -1020,7 +1105,7 @@ January 17, 2025 (2025-01-17) (Friday)
 **Armed conflicts and attacks**
 
 * [Gaza war](/wiki/Gaza_war "Gaza war")
-  + The [Security Cabinet of Israel](/wiki/Security_Cabinet_of_Israel "Security Cabinet of Israel") approves the proposed [Gaza ceasefire agreement](/wiki/2025_Gaza_war_ceasefire "2025 Gaza war ceasefire"), which is expected to take effect on Sunday. [(*The Guardian*)](https://www.theguardian.com/world/2025/jan/17/israel-security-cabinet-approves-gaza-ceasefire-agreement)
+  + The [Security Cabinet of Israel](/wiki/Security_Cabinet_of_Israel "Security Cabinet of Israel") approves the proposed [Gaza ceasefire agreement](/wiki/January_2025_Gaza_war_ceasefire "January 2025 Gaza war ceasefire"), which is expected to take effect on Sunday. [(*The Guardian*)](https://www.theguardian.com/world/2025/jan/17/israel-security-cabinet-approves-gaza-ceasefire-agreement)
 * [Naxalite–Maoist insurgency](/wiki/Naxalite%E2%80%93Maoist_insurgency "Naxalite–Maoist insurgency")
   + Twelve [Naxalites](/wiki/Communist_Party_of_India_%28Maoist%29 "Communist Party of India (Maoist)") are killed in a [police](/wiki/State_Armed_Police_Forces "State Armed Police Forces") raid in [Bijapur](/wiki/Bijapur_district%2C_Chhattisgarh "Bijapur district, Chhattisgarh"), [Chhattisgarh](/wiki/Chhattisgarh "Chhattisgarh"), [India](/wiki/India "India"). [(Al Jazeera)](https://www.aljazeera.com/news/2025/1/17/at-least-12-maoist-rebels-killed-by-indias-security-forces)
 * [Colombian conflict](/wiki/Colombian_conflict "Colombian conflict")
@@ -1081,7 +1166,7 @@ January 18, 2025 (2025-01-18) (Saturday)
     - At least four people are killed in Russian missile and [drone attacks](/wiki/Drone_warfare "Drone warfare") on [Kyiv](/wiki/Kyiv "Kyiv"), Ukraine. [(Al Jazeera)](https://www.aljazeera.com/news/2025/1/18/russian-attacks-on-centre-of-kyiv-leave-four-dead)
 * [Israeli–Palestinian conflict](/wiki/Israeli%E2%80%93Palestinian_conflict "Israeli–Palestinian conflict")
   + [Gaza war](/wiki/Gaza_war "Gaza war")
-    - The [Government of Israel](/wiki/Government_of_Israel "Government of Israel") approves the proposed [Gaza ceasefire agreement](/wiki/2025_Gaza_war_ceasefire "2025 Gaza war ceasefire"), which had previously been approved by the [Security Cabinet of Israel](/wiki/Security_Cabinet_of_Israel "Security Cabinet of Israel"). [(CNN)](https://edition.cnn.com/2025/01/18/middleeast/israel-approves-ceasefire-hostage-deal-intl-hnk/index.html?iid=cnn_buildContentRecirc_end_recirc)
+    - The [Government of Israel](/wiki/Government_of_Israel "Government of Israel") approves the proposed [Gaza ceasefire agreement](/wiki/January_2025_Gaza_war_ceasefire "January 2025 Gaza war ceasefire"), which had previously been approved by the [Security Cabinet of Israel](/wiki/Security_Cabinet_of_Israel "Security Cabinet of Israel"). [(CNN)](https://edition.cnn.com/2025/01/18/middleeast/israel-approves-ceasefire-hostage-deal-intl-hnk/index.html?iid=cnn_buildContentRecirc_end_recirc)
   + A [Palestinian](/wiki/Palestinian "Palestinian") man from [Tulkarm](/wiki/Tulkarm "Tulkarm") in the [West Bank](/wiki/West_Bank "West Bank") stabs and seriously injures a man in central [Tel Aviv](/wiki/Tel_Aviv "Tel Aviv") after illegally entering [Israel](/wiki/Israel "Israel"). An armed civilian subsequently shoots and kills the perpetrator. [(*The Times of Israel*)](https://www.timesofisrael.com/man-seriously-hurt-in-tel-aviv-stabbing-palestinian-terrorist-shot-dead/)
 * [2025 assassination of Iranian Supreme Court judges](/wiki/2025_assassination_of_Iranian_Supreme_Court_judges "2025 assassination of Iranian Supreme Court judges")
   + Two judges are killed and a third judge and a bodyguard are injured in a mass shooting at the [Supreme Court of Iran](/wiki/Supreme_Court_of_Iran "Supreme Court of Iran") in [Tehran](/wiki/Tehran "Tehran"), [Iran](/wiki/Iran "Iran"). The perpetrator subsequently [kills himself](/wiki/Murder%E2%80%93suicide "Murder–suicide"). [(DW)](https://www.dw.com/en/iran-two-judges-shot-dead-outside-supreme-court-in-tehran/a-71335185)
@@ -1125,7 +1210,7 @@ January 19, 2025 (2025-01-19) (Sunday)
       * The [National Liberation Army](/wiki/National_Liberation_Army_%28Colombia%29 "National Liberation Army (Colombia)") (ELN) and [FARC dissidents](/wiki/FARC_dissidents "FARC dissidents") exchange heavy fire across the [Catatumbo region](/wiki/Catatumbo_region "Catatumbo region"), [Colombia](/wiki/Colombia "Colombia"), killing at least 80 people and injuring hundreds of others, with an unknown number of people also reportedly being kidnapped, after the ELN accused the FARC dissidents of killing civilians in the area. Thousands of people have fled their homes due to the fighting. The [Colombian Army](/wiki/National_Army_of_Colombia "National Army of Colombia") says that it has rescued dozens of people, while [the government](/wiki/Government_of_Colombia "Government of Colombia") calls on the ELN to cease their attacks immediately. [(CBS News)](https://www.cbsnews.com/news/kidnapped-colombia-peace-talks-fail-rebel-national-liberation-army/)
 * [Gaza war](/wiki/Gaza_war "Gaza war")
   + [Gaza war hostage crisis](/wiki/Gaza_war_hostage_crisis "Gaza war hostage crisis")
-    - The [Gaza ceasefire agreement](/wiki/2025_Gaza_war_ceasefire "2025 Gaza war ceasefire") formally goes into effect, with the first hostages and prisoners freed as part of the deal. [(CNN)](https://edition.cnn.com/world/live-news/israel-hamas-ceasefire-war-palestine-01-19-25/index.html)
+    - The [Gaza ceasefire agreement](/wiki/January_2025_Gaza_war_ceasefire "January 2025 Gaza war ceasefire") formally goes into effect, with the first hostages and prisoners freed as part of the deal. [(CNN)](https://edition.cnn.com/world/live-news/israel-hamas-ceasefire-war-palestine-01-19-25/index.html)
   + [Israel](/wiki/Israel "Israel") announces that [its troops](/wiki/Israel_Defense_Forces "Israel Defense Forces") have recovered the body of [staff sergeant](/wiki/Staff_sergeant "Staff sergeant") [Oron Shaul](/wiki/Deaths_and_ransoming_of_Oron_Shaul_and_Hadar_Goldin#Oron_Shaul "Deaths and ransoming of Oron Shaul and Hadar Goldin"), who was captured and killed by [Hamas](/wiki/Hamas "Hamas") in 2014. [(*The Times of Israel*)](https://www.timesofisrael.com/liveblog_entry/body-of-oron-shaul-killed-and-captured-by-hamas-in-2014-recovered-from-gaza/)
 
 **Disasters and accidents**
@@ -1135,6 +1220,8 @@ January 19, 2025 (2025-01-19) (Sunday)
   + [January 2025 Southern California wildfires](/wiki/January_2025_Southern_California_wildfires "January 2025 Southern California wildfires")
     - [Cal Fire](/wiki/California_Department_of_Forestry_and_Fire_Protection "California Department of Forestry and Fire Protection") reports that the [Palisades Fire](/wiki/Palisades_Fire "Palisades Fire") is more than 50% contained, while the [Eaton Fire](/wiki/Eaton_Fire "Eaton Fire") is more than 80% contained. [(*Forbes*)](https://www.forbes.com/sites/antoniopequenoiv/2025/01/19/california-wildfire-updates-palisades-fire-finally-over-50-contained/)
 * A bus crashed into a concrete centre barrier in [Eastern Cape](/wiki/Eastern_Cape "Eastern Cape"), killing five and injuring six. [(news365)](https://news365.co.za/head-on-collision-25/)
+* Four people are killed after a house caught fire from a short circuit in [Ghaziabad](/wiki/Ghaziabad "Ghaziabad"), [India](/wiki/India "India"). [(The Hindu)](https://www.thehindu.com/news/national/uttar-pradesh/fire-breaks-out-in-house-in-ghaziabad-four-killed/article69115550.ece)
+* Three people are killed and four are missing after a boat carrying 17 people capsized near [Golaghat](/wiki/Golaghat "Golaghat"), [India](/wiki/India "India"). [(The Hindu)](https://www.thehindu.com/news/national/bihar/people-missing-some-dead-as-boat-capsizes-in-ganga-in-bihars-katihar/article69115808.ece)
 
 **Law and crime**
 
@@ -1148,7 +1235,7 @@ January 19, 2025 (2025-01-19) (Sunday)
 **Politics and elections**
 
 * [Gaza war](/wiki/Gaza_war "Gaza war")
-  + Three ministers of the [Government of Israel](/wiki/Government_of_Israel "Government of Israel") belonging to the [Otzma Yehudit](/wiki/Otzma_Yehudit "Otzma Yehudit") party resign in protest of the approved [Gaza ceasefire agreement](/wiki/2025_Gaza_war_ceasefire "2025 Gaza war ceasefire"). [(*The Times of Israel*)](https://www.timesofisrael.com/otzma-yehudit-exits-coalition-over-gaza-deal-blasting-it-as-victory-for-terrorism/)
+  + Three ministers of the [Government of Israel](/wiki/Government_of_Israel "Government of Israel") belonging to the [Otzma Yehudit](/wiki/Otzma_Yehudit "Otzma Yehudit") party resign in protest of the approved [Gaza ceasefire agreement](/wiki/January_2025_Gaza_war_ceasefire "January 2025 Gaza war ceasefire"). [(*The Times of Israel*)](https://www.timesofisrael.com/otzma-yehudit-exits-coalition-over-gaza-deal-blasting-it-as-victory-for-terrorism/)
 
 **Science and technology**
 
@@ -1174,7 +1261,7 @@ January 20, 2025 (2025-01-20) (Monday)
     - [Ukrainian](/wiki/Armed_Forces_of_Ukraine "Armed Forces of Ukraine") [drones attack](/wiki/Drone_warfare "Drone warfare") industrial facilities in [Tatarstan](/wiki/Tatarstan "Tatarstan"), [Russia](/wiki/Russia "Russia"), prompting the Russian [Federal Air Transport Agency](/wiki/Federal_Air_Transport_Agency "Federal Air Transport Agency") to temporarily suspend flights at [Kazan International Airport](/wiki/Kazan_International_Airport "Kazan International Airport") in [Kazan](/wiki/Kazan "Kazan") and [Begishevo Airport](/wiki/Begishevo_Airport "Begishevo Airport") in [Nizhnekamsk](/wiki/Nizhnekamsk "Nizhnekamsk"). [(ABC News)](https://abcnews.go.com/International/drones-attack-russian-military-industrial-hub-600-miles/story?id=117876447)
 * [Gaza war](/wiki/Gaza_war "Gaza war")
   + An [IDF](/wiki/Israel_Defense_Forces "Israel Defense Forces") reservist is killed and four others are injured, including a senior officer in critical condition, after their [MDT David](/wiki/MDT_David "MDT David") light armored vehicle hits a roadside bomb during a patrol in [Tammun](/wiki/Tammun "Tammun") in the [West Bank](/wiki/West_Bank "West Bank"). [(*Times of Israel*)](https://www.timesofisrael.com/liveblog_entry/idf-reservist-killed-two-others-wounded-by-roadside-bomb-in-west-bank-overnight/)
-  + The [Palestinian Civil Defence](/wiki/Palestinian_Civil_Defence "Palestinian Civil Defence") (PCD) states that the remains of 137 people have been recovered from [Rafah](/wiki/Rafah "Rafah") in the [Gaza Strip](/wiki/Gaza_Strip "Gaza Strip") since the start of the [ceasefire](/wiki/2025_Gaza_war_ceasefire "2025 Gaza war ceasefire"). The PCD estimates that there are 10,000 bodies buried under rubble left to be recovered. [(Al Jazeera)](https://www.aljazeera.com/news/liveblog/2025/1/20/live-palestinian-prisoners-freed-by-israel-after-captives-released-in-gaza?update=3454862)
+  + The [Palestinian Civil Defence](/wiki/Palestinian_Civil_Defence "Palestinian Civil Defence") (PCD) states that the remains of 137 people have been recovered from [Rafah](/wiki/Rafah "Rafah") in the [Gaza Strip](/wiki/Gaza_Strip "Gaza Strip") since the start of the [ceasefire](/wiki/January_2025_Gaza_war_ceasefire "January 2025 Gaza war ceasefire"). The PCD estimates that there are 10,000 bodies buried under rubble left to be recovered. [(Al Jazeera)](https://www.aljazeera.com/news/liveblog/2025/1/20/live-palestinian-prisoners-freed-by-israel-after-captives-released-in-gaza?update=3454862)
 
 **Business and economy**
 
@@ -1342,6 +1429,7 @@ January 23, 2025 (2025-01-23) (Thursday)
 
 **Disasters and accidents**
 
+* Twenty-five people are killed and 14 injured after a bus overturned in [Dawunt District](/w/index.php?title=Dawunt_District&action=edit&redlink=1 "Dawunt District (page does not exist)"), [Ethiopia](/wiki/Ethiopia "Ethiopia"). [(The Sudan Times)](https://thesudantimes.com/africa/deadly-bus-accident-in-northern-ethiopia-25-killed/)
 * Four people are killed and five more injured in a [stampede](/wiki/Stampede "Stampede") at [Cambodian](/wiki/Cambodia "Cambodia") businessman [Sok Kong](/wiki/Sok_Kong "Sok Kong")'s home in [Phnom Penh](/wiki/Phnom_Penh "Phnom Penh") as he was giving away food and money amid [Lunar New Year](/wiki/Lunar_New_Year "Lunar New Year") celebrations. [(AP)](https://apnews.com/article/cambodia-crowd-crush-killed-sok-kong-facdf0652f008fa1695283aae9f49078)
 * Nineteen vehicles figured in a pileup along the [Yekaterinburg](/wiki/Yekaterinburg "Yekaterinburg")-[Almaty](/wiki/Almaty "Almaty") highway near [Aksu-Ayuly](/wiki/Aksu-Ayuly "Aksu-Ayuly"), [Kazakhstan](/wiki/Kazakhstan "Kazakhstan"), [Karaganda Region](/wiki/Karaganda_Region "Karaganda Region"), injuring six. [(Kazinform)](https://en.inform.kz/news/several-injured-in-massive-19-car-pile-up-in-karaganda-region-8ed368/)
 
@@ -1454,7 +1542,7 @@ January 25, 2025 (2025-01-25) (Saturday)
       * Eighty-four [National Liberation Army](/wiki/National_Liberation_Army_%28Colombia%29 "National Liberation Army (Colombia)") (ELN) combatants surrender to [Colombian](/wiki/Colombia "Colombia") [authorities](/wiki/Military_Forces_of_Colombia "Military Forces of Colombia") as offensive operations resume in the [Catatumbo region](/wiki/Catatumbo_region "Catatumbo region"). Colombian authorities also rescue 20 [child soldiers](/wiki/Child_soldiers "Child soldiers") from the ELN's 33rd Front. [(*El Colombiano*)](https://www.elcolombiano.com/colombia/primeros-resultados-operaciones-militares-en-el-catatumbo-GE26447188)
   + A [police officer](/wiki/National_Police_of_Colombia "National Police of Colombia") is shot dead by an ELN sniper in [Río Iró](/wiki/R%C3%ADo_Ir%C3%B3 "Río Iró"), [Chocó Department](/wiki/Choc%C3%B3_Department "Chocó Department"), Colombia. [(*El Tiempo*)](https://www.eltiempo.com/colombia/otras-ciudades/choco-muere-patrullero-de-la-policia-que-resulto-herido-durante-ataque-armado-del-eln-en-rio-iro-3420870)
 * [Gaza war](/wiki/Gaza_war "Gaza war")
-  + [2025 Gaza war ceasefire](/wiki/2025_Gaza_war_ceasefire "2025 Gaza war ceasefire"), [Gaza war hostage crisis](/wiki/Gaza_war_hostage_crisis "Gaza war hostage crisis")
+  + [2025 Gaza war ceasefire](/wiki/January_2025_Gaza_war_ceasefire "January 2025 Gaza war ceasefire"), [Gaza war hostage crisis](/wiki/Gaza_war_hostage_crisis "Gaza war hostage crisis")
     - [Israeli forces](/wiki/Israeli_Defense_Forces "Israeli Defense Forces") open fire on a crowd of [displaced](/wiki/Forced_displacement "Forced displacement") [Palestinians](/wiki/Palestinians "Palestinians") waiting at the [Netzarim Corridor](/wiki/Netzarim_Corridor "Netzarim Corridor"), killing two people and wounding seven others, including a child. [Israeli authorities](/wiki/Government_of_Israel "Government of Israel") allege that the shooting was due to the delayed release of Israeli hostage [Arbel Yahud](/wiki/2025_Israel%E2%80%93Hamas_ceasefire#By_Hamas "2025 Israel–Hamas ceasefire"). [(Anadolu Ajansi)](https://www.aa.com.tr/en/middle-east/2-killed-7-injured-by-israeli-army-fire-in-gaza-in-violation-of-ceasefire/3462678) [(Al Jazeera)](https://www.aljazeera.com/program/newsfeed/2025/1/25/israeli-forces-fire-on-crowds-near-gazas-netzarim-corridor)
     - [Hamas](/wiki/Hamas "Hamas") frees four [Israeli](/wiki/Israelis "Israelis") hostages, including [Naama Levy](/wiki/Kidnapping_of_Naama_Levy "Kidnapping of Naama Levy"), in exchange for 200 [Palestinian prisoners](/wiki/Palestinian_prisoners_in_Israel "Palestinian prisoners in Israel"), including 121 people serving [life sentences](/wiki/Life_sentence "Life sentence") after being convicted of carrying out deadly attacks against Israelis, as part of the ceasefire deal. [(AP)](https://apnews.com/article/israel-palestinians-hamas-war-news-ceasefire-hostages-01-25-2025-150674e17bd8b22f2c2c3aa4991cf061)
   + [Israel](/wiki/Israel "Israel") accuses Hamas of violating the deal by failing to release female civilians, including Arbel Yehud, before [female soldiers](/wiki/Women_in_the_Israel_Defense_Forces "Women in the Israel Defense Forces"). As a result, Israel blocks Palestinians from returning to [North Gaza](/wiki/North_Gaza_Governorate "North Gaza Governorate") through the Netzarim Corridor. [(AP)](https://apnews.com/article/israel-palestinians-hamas-war-news-ceasefire-hostages-01-26-2025-d0f9d113ceec2dababe462967ee8d398) [(BBC News)](https://www.bbc.com/news/articles/c9qjy4lzqn3o)
@@ -1691,7 +1779,7 @@ January 29, 2025 (2025-01-29) (Wednesday)
     - [Islamic State insurgency in Puntland](/wiki/Islamic_State_insurgency_in_Puntland "Islamic State insurgency in Puntland")
       * [Puntland](/wiki/Puntland "Puntland") authorities deport around a thousand undocumented [Ethiopians](/wiki/Ethiopians "Ethiopians") from the cities of [Bosaso](/wiki/Bosaso "Bosaso"), [Galkayo](/wiki/Galkayo "Galkayo"), [Qardho](/wiki/Qardho "Qardho"), and the state’s capital, [Garoowe](/wiki/Garoowe "Garoowe"), as part of an ongoing crackdown on foreigners without legal status, following the discovery of foreign fighters acting as [Islamic State](/wiki/Islamic_State "Islamic State") recruiters in the [Cal Miskaad](/wiki/Cal_Miskaad "Cal Miskaad") mountains of the [Bari Region](/wiki/Bari_Region "Bari Region"). [(Hiiraan Online)](https://www.hiiraan.com/news4/2025/Jan/200008/puntland_deports_hundreds_of_undocumented_ethiopians_over_isis_recruitment_concerns.aspx) [(Idil News)](https://www.idilnews.com/puntland-oo-dib-ugu-celisay-dalkooda-boqolaal-itoobiyaan-ah/) [(Horseed Media)](https://horseedmedia.net/puntland-oo-masaafurisay-boqolaal-ajaaniib-ah-oo-sharci-darro-ku-joogay-deegaanadeeda/399908/)
 * [Gaza war](/wiki/Gaza_war "Gaza war")
-  + [2025 Gaza war ceasefire](/wiki/2025_Gaza_war_ceasefire "2025 Gaza war ceasefire")
+  + [2025 Gaza war ceasefire](/wiki/January_2025_Gaza_war_ceasefire "January 2025 Gaza war ceasefire")
     - [U.S.](/wiki/U.S. "U.S.") [Middle East](/wiki/Middle_East "Middle East") Envoy [Steve Witkoff](/wiki/Steve_Witkoff "Steve Witkoff") visits the [Gaza Strip](/wiki/Gaza_Strip "Gaza Strip") and meets with [Israeli](/wiki/Israel "Israel") [prime minister](/wiki/Prime_Minister_of_Israel "Prime Minister of Israel") [Benjamin Netanyahu](/wiki/Benjamin_Netanyahu "Benjamin Netanyahu") to assure that the [ceasefire](/wiki/Ceasefire "Ceasefire") remains intact. [(NPR)](https://www.npr.org/2025/01/29/nx-s1-5279178/us-mideast-envoy-steve-witkoff-gaza-israel-netanyahu)
 * [Russian invasion of Ukraine](/wiki/Russian_invasion_of_Ukraine "Russian invasion of Ukraine")
   + [Battle of Chasiv Yar](/wiki/Battle_of_Chasiv_Yar "Battle of Chasiv Yar")
@@ -1762,7 +1850,7 @@ January 30, 2025 (2025-01-30) (Thursday)
   + [Killing of Salwan Momika](/wiki/Killing_of_Salwan_Momika "Killing of Salwan Momika")
     - [Islam critic](/wiki/Criticism_of_Islam "Criticism of Islam") and [Quran burner](/wiki/Quran_desecration "Quran desecration") [Salwan Momika](/wiki/Salwan_Momika "Salwan Momika") is [assassinated](/wiki/Assassination "Assassination") at his apartment in [Södertälje](/wiki/S%C3%B6dert%C3%A4lje "Södertälje"), [Sweden](/wiki/Sweden "Sweden"). [(BBC News)](https://www.bbc.com/news/articles/cpdx2wqpg7zo)
 * [Gaza war](/wiki/Gaza_war "Gaza war")
-  + [2025 Gaza war ceasefire](/wiki/2025_Gaza_war_ceasefire "2025 Gaza war ceasefire"), [Gaza war hostage crisis](/wiki/Gaza_war_hostage_crisis "Gaza war hostage crisis")
+  + [2025 Gaza war ceasefire](/wiki/January_2025_Gaza_war_ceasefire "January 2025 Gaza war ceasefire"), [Gaza war hostage crisis](/wiki/Gaza_war_hostage_crisis "Gaza war hostage crisis")
     - [Hamas](/wiki/Hamas "Hamas") free eight hostages, three [Israelis](/wiki/Israelis "Israelis") and five [Thai](/wiki/Thailand "Thailand") nationals. [(*The Times of Israel*)](https://www.timesofisrael.com/hostages-agam-berger-arbel-yehoud-gadi-mozes-5-thai-nationals-freed-from-gaza-after-482-days/)
     - Israel releases 110 [Palestinian](/wiki/Palestinians "Palestinians") [prisoners](/wiki/Palestinian_prisoners_in_Israel "Palestinian prisoners in Israel") after initially delaying their release in protest of the chaotic scenes at the handover of several hostages in [Khan Yunis](/wiki/Khan_Yunis "Khan Yunis"), [Gaza](/wiki/Gaza_Strip "Gaza Strip"), earlier today, citing concerns for the hostages' safety. [(Reuters)](https://www.reuters.com/world/middle-east/palestinian-militants-arrive-gaza-site-before-hostage-handover-militant-sources-2025-01-30/)
   + [Hamas](/wiki/Hamas "Hamas") confirms that Israel killed [Mohammed Deif](/wiki/Mohammed_Deif "Mohammed Deif") along with [Marwan Issa](/wiki/Marwan_Issa "Marwan Issa"), Raed Thabet, [Rafa Salama](/wiki/Rafa_Salama "Rafa Salama"), [Ayman Nofal](/wiki/Ayman_Nofal "Ayman Nofal") and Ghazi Abu Tamaa. [(Al Arabiya)](https://www.alarabiya.net/arab-and-world/2025/01/30/%D8%B1%D8%B3%D9%85%D9%8A%D8%A7-%D8%AD%D9%85%D8%A7%D8%B3-%D8%AA%D9%86%D8%B9%D9%89-%D9%85%D8%AD%D9%85%D8%AF-%D8%A7%D9%84%D8%B6%D9%8A%D9%81)
@@ -1777,7 +1865,7 @@ January 30, 2025 (2025-01-30) (Thursday)
 **Disasters and accidents**
 
 * [2025 Potomac River mid-air collision](/wiki/2025_Potomac_River_mid-air_collision "2025 Potomac River mid-air collision")
-  + The [District of Columbia Fire and Emergency Medical Services Department](/wiki/District_of_Columbia_Fire_and_Emergency_Medical_Services_Department "District of Columbia Fire and Emergency Medical Services Department") says no survivors are expected after the midair collision between an [American Airlines](/wiki/American_Airlines "American Airlines") aicraft and a [military](/wiki/United_States_Armed_Forces "United States Armed Forces") [helicopter](/wiki/Military_helicopter "Military helicopter") last night over [Washington, D.C.](/wiki/Washington%2C_D.C. "Washington, D.C."), [United States](/wiki/United_States "United States"), making it the deadliest aviation disaster in the U.S. since [American Airlines Flight 587](/wiki/American_Airlines_Flight_587 "American Airlines Flight 587") in 2001. [(CNN)](https://edition.cnn.com/us/live-news/plane-crash-dca-potomac-washington-dc-01-29-25/index.html)
+  + The [District of Columbia Fire and Emergency Medical Services Department](/wiki/District_of_Columbia_Fire_and_Emergency_Medical_Services_Department "District of Columbia Fire and Emergency Medical Services Department") says no survivors are expected after the midair collision between an [American Airlines](/wiki/American_Airlines "American Airlines") aircraft and a [military](/wiki/United_States_Armed_Forces "United States Armed Forces") [helicopter](/wiki/Military_helicopter "Military helicopter") last night over [Washington, D.C.](/wiki/Washington%2C_D.C. "Washington, D.C."), [United States](/wiki/United_States "United States"), making it the deadliest aviation disaster in the U.S. since [American Airlines Flight 587](/wiki/American_Airlines_Flight_587 "American Airlines Flight 587") in 2001. [(CNN)](https://edition.cnn.com/us/live-news/plane-crash-dca-potomac-washington-dc-01-29-25/index.html)
 
 **Health and environment**
 
@@ -1923,7 +2011,7 @@ Wikimedia portal
 
 :   * 06: **[Greece](/wiki/Elections_in_Greece "Elections in Greece")**, [President (3rd; indirect)](/wiki/2025_Greek_presidential_election "2025 Greek presidential election")
     * 07: ***[Turks and Caicos Islands](/wiki/Elections_in_the_Turks_and_Caicos_Islands "Elections in the Turks and Caicos Islands")***, *[House of Assembly](/wiki/2025_Turks_and_Caicos_Islands_general_election "2025 Turks and Caicos Islands general election")*
-    * 09: ***[Kosovo](/wiki/Elections_in_Kosovo "Elections in Kosovo")***, *[Assembly](/wiki/2025_Kosovan_parliamentary_election "2025 Kosovan parliamentary election")*
+    * 09: ***[Kosovo](/wiki/Elections_in_Kosovo "Elections in Kosovo")***, *[Assembly](/wiki/February_2025_Kosovan_parliamentary_election "February 2025 Kosovan parliamentary election")*
     * 09: **[Liechtenstein](/wiki/Elections_in_Liechtenstein "Elections in Liechtenstein")**, [Landtag](/wiki/2025_Liechtenstein_general_election "2025 Liechtenstein general election")
     * 09: **[Ecuador](/wiki/Elections_in_Ecuador "Elections in Ecuador")**, [President, National Assembly](/wiki/2025_Ecuadorian_general_election "2025 Ecuadorian general election")
     * 15: ***[Abkhazia](/wiki/Elections_in_Abkhazia "Elections in Abkhazia")***, *[President](/wiki/2025_Abkhazian_presidential_election "2025 Abkhazian presidential election")*
@@ -2218,7 +2306,7 @@ See also – [List of ongoing proxy wars](/wiki/List_of_ongoing_proxy_wars "List
 * [![](//upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Wikiquote-logo.svg/40px-Wikiquote-logo.svg.png)](/wiki/File%3AWikiquote-logo.svg)[Quotations](https://en.wikiquote.org/wiki/Category%3A2025 "q:Category:2025") from Wikiquote
 * [![](//upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Wikisource-logo.svg/40px-Wikisource-logo.svg.png)](/wiki/File%3AWikisource-logo.svg)[Texts](https://en.wikisource.org/wiki/Category%3A2025_works "s:Category:2025 works") from Wikisource
 * [![](//upload.wikimedia.org/wikipedia/commons/thumb/d/df/Wikispecies-logo.svg/40px-Wikispecies-logo.svg.png)](/wiki/File%3AWikispecies-logo.svg)[Taxa](https://species.wikimedia.org/wiki/Category%3ANew_species_2025 "species:Category:New species 2025") from Wikispecies
-* ![](//upload.wikimedia.org/wikipedia/commons/thumb/7/75/Wikimedia_Community_Logo.svg/40px-Wikimedia_Community_Logo.svg.png) [Discussions](https://meta.wikimedia.org/wiki/Special%3ASearch/Category%3A2025 "m:Special:Search/Category:2025") from Meta-Wiki
+* ![](//upload.wikimedia.org/wikipedia/commons/thumb/7/75/Wikimedia_Community_Logo.svg/40px-Wikimedia_Community_Logo.svg.png)[Discussions](https://meta.wikimedia.org/wiki/Special%3ASearch/Category%3A2025 "m:Special:Search/Category:2025") from Meta-Wiki
 
 [...more](/wiki/Category%3A2025 "Category:2025")
 
@@ -2230,38 +2318,53 @@ Wikimedia Commons has media related to [January 2025](https://commons.wikimedia.
 
 | * [v](/wiki/Template%3AEvents_by_month_links "Template:Events by month links") * [t](/wiki/Template_talk%3AEvents_by_month_links "Template talk:Events by month links") * [e](/wiki/Special%3AEditPage/Template%3AEvents_by_month_links "Special:EditPage/Template:Events by month links")  Current events by month | |
 | --- | --- |
-| [2025](/wiki/2025 "2025") | * Jan * [Feb](/wiki/Portal%3ACurrent_events/February_2025 "Portal:Current events/February 2025") * [Mar](/wiki/Portal%3ACurrent_events/March_2025 "Portal:Current events/March 2025") * [Apr](/wiki/Portal%3ACurrent_events/April_2025 "Portal:Current events/April 2025") * [May](/wiki/Portal%3ACurrent_events/May_2025 "Portal:Current events/May 2025") * [Jun](/wiki/Portal%3ACurrent_events/June_2025 "Portal:Current events/June 2025") * [Jul](/wiki/Portal%3ACurrent_events/July_2025 "Portal:Current events/July 2025") * [Aug](/wiki/Portal%3ACurrent_events/August_2025 "Portal:Current events/August 2025") |
+| [2026](/wiki/2026 "2026") | * [Jan](/wiki/Portal%3ACurrent_events/January_2026 "Portal:Current events/January 2026") |
+| [2025](/wiki/2025 "2025") | * Jan * [Feb](/wiki/Portal%3ACurrent_events/February_2025 "Portal:Current events/February 2025") * [Mar](/wiki/Portal%3ACurrent_events/March_2025 "Portal:Current events/March 2025") * [Apr](/wiki/Portal%3ACurrent_events/April_2025 "Portal:Current events/April 2025") * [May](/wiki/Portal%3ACurrent_events/May_2025 "Portal:Current events/May 2025") * [Jun](/wiki/Portal%3ACurrent_events/June_2025 "Portal:Current events/June 2025") * [Jul](/wiki/Portal%3ACurrent_events/July_2025 "Portal:Current events/July 2025") * [Aug](/wiki/Portal%3ACurrent_events/August_2025 "Portal:Current events/August 2025") * [Sep](/wiki/Portal%3ACurrent_events/September_2025 "Portal:Current events/September 2025") * [Oct](/wiki/Portal%3ACurrent_events/October_2025 "Portal:Current events/October 2025") * [Nov](/wiki/Portal%3ACurrent_events/November_2025 "Portal:Current events/November 2025") * [Dec](/wiki/Portal%3ACurrent_events/December_2025 "Portal:Current events/December 2025") |
 | [2024](/wiki/2024 "2024") | * [Jan](/wiki/Portal%3ACurrent_events/January_2024 "Portal:Current events/January 2024") * [Feb](/wiki/Portal%3ACurrent_events/February_2024 "Portal:Current events/February 2024") * [Mar](/wiki/Portal%3ACurrent_events/March_2024 "Portal:Current events/March 2024") * [Apr](/wiki/Portal%3ACurrent_events/April_2024 "Portal:Current events/April 2024") * [May](/wiki/Portal%3ACurrent_events/May_2024 "Portal:Current events/May 2024") * [Jun](/wiki/Portal%3ACurrent_events/June_2024 "Portal:Current events/June 2024") * [Jul](/wiki/Portal%3ACurrent_events/July_2024 "Portal:Current events/July 2024") * [Aug](/wiki/Portal%3ACurrent_events/August_2024 "Portal:Current events/August 2024") * [Sep](/wiki/Portal%3ACurrent_events/September_2024 "Portal:Current events/September 2024") * [Oct](/wiki/Portal%3ACurrent_events/October_2024 "Portal:Current events/October 2024") * [Nov](/wiki/Portal%3ACurrent_events/November_2024 "Portal:Current events/November 2024") * [Dec](/wiki/Portal%3ACurrent_events/December_2024 "Portal:Current events/December 2024") |
 | [2023](/wiki/2023 "2023") | * [Jan](/wiki/Portal%3ACurrent_events/January_2023 "Portal:Current events/January 2023") * [Feb](/wiki/Portal%3ACurrent_events/February_2023 "Portal:Current events/February 2023") * [Mar](/wiki/Portal%3ACurrent_events/March_2023 "Portal:Current events/March 2023") * [Apr](/wiki/Portal%3ACurrent_events/April_2023 "Portal:Current events/April 2023") * [May](/wiki/Portal%3ACurrent_events/May_2023 "Portal:Current events/May 2023") * [Jun](/wiki/Portal%3ACurrent_events/June_2023 "Portal:Current events/June 2023") * [Jul](/wiki/Portal%3ACurrent_events/July_2023 "Portal:Current events/July 2023") * [Aug](/wiki/Portal%3ACurrent_events/August_2023 "Portal:Current events/August 2023") * [Sep](/wiki/Portal%3ACurrent_events/September_2023 "Portal:Current events/September 2023") * [Oct](/wiki/Portal%3ACurrent_events/October_2023 "Portal:Current events/October 2023") * [Nov](/wiki/Portal%3ACurrent_events/November_2023 "Portal:Current events/November 2023") * [Dec](/wiki/Portal%3ACurrent_events/December_2023 "Portal:Current events/December 2023") |
 | [2022](/wiki/2022 "2022") | * [Jan](/wiki/Portal%3ACurrent_events/January_2022 "Portal:Current events/January 2022") * [Feb](/wiki/Portal%3ACurrent_events/February_2022 "Portal:Current events/February 2022") * [Mar](/wiki/Portal%3ACurrent_events/March_2022 "Portal:Current events/March 2022") * [Apr](/wiki/Portal%3ACurrent_events/April_2022 "Portal:Current events/April 2022") * [May](/wiki/Portal%3ACurrent_events/May_2022 "Portal:Current events/May 2022") * [Jun](/wiki/Portal%3ACurrent_events/June_2022 "Portal:Current events/June 2022") * [Jul](/wiki/Portal%3ACurrent_events/July_2022 "Portal:Current events/July 2022") * [Aug](/wiki/Portal%3ACurrent_events/August_2022 "Portal:Current events/August 2022") * [Sep](/wiki/Portal%3ACurrent_events/September_2022 "Portal:Current events/September 2022") * [Oct](/wiki/Portal%3ACurrent_events/October_2022 "Portal:Current events/October 2022") * [Nov](/wiki/Portal%3ACurrent_events/November_2022 "Portal:Current events/November 2022") * [Dec](/wiki/Portal%3ACurrent_events/December_2022 "Portal:Current events/December 2022") |
 | [2021](/wiki/2021 "2021") | * [Jan](/wiki/Portal%3ACurrent_events/January_2021 "Portal:Current events/January 2021") * [Feb](/wiki/Portal%3ACurrent_events/February_2021 "Portal:Current events/February 2021") * [Mar](/wiki/Portal%3ACurrent_events/March_2021 "Portal:Current events/March 2021") * [Apr](/wiki/Portal%3ACurrent_events/April_2021 "Portal:Current events/April 2021") * [May](/wiki/Portal%3ACurrent_events/May_2021 "Portal:Current events/May 2021") * [Jun](/wiki/Portal%3ACurrent_events/June_2021 "Portal:Current events/June 2021") * [Jul](/wiki/Portal%3ACurrent_events/July_2021 "Portal:Current events/July 2021") * [Aug](/wiki/Portal%3ACurrent_events/August_2021 "Portal:Current events/August 2021") * [Sep](/wiki/Portal%3ACurrent_events/September_2021 "Portal:Current events/September 2021") * [Oct](/wiki/Portal%3ACurrent_events/October_2021 "Portal:Current events/October 2021") * [Nov](/wiki/Portal%3ACurrent_events/November_2021 "Portal:Current events/November 2021") * [Dec](/wiki/Portal%3ACurrent_events/December_2021 "Portal:Current events/December 2021") |
 | [2020](/wiki/2020 "2020") | * [Jan](/wiki/Portal%3ACurrent_events/January_2020 "Portal:Current events/January 2020") * [Feb](/wiki/Portal%3ACurrent_events/February_2020 "Portal:Current events/February 2020") * [Mar](/wiki/Portal%3ACurrent_events/March_2020 "Portal:Current events/March 2020") * [Apr](/wiki/Portal%3ACurrent_events/April_2020 "Portal:Current events/April 2020") * [May](/wiki/Portal%3ACurrent_events/May_2020 "Portal:Current events/May 2020") * [Jun](/wiki/Portal%3ACurrent_events/June_2020 "Portal:Current events/June 2020") * [Jul](/wiki/Portal%3ACurrent_events/July_2020 "Portal:Current events/July 2020") * [Aug](/wiki/Portal%3ACurrent_events/August_2020 "Portal:Current events/August 2020") * [Sep](/wiki/Portal%3ACurrent_events/September_2020 "Portal:Current events/September 2020") * [Oct](/wiki/Portal%3ACurrent_events/October_2020 "Portal:Current events/October 2020") * [Nov](/wiki/Portal%3ACurrent_events/November_2020 "Portal:Current events/November 2020") * [Dec](/wiki/Portal%3ACurrent_events/December_2020 "Portal:Current events/December 2020") |
 
-![](https://en.m.wikipedia.org/wiki/Special:CentralAutoLogin/start?type=1x1&usesul3=1)
+![](https://en.wikipedia.org/wiki/Special:CentralAutoLogin/start?useformat=desktop&type=1x1&usesul3=1)
 
-Retrieved from "<https://en.wikipedia.org/w/index.php?title=Portal:Current_events/January_2025&oldid=1281630831>"
+Retrieved from "<https://en.wikipedia.org/w/index.php?title=Portal:Current_events/January_2025&oldid=1330530208>"
 
-[Last edited on 21 March 2025, at 14:47](/w/index.php?title=Portal:Current_events/January_2025&action=history)
+[Categories](/wiki/Help%3ACategory "Help:Category"):
 
-#### Languages
+* [2025 by day](/wiki/Category%3A2025_by_day "Category:2025 by day")
+* [January](/wiki/Category%3AJanuary "Category:January")
+* [2025](/wiki/Category%3A2025 "Category:2025")
+* [Months in the 2020s](/wiki/Category%3AMonths_in_the_2020s "Category:Months in the 2020s")
+* [Current events archives](/wiki/Category%3ACurrent_events_archives "Category:Current events archives")
 
-* [العربية](https://ar.wikipedia.org/wiki/%D8%A8%D9%88%D8%A7%D8%A8%D8%A9%3A%D8%A3%D8%AD%D8%AF%D8%A7%D8%AB_%D8%AC%D8%A7%D8%B1%D9%8A%D8%A9/%D9%8A%D9%86%D8%A7%D9%8A%D8%B1_2025 "بوابة:أحداث جارية/يناير 2025 – Arabic")
-* [বাংলা](https://bn.wikipedia.org/wiki/%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A7%81%E0%A6%AF%E0%A6%BC%E0%A6%BE%E0%A6%B0%E0%A6%BF_%E0%A7%A8%E0%A7%A6%E0%A7%A8%E0%A7%AB-%E0%A6%8F%E0%A6%B0_%E0%A6%98%E0%A6%9F%E0%A6%A8%E0%A6%BE%E0%A6%AC%E0%A6%B2%E0%A6%BF "জানুয়ারি ২০২৫-এর ঘটনাবলি – Bangla")
-* [ไทย](https://th.wikipedia.org/wiki/%E0%B8%A1%E0%B8%81%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%A1_%E0%B8%9E.%E0%B8%A8._2568 "มกราคม พ.ศ. 2568 – Thai")
-* [اردو](https://ur.wikipedia.org/wiki/%D8%A8%D8%A7%D8%A8%3A%D8%AD%D8%A7%D9%84%DB%8C%DB%81_%D9%88%D8%A7%D9%82%D8%B9%D8%A7%D8%AA/%D8%AC%D9%86%D9%88%D8%B1%DB%8C_2025 "باب:حالیہ واقعات/جنوری 2025 – Urdu")
+Hidden category:
 
-![Wikipedia](/static/images/mobile/copyright/wikipedia-wordmark-en.svg)
+* [Interlanguage link template existing link](/wiki/Category%3AInterlanguage_link_template_existing_link "Category:Interlanguage link template existing link")
 
-* This page was last edited on 21 March 2025, at 14:47 (UTC).
-* Content is available under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.en) unless otherwise noted.
+* This page was last edited on 1 January 2026, at 00:07 (UTC).
+* Text is available under the [Creative Commons Attribution-ShareAlike 4.0 License](/wiki/Wikipedia%3AText_of_the_Creative_Commons_Attribution-ShareAlike_4.0_International_License "Wikipedia:Text of the Creative Commons Attribution-ShareAlike 4.0 International License");
+  additional terms may apply. By using this site, you agree to the [Terms of Use](https://foundation.wikimedia.org/wiki/Special%3AMyLanguage/Policy%3ATerms_of_Use "foundation:Special:MyLanguage/Policy:Terms of Use") and [Privacy Policy](https://foundation.wikimedia.org/wiki/Special%3AMyLanguage/Policy%3APrivacy_policy "foundation:Special:MyLanguage/Policy:Privacy policy"). Wikipedia® is a registered trademark of the [Wikimedia Foundation, Inc.](https://wikimediafoundation.org/), a non-profit organization.
 
 * [Privacy policy](https://foundation.wikimedia.org/wiki/Special%3AMyLanguage/Policy%3APrivacy_policy)
 * [About Wikipedia](/wiki/Wikipedia%3AAbout)
 * [Disclaimers](/wiki/Wikipedia%3AGeneral_disclaimer)
 * [Contact Wikipedia](//en.wikipedia.org/wiki/Wikipedia%3AContact_us)
+* [Legal & safety contacts](https://foundation.wikimedia.org/wiki/Special%3AMyLanguage/Legal%3AWikimedia_Foundation_Legal_and_Safety_Contact_Information)
 * [Code of Conduct](https://foundation.wikimedia.org/wiki/Special%3AMyLanguage/Policy%3AUniversal_Code_of_Conduct)
 * [Developers](https://developer.wikimedia.org)
 * [Statistics](https://stats.wikimedia.org/#/en.wikipedia.org)
 * [Cookie statement](https://foundation.wikimedia.org/wiki/Special%3AMyLanguage/Policy%3ACookie_statement)
-* [Terms of Use](https://foundation.m.wikimedia.org/wiki/Special%3AMyLanguage/Policy%3ATerms_of_Use)
-* [Desktop](//en.wikipedia.org/w/index.php?title=Portal:Current_events/January_2025&mobileaction=toggle_view_desktop)
+* [Mobile view](//en.wikipedia.org/w/index.php?title=Portal:Current_events/January_2025&mobileaction=toggle_view_mobile)
+
+* [![Wikimedia Foundation](/static/images/footer/wikimedia.svg)](https://www.wikimedia.org/)
+* [![Powered by MediaWiki](/w/resources/assets/mediawiki_compact.svg)](https://www.mediawiki.org/)
+
+Search
+
+Search
+
+Portal:Current events/January 2025
+
+4 languages
+Add topic
