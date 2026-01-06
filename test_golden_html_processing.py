@@ -119,9 +119,11 @@ def test_html_processing_with_refactored_main() -> None:
             generated_fm, generated_body = parse_jekyll_post(generated_content_full)
             reference_fm, reference_body = parse_jekyll_post(reference_content_full)
 
-            # Remove last_modified_at from generated front matter for comparison
+            # Remove last_modified_at from both front matters for comparison
             if "last_modified_at" in generated_fm:
                 del generated_fm["last_modified_at"]
+            if "last_modified_at" in reference_fm:
+                del reference_fm["last_modified_at"]
 
             if generated_fm != reference_fm or generated_body.strip() != reference_body.strip():
                 source_html_candidate = f"{event_date.strftime('%B').lower()}_{event_date.year}.html"
