@@ -293,11 +293,11 @@ wheels = [
 
 [[package]]
 name = "immutabledict"
-version = "4.3.0"
+version = "4.3.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/31/d5/99764e9a1fa555d0c0be0ea03ed42f32a6948ee00fd135b436e7ea35153c/immutabledict-4.3.0.tar.gz", hash = "sha256:9a6ea13c6baacebdcecb3aed3f1fb571bc3d600777d87518f1d176cc8b207e9c", size = 6863, upload-time = "2026-02-10T18:15:01.808Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1d/e6/718471048fea0366c3e3d1df3acfd914ca66d571cdffcf6d37bbcd725708/immutabledict-4.3.1.tar.gz", hash = "sha256:f844a669106cfdc73f47b1a9da003782fb17dc955a54c80972e0d93d1c63c514", size = 7806, upload-time = "2026-02-15T10:32:34.668Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/58/17/6c49e68e6b1824ba03483fd1adcdebad7f8a261bb332ae8d4f0aae9d448a/immutabledict-4.3.0-py3-none-any.whl", hash = "sha256:998d43d1dbc3a0e733ce4135c1c948aa7866c256761d3fa63d8627366502ca00", size = 4923, upload-time = "2026-02-10T18:15:00.378Z" },
+    { url = "https://files.pythonhosted.org/packages/a3/ce/f9018bf69ae91b273b6391a095e7c93fa5e1617f25b6ba81ad4b20c9df10/immutabledict-4.3.1-py3-none-any.whl", hash = "sha256:c9facdc0ff30fdb8e35bd16532026cac472a549e182c94fa201b51b25e4bf7bf", size = 5000, upload-time = "2026-02-15T10:32:33.672Z" },
 ]
 
 [[package]]
