@@ -1103,3 +1103,45 @@ class TestSaveNews:
 
         assert "last_modified_at" not in front_matter
         assert body.strip() == initial_body.strip()
+
+
+class TestMainFunctionExecution:
+    @patch("wikipedia_news_downloader.sys.exit")
+    @patch("wikipedia_news_downloader.MarkItDown")
+    @patch("wikipedia_news_downloader.setup_logging")
+    def test_main_exits_on_403_error(
+        self,
+        mock_setup_logging: MagicMock,
+        mock_markitdown_class: MagicMock,
+        mock_sys_exit: MagicMock,
+        tmp_path: Path,
+    ) -> None:
+        """
+        Test that the main function exits with code 1 if a worker encounters a 403 error.
+        """
+        # Configure the mock MarkItDown converter to raise a 403 error
+        mock_converter_instance = MagicMock()
+        response_mock = MagicMock()
+        response_mock.status_code = 403
+        error = requests.exceptions.RequestException("Forbidden", response=response_mock)
+        mock_converter_instance.convert.side_effect = error
+        mock_markitdown_class.return_value = mock_converter_instance
+
+        # Mock the logger
+        mock_logger = MagicMock(spec=logging.Logger)
+        mock_setup_logging.return_value = mock_logger
+
+        output_dir = tmp_path / "output"
+
+        # Run the main function in online mode
+        # We expect this to encounter the 403 and trigger sys.exit(1)
+        main(
+            output_dir_str=str(output_dir),
+            verbose=False,
+            num_workers=1,
+            local_html_files_list=None,
+            logger=mock_logger,
+        )
+
+        # Assert that sys.exit(1) was called
+        mock_sys_exit.assert_called_once_with(1)
