@@ -311,6 +311,7 @@ def worker(
     logger: logging.Logger,
     md_converter: MarkItDown,  # Moved before parameter with default
     local_html_input_dir: str | None = None,
+    fatal_error_event: threading.Event | None = None,
 ) -> None:
     while True:
         try:
@@ -395,6 +396,13 @@ def worker(
                     logger.warning(f"HTTP 429 Too Many Requests for {url_for_error} ({source_name}). Relying on session retry.")
                 elif status_code == 404:
                     logger.warning(f"HTTP 404 Not Found for {url_for_error} ({source_name}). Skipping.")
+                elif status_code == 403:
+                    logger.critical(
+                        f"HTTP 403 Forbidden for {url_for_error} ({source_name}). "
+                        "This is likely a fatal error. Aborting."
+                    )
+                    if fatal_error_event:
+                        fatal_error_event.set()
                 else:
                     # For other request errors, log them. Retries are handled by the session.
                     logger.warning(f"Request error fetching {url_for_error} ({source_name}): {e}. Relying on session retry.")
@@ -460,6 +468,7 @@ def main(
     current_output_dir = output_dir_str
     Path(current_output_dir).mkdir(parents=True, exist_ok=True)
 
+    fatal_error_event = threading.Event()
     processing_queue: queue.Queue[StructuredQueueItem] = queue.Queue()
     items_to_process_count = 0
     operation_mode = ""
@@ -537,6 +546,7 @@ def main(
                 logger,
                 shared_md_converter,  # Moved before effective_local_html_input_dir_str
                 effective_local_html_input_dir_str,
+                fatal_error_event,
             ),
         )
         t.start()
@@ -546,6 +556,10 @@ def main(
         processing_queue.join()  # Only join if items were actually queued and processed
     for t in threads:
         t.join()
+
+    if fatal_error_event.is_set():
+        logger.critical("A fatal error occurred during the download process. Exiting with error status.")
+        sys.exit(1)
 
     logger.info("Wikipedia News Download Complete")
 
