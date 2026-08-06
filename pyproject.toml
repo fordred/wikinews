@@ -64,3 +64,6 @@ ignore_missing_imports = true
 python-preference = "managed"
 
 [tool.pyrefly]
+
+[tool.setuptools]
+py-modules = ["wikipedia_news_downloader"]
