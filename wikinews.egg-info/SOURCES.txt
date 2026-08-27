@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+wikipedia_news_downloader.py
+wikinews.egg-info/PKG-INFO
+wikinews.egg-info/SOURCES.txt
+wikinews.egg-info/dependency_links.txt
+wikinews.egg-info/requires.txt
+wikinews.egg-info/top_level.txt
